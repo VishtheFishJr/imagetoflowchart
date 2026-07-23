@@ -19,7 +19,7 @@ $base64Image = base64_encode($imageData);
 $mimeType = mime_content_type($imagePath);
 
 // Paste your actual Gemini API Key here
-$apiKey = 'YOUR_GEMINI_API_KEY_HERE';
+$apiKey = 'AQ.Ab8RN6IFDksfKy0n1eh-5SErF_HP1AlNw3S4qBR8gwf1xZIl9A';
 
 // 3. Prepare Gemini API Payload
 $payload = [
