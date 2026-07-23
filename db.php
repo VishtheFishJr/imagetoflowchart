@@ -1,5 +1,5 @@
 <?php
-// db.php - Database Connectio
+// db.php - Database Connection
 
 // If PHP runs on the same Droplet, keep 'localhost'.
 // If PHP runs locally on your machine, replace 'localhost' with your Droplet IP '64.23.131.157'.
