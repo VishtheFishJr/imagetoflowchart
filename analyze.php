@@ -2,75 +2,87 @@
 // analyze.php
 require_once 'db.php';
 
-// 1. Get image file path from command-line argument or default to "test.jpg"
+// Ensure response is returned as JSON for web endpoints
+header('Content-Type: application/json');
+
+// 1. Get image file path from argument or default to "test.jpg"
 $imagePath = $argv[1] ?? 'test.jpg';
 
 if (!file_exists($imagePath)) {
-    die("Error: File '{$imagePath}' not found.\n");
+    echo json_encode(['error' => "File '{$imagePath}' not found."]);
+    exit;
 }
 
-echo "Encoding image...\n";
+// 2. Read image and encode as base64
 $imageData = file_get_contents($imagePath);
 $base64Image = base64_encode($imageData);
-
-// Detect image mime type (e.g., image/jpeg or image/png)
 $mimeType = mime_content_type($imagePath);
-$dataUrl = "data:{$mimeType};base64,{$base64Image}";
 
-$apiKey = 'AQ.Ab8RN6I1HnTcfei_bt_Y3wRP8wXZbYz1t6G7jNg7XMhwCQLVDQ'; // Replace with your actual key
+// Paste your actual Gemini API Key here or load from a config file
+$apiKey = 'AQ.Ab8RN6I1HnTcfei_bt_Y3wRP8wXZbYz1t6G7jNg7XMhwCQLVDQ';
 
-// 2. Prepare API payload
+// 3. Prepare Gemini API Payload
 $payload = [
-    'model' => 'gpt-4o-mini',
-    'messages' => [
+    'contents' => [
         [
-            'role' => 'user',
-            'content' => [
-                ['type' => 'text', 'text' => 'Describe what you see in this image in detail.'],
+            'parts' => [
                 [
-                    'type' => 'image_url',
-                    'image_url' => [
-                        'url' => $dataUrl
+                    'text' => 'Describe what you see in this image in detail.'
+                ],
+                [
+                    'inlineData' => [
+                        'mimeType' => $mimeType,
+                        'data' => $base64Image
                     ]
                 ]
             ]
         ]
-    ],
-    'max_tokens' => 300
+    ]
 ];
 
-echo "Sending image to AI...\n";
+// 4. Send cURL request to Google Gemini API
+$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey;
 
-// 3. Send cURL request to OpenAI
-$ch = curl_init('https://api.openai.com/v1/chat/completions');
+$ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer ' . $apiKey
+    'Content-Type: application/json'
 ]);
 
 $response = curl_exec($ch);
+
+if (curl_errno($ch)) {
+    echo json_encode(['error' => 'cURL Error: ' . curl_error($ch)]);
+    curl_close($ch);
+    exit;
+}
 curl_close($ch);
 
 $responseData = json_decode($response, true);
 
+// Check for Gemini API errors
 if (isset($responseData['error'])) {
-    die("API Error: " . $responseData['error']['message'] . "\n");
+    echo json_encode(['error' => 'Gemini API Error: ' . $responseData['error']['message']]);
+    exit;
 }
 
-$aiAnswer = $responseData['choices'][0]['message']['content'] ?? 'No response received.';
+// Extract AI output text
+$aiAnswer = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? 'No response received from Gemini.';
 
-echo "\n--- AI Response ---\n";
-echo $aiAnswer . "\n\n";
-
-// 4. Save to Database on Droplet
+// 5. Save to Database
 try {
     $stmt = $pdo->prepare("INSERT INTO scan_logs (image_path, ai_response) VALUES (?, ?)");
     $stmt->execute([$imagePath, $aiAnswer]);
-    echo "Successfully logged to database!\n";
+
+    // Output clean JSON response
+    echo json_encode([
+        'success' => true,
+        'image_path' => $imagePath,
+        'ai_response' => $aiAnswer
+    ]);
 } catch (PDOException $e) {
-    echo "Database Error: " . $e->getMessage() . "\n";
+    echo json_encode(['error' => 'Database Error: ' . $e->getMessage()]);
 }
 ?>
