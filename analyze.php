@@ -17,7 +17,7 @@ $base64Image = base64_encode($imageData);
 $mimeType = mime_content_type($imagePath);
 $dataUrl = "data:{$mimeType};base64,{$base64Image}";
 
-$apiKey = 'YOUR_OPENAI_API_KEY'; // Replace with your actual key
+$apiKey = 'AQ.Ab8RN6I1HnTcfei_bt_Y3wRP8wXZbYz1t6G7jNg7XMhwCQLVDQ'; // Replace with your actual key
 
 // 2. Prepare API payload
 $payload = [
