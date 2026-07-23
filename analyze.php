@@ -2,10 +2,10 @@
 // analyze.php
 require_once 'db.php';
 
-// Ensure response is returned as JSON for web endpoints
+// Ensure response is returned as valid JSON
 header('Content-Type: application/json');
 
-// 1. Get image file path from argument or default to "test.jpg"
+// 1. Get image file path from CLI argument or default to "test.jpg"
 $imagePath = $argv[1] ?? 'test.jpg';
 
 if (!file_exists($imagePath)) {
@@ -18,8 +18,8 @@ $imageData = file_get_contents($imagePath);
 $base64Image = base64_encode($imageData);
 $mimeType = mime_content_type($imagePath);
 
-// Paste your actual Gemini API Key here or load from a config file
-$apiKey = 'AQ.Ab8RN6I1HnTcfei_bt_Y3wRP8wXZbYz1t6G7jNg7XMhwCQLVDQ';
+// Paste your actual Gemini API Key here
+$apiKey = 'YOUR_GEMINI_API_KEY_HERE';
 
 // 3. Prepare Gemini API Payload
 $payload = [
@@ -40,8 +40,8 @@ $payload = [
     ]
 ];
 
-// 4. Send cURL request to Google Gemini API
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey;
+// 4. Send cURL request to Gemini API (using gemini-3.5-flash)
+$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" . $apiKey;
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -55,10 +55,9 @@ $response = curl_exec($ch);
 
 if (curl_errno($ch)) {
     echo json_encode(['error' => 'cURL Error: ' . curl_error($ch)]);
-    curl_close($ch);
     exit;
 }
-curl_close($ch);
+// Note: curl_close($ch) is omitted here as it is deprecated in PHP 8.5 (and handled automatically)
 
 $responseData = json_decode($response, true);
 
