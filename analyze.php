@@ -131,7 +131,10 @@ B{"Decision?"}
 C(["End"])
 - Add examples from the original image into the flowchart for better explanation, MAKE SURE THE FLOWCHART COVERS THE MAIN TOPIC WITHOUT
 BEING TOO DENSE IN INFORMATION
-- Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, make it compact.'
+- Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, MAKE IT COMPACT. 
+- Dont add too many nodes, only add the most important ones
+- ADD SOME NOTES ON THE SIDE USING BULLET POINTS AND DASHES, NOT JUST BOXES, MAKE IT LOOK NICE.
+- MAKE SURE THE FLOWCHART DOES NOT TAKE TOO MUCH SPACE VERTICALLY.'
                 ],
                 [
                     "inlineData" => [
