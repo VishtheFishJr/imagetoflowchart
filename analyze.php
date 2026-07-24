@@ -91,7 +91,9 @@ Create a clean, professional-looking flowchart:
 - Use clear directional arrows (-->).
 - Label decision arrows with Yes/No when applicable.
 - Organize the layout vertically from top to bottom.
-- Keep spacing clean and avoid overlapping nodes.
+- Keep spacing clean and avoid overlapping nodes
+- Use text in bullet points and dashes in the diagram to make it look nice and detailed.
+- Make it relatively dense with information but not too much to make it look messy, find a balance.
 
 Add Mermaid styling:
 - Add classDef definitions for different node types.
