@@ -45,13 +45,13 @@ if (!$base64Image) {
     exit;
 }
 
-// 2. Prepare Gemini API Payload with strict Mermaid prompt
+// 2. Prepare Gemini API Payload with strict Mermaid prompt (enhanced for visually rich diagrams)
 $payload = [
     'contents' => [
         [
             'parts' => [
                 [
-                    'text' => 'Analyze the flowchart or process in this image and convert it into valid Mermaid.js syntax. Start directly with "graph TD" or "flowchart TD". Do not wrap it in markdown code blocks like ```mermaid. Do not include introductory or concluding text.'
+                    'text' => 'Analyze the flowchart or diagram in this image and convert it into valid Mermaid.js syntax. Start directly with "flowchart TD" or "graph TD". Use appropriate node shapes: rounded boxes ([Text]), decision diamonds {Text}, stadium shapes ([Start/End]), or cylindrical databases [(Database)]. Use clear arrows like --> or -->|Yes| or -->|No|. Do not wrap in markdown code blocks like ```mermaid. Do not include extra conversational text.'
                 ],
                 [
                     'inlineData' => [
@@ -65,7 +65,7 @@ $payload = [
 ];
 
 // 3. Send cURL request to Gemini API (gemini-3.5-flash)
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" . $apiKey;
+$url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=)" . $apiKey;
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
