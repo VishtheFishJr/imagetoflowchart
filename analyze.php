@@ -123,7 +123,12 @@ STRICT MERMAID SYNTAX RULES:
 - Do not use brackets inside node text.
 - Keep node text short (under 50 characters).
 - Replace mathematical symbols with plain text.
-- Escape special characters.'
+- Escape special characters.
+Always wrap node labels in double quotes.
+Example:
+A["Start Process"]
+B{"Decision?"}
+C(["End"])'
                 ],
                 [
                     "inlineData" => [
