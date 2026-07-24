@@ -78,63 +78,79 @@ $payload = [
             "parts" => [
                 [
                     "text" =>
-                        'Analyze the image and convert it into a detailed Mermaid.js flowchart.
+                        'Analyze the image and convert it into a detailed Mermaid.js diagram.
 
-Return ONLY Mermaid syntax. No markdown, no explanations.
-The first line must be:
+Return ONLY Mermaid syntax. No markdown or explanations.
+Start with:
 flowchart TD
 
-Create a visually rich, information-dense, professional flowchart.
+Create a professional, information-dense diagram that looks like a polished infographic, not a simple chain of boxes.
 
-CONTENT RULES:
-- Capture the important details from the image.
-- Do not oversimplify.
-- Include explanations, conditions, steps, examples, and important notes inside nodes.
-- Prefer fewer detailed nodes over many tiny nodes.
-- Each node should contain useful information.
-- Use multi-line node labels with <br/>.
-- Use bullet points (•) or dashes (-) inside nodes whenever a step has multiple details.
-
-NODE FORMATTING:
-- Start/end nodes:
-  A(["Start or End"])
-- Process nodes:
-  A["Title<br/>• Detail 1<br/>• Detail 2<br/>• Detail 3"]
-- Decision nodes:
-  A{"Question or Condition"}
-- Database/data nodes:
-  A[("Stored Data<br/>• Item 1<br/>• Item 2")]
+CONTENT:
+- Extract as much useful information from the image as possible.
+- Include explanations, examples, definitions, conditions, and notes.
+- Balance detail and readability.
+- Do not make every piece of information its own node.
+- Use a mixture of:
+  - flowchart nodes for main steps
+  - annotation/info boxes for extra details
+  - subgraph compartments for related sections
 
 LAYOUT:
-- Use flowchart TD.
-- Make it compact and balanced.
-- Avoid extremely long vertical diagrams.
-- Group related ideas together.
-- Use arrows between all logical steps.
-- Label decision arrows with Yes/No.
-- Avoid unnecessary nodes.
+- Use subgraph sections to organize related concepts.
+- Add side information boxes connected with dashed arrows.
+- Put supporting explanations, bullet lists, and notes in separate boxes near the relevant step.
+- Create visual grouping like a textbook diagram.
+- Keep the diagram compact and avoid excessive vertical scrolling.
 
-MERMAID SAFETY:
-- Every node must have a unique ID.
-- Every node label must be wrapped in double quotes.
+NODE STYLES:
+
+Main process:
+A["Process Name<br/>• Step detail<br/>• Important point"]
+
+Decision:
+A{"Decision question"}
+
+Start/end:
+A(["Start / End"])
+
+Information boxes:
+A["Notes:<br/>• Explanation<br/>• Example<br/>• Key fact"]
+
+Use dashed arrows for explanations:
+A -.-> B
+
+Use normal arrows for the main flow:
+A --> B
+
+TEXT:
+- Use <br/> for line breaks.
+- Use bullet points (•) and dashes (-) frequently.
+- Put details outside main flow nodes when they are supporting information.
+- Keep main nodes clean and readable.
+
+MERMAID RULES:
+- Every node needs a unique ID.
+- Wrap all labels in double quotes.
+- Never put raw [] or {} inside text.
+- Only use {} for decision diamonds.
 - Never put text after a closing bracket.
-- Never use [] or {} characters inside node text.
-- Only use {} for actual decision nodes.
-- Replace mathematical symbols and special characters with words.
+- Escape special characters.
 - Keep syntax valid Mermaid.
 
 STYLING:
-Add classDef styling at the end:
-- Green rounded nodes for start/end.
-- Blue nodes for processes.
-- Yellow nodes for decisions.
-- Purple nodes for databases.
-- Use readable text colors and borders.
-- Apply styles using class statements.
+Add classDef at the bottom:
+- Green start/end nodes
+- Blue process nodes
+- Yellow decisions
+- Purple data nodes
+- Gray/white info boxes
+- Rounded corners
+- Clear borders
 
-If the image is not already a flowchart, create a logical flowchart that organizes the information.
+Apply styles with class statements.
 
-Return ONLY the final Mermaid code.
+Return ONLY Mermaid syntax.
 '
                 ],
                 [
