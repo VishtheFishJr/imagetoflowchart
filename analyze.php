@@ -45,7 +45,7 @@ if (!$base64Image) {
     exit;
 }
 
-// 2. Prepare Gemini API Payload with strict Mermaid prompt
+// 2. Prepare Gemini API Payload
 $payload = [
     'contents' => [
         [
@@ -64,17 +64,25 @@ $payload = [
     ]
 ];
 
-// 3. Send cURL request to Gemini API (gemini-1.5-flash)
-// We trim everything to guarantee no stray spaces break the cURL address parser
-$url = trim("[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=)") . urlencode(trim($apiKey));
+// 3. Send cURL request to Gemini API
+// Using single quotes and zero concatenation to completely prevent parsing bugs
+$url = '[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent)';
 
-$ch = curl_init($url);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); // Forces standard IPv4 resolution
+
+// Safety fallbacks to prevent network/IPv6 rejection
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+// Pass the API key cleanly via headers
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'x-goog-api-key: ' . trim($apiKey)
 ]);
 
 $response = curl_exec($ch);
