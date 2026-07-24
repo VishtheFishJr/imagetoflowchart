@@ -110,7 +110,12 @@ classDef database fill:#DDA0DD,stroke:#333,stroke-width:2px,color:#000;
 
 Apply these styles to all appropriate nodes.
 
-Return only the final Mermaid syntax.'
+Return only the final Mermaid syntax. Do not add "```mermaid" at the start or "```" at the end.
+IMPORTANT MERMAID RULES:
+- Escape all curly braces that are part of normal text.
+- Only use {Text} syntax for actual decision diamond nodes.
+- Never put mathematical notation, sets, equations, or examples containing {} directly inside nodes.
+- Replace curly braces in text with parentheses.'
                 ],
                 [
                     "inlineData" => [
