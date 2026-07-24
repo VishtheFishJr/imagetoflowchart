@@ -95,9 +95,11 @@ Create a clean, professional-looking flowchart:
 - Use text in bullet points and dashes in the diagram to make it look nice and detailed.
 - Make it relatively dense with information but not too much to make it look messy, find a balance.
 - Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, MAKE IT COMPACT. 
-- Dont add too many nodes, only add the most important ones
-- ADD SOME NOTES ON THE SIDE OF THE FLOWCHART, NOT IN THE BOXES BUT AROUND IT AND NEAR WHAT IT IS RELATED TO, USING BULLET POINTS AND DASHES, NOT JUST BOXES, MAKE IT LOOK NICE.
-- MAKE SURE THE FLOWCHART DOES NOT TAKE TOO MUCH SPACE VERTICALLY, BUT IT SHOULD STILL HAVE A LOT OF CONTENT.
+- Node labels may contain multiple lines.
+- Use <br/> for line breaks.
+- Use bullet points (•) or dashes (-) for lists.
+- Do not use raw square brackets or curly braces inside text.
+- Keep all node labels wrapped in quotes.
 
 Add Mermaid styling:
 - Add classDef definitions for different node types.
