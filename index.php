@@ -201,6 +201,16 @@
 
                     let code = data.ai_response;
 
+                    // Remove markdown
+                    code = code.replace(/```mermaid/gi, "")
+                        .replace(/```/g, "")
+                        .trim();
+
+                    // Escape curly braces inside node labels
+                    code = code.replace(/\[([^\]]*)\]/g, function (match, text) {
+                        return "[" + text.replace(/{/g, "&#123;").replace(/}/g, "&#125;") + "]";
+                    });
+
 
                     // Remove accidental markdown
                     code = code
