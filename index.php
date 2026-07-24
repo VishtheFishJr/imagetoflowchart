@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Camera Scanner</title>
+    <title>AI Flowchart Scanner</title>
+    <script type="module">
+        import mermaid from '[https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs](https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs)';
+        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+        window.mermaid = mermaid;
+    </script>
     <style>
         body {
             font-family: sans-serif;
@@ -16,7 +21,7 @@
         }
 
         .container {
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             text-align: center;
         }
@@ -48,8 +53,14 @@
             padding: 15px;
             background: #fff;
             border-radius: 8px;
-            text-align: left;
+            text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        #ai-status {
+            color: #666;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -57,16 +68,17 @@
 <body>
 
     <div class="container">
-        <h2>AI Camera Scanner</h2>
+        <h2>AI Flowchart Scanner</h2>
 
         <video id="webcam" autoplay playsinline></video>
         <canvas id="canvas" style="display: none;"></canvas>
 
-        <button id="capture-btn">Snap & Ask AI</button>
+        <button id="capture-btn">Snap & Convert to Flowchart</button>
 
         <div id="result">
-            <strong>AI Analysis:</strong>
-            <p id="ai-text">Click "Snap & Ask AI" to start...</p>
+            <strong>Flowchart Output:</strong>
+            <p id="ai-status">Click "Snap & Convert to Flowchart" to start...</p>
+            <div id="flowchart-render"></div>
         </div>
     </div>
 
@@ -74,7 +86,8 @@
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const captureBtn = document.getElementById('capture-btn');
-        const aiText = document.getElementById('ai-text');
+        const aiStatus = document.getElementById('ai-status');
+        const flowchartRender = document.getElementById('flowchart-render');
 
         // 1. Request access to the user's camera
         async function initCamera() {
@@ -82,14 +95,15 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 video.srcObject = stream;
             } catch (err) {
-                aiText.innerText = "Error accessing camera: " + err.message;
+                aiStatus.innerText = "Error accessing camera: " + err.message;
             }
         }
 
         // 2. Capture Frame and Send to PHP
         captureBtn.addEventListener('click', async () => {
             captureBtn.disabled = true;
-            aiText.innerText = "Analyzing image with AI...";
+            aiStatus.innerText = "Analyzing image with AI...";
+            flowchartRender.innerHTML = "";
 
             // Set canvas size matching video frame
             canvas.width = video.videoWidth;
@@ -113,18 +127,28 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    aiText.innerText = data.ai_response;
+                    aiStatus.innerText = "Flowchart generated successfully!";
+
+                    // Format Mermaid syntax into container
+                    flowchartRender.innerHTML = `<pre class="mermaid">${data.ai_response}</pre>`;
+
+                    // Render diagram visually using Mermaid
+                    if (window.mermaid) {
+                        await window.mermaid.run({
+                            nodes: [flowchartRender.querySelector('.mermaid')]
+                        });
+                    }
                 } else {
-                    aiText.innerText = "Error: " + (data.error || "Failed to analyze.");
+                    aiStatus.innerText = "Error: " + (data.error || "Failed to analyze.");
                 }
             } catch (error) {
-                aiText.innerText = "Network Error: " + error.message;
+                aiStatus.innerText = "Network Error: " + error.message;
             } finally {
                 captureBtn.disabled = false;
             }
         });
 
-        // Initialize on page load
+        // Initialize camera on page load
         initCamera();
     </script>
 
