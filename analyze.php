@@ -128,7 +128,10 @@ Always wrap node labels in double quotes.
 Example:
 A["Start Process"]
 B{"Decision?"}
-C(["End"])'
+C(["End"])
+- Add examples from the original image into the flowchart for better explanation, MAKE SURE THE FLOWCHART COVERS THE MAIN TOPIC WITHOUT
+BEING TOO DENSE IN INFORMATION
+- Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, make it compact.'
                 ],
                 [
                     "inlineData" => [
