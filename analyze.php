@@ -66,7 +66,7 @@ $payload = [
 
 // 3. Send cURL request to Gemini API
 // Using single quotes and zero concatenation to completely prevent parsing bugs
-$url = '[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent)';
+$url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
