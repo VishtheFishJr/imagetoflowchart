@@ -78,65 +78,47 @@ $payload = [
             "parts" => [
                 [
                     "text" =>
-                        'Analyze the flowchart or diagram in this image and convert it into valid Mermaid.js syntax.
+                        'Analyze the image and convert it into valid Mermaid.js syntax.
 
-Return ONLY Mermaid code. Do not use markdown code blocks. Start directly with "flowchart TD".
+Return ONLY Mermaid code. No markdown, no explanations. Start with:
+flowchart TD
 
-Create a clean, professional-looking flowchart:
-- Use descriptive node names.
-- Use rounded rectangles ([Text]) for start/end and process steps.
-- Use diamonds {Text} for decisions.
-- Use cylinders [(Text)] for databases or stored data.
-- Use document shapes where appropriate.
-- Use clear directional arrows (-->).
-- Label decision arrows with Yes/No when applicable.
-- Organize the layout vertically from top to bottom.
-- Keep spacing clean and avoid overlapping nodes
-- Use text in bullet points and dashes in the diagram to make it look nice and detailed.
-- Make it relatively dense with information but not too much to make it look messy, find a balance.
-- Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, MAKE IT COMPACT. 
-- Node labels may contain multiple lines.
-- Use <br/> for line breaks.
-- Use bullet points (•) or dashes (-) for lists.
-- Do not use raw square brackets or curly braces inside text.
-- Keep all node labels wrapped in quotes.
+Create a clean, compact, professional flowchart:
+- Use descriptive but short node labels.
+- Use rounded boxes for start/end: A(["Text"])
+- Use rectangles for processes: A["Text"]
+- Use diamonds for decisions: A{"Text"}
+- Use cylinders for databases: A[("Text")]
+- Connect every node with arrows.
+- Label decision arrows Yes/No when needed.
+- Keep the layout top-to-bottom and compact.
+- Avoid long vertical spacing.
+- Use <br/> for multiple lines.
+- Use bullets (•) or dashes (-) for lists.
+- Keep nodes detailed but not overcrowded.
 
-Add Mermaid styling:
-- Add classDef definitions for different node types.
-- Use different colors for start/end, processes, decisions, databases, and important steps.
-- Add rounded corners and readable text colors.
-- Apply styles using class statements.
-- Make the diagram visually appealing and presentation-ready.
+Formatting rules:
+- Every node must have a unique ID.
+- Every node label must be inside double quotes.
+- Never put text after a closing node bracket.
+- Never use raw [] or {} inside node text.
+- Replace mathematical symbols and special characters with plain text.
+- Only use {} for actual decision diamonds.
+- Keep node text under 50 characters when possible.
 
-If the image is not a flowchart, create a logical flowchart representing the content shown.
+Add Mermaid styling at the bottom:
+- Use classDef for start/end, processes, decisions, databases, and important nodes.
+- Apply colors, borders, rounded corners, and readable text.
 
-Example style format:
+Example style:
 classDef startEnd fill:#90EE90,stroke:#333,stroke-width:2px,color:#000;
 classDef process fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000;
 classDef decision fill:#FFD700,stroke:#333,stroke-width:2px,color:#000;
 classDef database fill:#DDA0DD,stroke:#333,stroke-width:2px,color:#000;
 
-Apply these styles to all appropriate nodes.
+If the image is not a flowchart, create a logical flowchart representing the information shown.
 
-Return only the final Mermaid syntax. Do not add "```mermaid" at the start or "```" at the end.
-IMPORTANT MERMAID RULES:
-- Escape all curly braces that are part of normal text.
-- Only use {Text} syntax for actual decision diamond nodes.
-- Never put mathematical notation, sets, equations, or examples containing {} directly inside nodes.
-- Replace curly braces in text with parentheses.
-STRICT MERMAID SYNTAX RULES:
-- Every node must be on its own line.
-- Never put text after a closing node bracket ].
-- Every arrow must connect complete nodes.
-- Do not use brackets inside node text.
-- Keep node text short (under 50 characters).
-- Replace mathematical symbols with plain text.
-- Escape special characters.
-Always wrap node labels in double quotes.
-Example:
-A["Start Process"]
-B{"Decision?"}
-C(["End"])
+Output only Mermaid syntax.
 '
                 ],
                 [
