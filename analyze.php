@@ -78,7 +78,7 @@ $payload = [
             "parts" => [
                 [
                     "text" =>
-                        'Analyze the flowchart or diagram in this image and convert it into valid Mermaid.js syntax. Start directly with flowchart TD or graph TD. Use appropriate node shapes. Do not wrap the answer in markdown. Return only Mermaid syntax.'
+                        'Analyze the flowchart or diagram in this image and convert it into valid Mermaid.js syntax. Start directly with flowchart TD or graph TD. Use appropriate node shapes. Do not wrap the answer in markdown. Return only Mermaid syntax. No matter what the content is, generate a flowchart for it.'
                 ],
                 [
                     "inlineData" => [
