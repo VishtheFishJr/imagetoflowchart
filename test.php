@@ -1,6 +1,6 @@
 <?php
 
-$apiKey = "AQ.Ab8RN6LlBIyYLF8zy-X8-pAIcEsNIJUcK96_3o78KzGd-YuI4w";
+$apiKey = "AQ.Ab8RN6LQwwMMPp9NQdqOsUvG1zSm-DoUCc85bJ0FDiEj7q5Ceg";
 
 $url = "https://generativelanguage.googleapis.com/v1beta/models";
 
