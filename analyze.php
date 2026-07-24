@@ -115,7 +115,15 @@ IMPORTANT MERMAID RULES:
 - Escape all curly braces that are part of normal text.
 - Only use {Text} syntax for actual decision diamond nodes.
 - Never put mathematical notation, sets, equations, or examples containing {} directly inside nodes.
-- Replace curly braces in text with parentheses.'
+- Replace curly braces in text with parentheses.
+STRICT MERMAID SYNTAX RULES:
+- Every node must be on its own line.
+- Never put text after a closing node bracket ].
+- Every arrow must connect complete nodes.
+- Do not use brackets inside node text.
+- Keep node text short (under 50 characters).
+- Replace mathematical symbols with plain text.
+- Escape special characters.'
                 ],
                 [
                     "inlineData" => [
