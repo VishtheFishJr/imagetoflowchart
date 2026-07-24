@@ -78,7 +78,39 @@ $payload = [
             "parts" => [
                 [
                     "text" =>
-                        'Analyze the flowchart or diagram in this image and convert it into valid Mermaid.js syntax. Start directly with flowchart TD or graph TD. Use appropriate node shapes. Do not wrap the answer in markdown. Return only Mermaid syntax. No matter what the content is, generate a flowchart for it.'
+                        'Analyze the flowchart or diagram in this image and convert it into valid Mermaid.js syntax.
+
+Return ONLY Mermaid code. Do not use markdown code blocks. Start directly with "flowchart TD".
+
+Create a clean, professional-looking flowchart:
+- Use descriptive node names.
+- Use rounded rectangles ([Text]) for start/end and process steps.
+- Use diamonds {Text} for decisions.
+- Use cylinders [(Text)] for databases or stored data.
+- Use document shapes where appropriate.
+- Use clear directional arrows (-->).
+- Label decision arrows with Yes/No when applicable.
+- Organize the layout vertically from top to bottom.
+- Keep spacing clean and avoid overlapping nodes.
+
+Add Mermaid styling:
+- Add classDef definitions for different node types.
+- Use different colors for start/end, processes, decisions, databases, and important steps.
+- Add rounded corners and readable text colors.
+- Apply styles using class statements.
+- Make the diagram visually appealing and presentation-ready.
+
+If the image is not a flowchart, create a logical flowchart representing the content shown.
+
+Example style format:
+classDef startEnd fill:#90EE90,stroke:#333,stroke-width:2px,color:#000;
+classDef process fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000;
+classDef decision fill:#FFD700,stroke:#333,stroke-width:2px,color:#000;
+classDef database fill:#DDA0DD,stroke:#333,stroke-width:2px,color:#000;
+
+Apply these styles to all appropriate nodes.
+
+Return only the final Mermaid syntax.'
                 ],
                 [
                     "inlineData" => [
