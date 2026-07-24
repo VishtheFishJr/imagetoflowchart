@@ -64,15 +64,16 @@ $payload = [
     ]
 ];
 
-// 3. Send cURL request to Gemini API (gemini-3.5-flash)
-// ✅ FIXED (Properly encodes special characters for the URL):
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . urlencode(trim($apiKey));
+// 3. Send cURL request to Gemini API (gemini-3.5-flash) using x-goog-api-key header
+$url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent)";
+
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'x-goog-api-key: ' . trim($apiKey)
 ]);
 
 $response = curl_exec($ch);
