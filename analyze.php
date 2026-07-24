@@ -78,88 +78,113 @@ $payload = [
             "parts" => [
                 [
                     "text" =>
-                        'Analyze the image and convert it into a beautiful, visually appealing Mermaid.js diagram.
+                        'Analyze the image and convert it into a highly visual Mermaid.js infographic diagram.
 
-Return ONLY Mermaid syntax. No markdown. No explanations.
-Start exactly with:
+Return ONLY Mermaid syntax.
+No markdown. No explanations.
+Start with:
 flowchart TD
 
-DESIGN GOAL:
-Create a polished infographic-style diagram, similar to a professional textbook illustration or presentation slide.
-Make it visually engaging with colors, sections, annotations, and balanced information density.
+GOAL:
+Create a polished, colorful educational diagram that looks like a professional infographic, not a basic flowchart.
+
+The diagram should contain:
+- Main flow boxes
+- Supporting text sections
+- Side annotations
+- Callout notes
+- Labels and explanations outside the main flow
+- Organized compartments
+- Visual hierarchy
 
 CONTENT:
-- Extract important concepts, steps, explanations, examples, and relationships from the image.
-- Do not oversimplify.
-- Include a good amount of useful text, but keep it easy to read.
-- Use a balance of main flow steps and supporting information.
-- Put explanations and details into separate note/info boxes instead of making every main node huge.
+- Extract detailed information from the image.
+- Include important explanations, examples, definitions, and relationships.
+- Use a balanced amount of text.
+- Do not make every detail a main flow node.
+- Keep the main path simple and place extra information around it.
 
 LAYOUT:
-- Use subgraph sections to create organized compartments.
-- Arrange related ideas into groups.
-- Use main arrows for the primary flow.
-- Use dashed arrows for explanations, references, and supporting information.
-- Add side panels, notes, and callout boxes when helpful.
-- Keep the diagram compact while still detailed.
-- Avoid a single long vertical chain.
+- Use subgraph sections as visual compartments.
+- Add separate information boxes near related nodes.
+- Connect explanation boxes using dashed arrows.
+- Use arrow labels for additional text when useful.
+- Use side notes and callouts instead of putting everything inside main boxes.
+- Make it feel like a diagram from a textbook or presentation.
+- Keep it compact and balanced.
 
-NODE DESIGN:
-Use different shapes:
+TEXT PLACEMENT:
+Use different types of text:
 
+Main nodes:
+A["Main Step<br/>• Important detail<br/>• Key information"]
+
+Side annotations:
+B["Explanation:<br/>• Additional context<br/>• Example<br/>• Important note"]
+
+Arrow labels:
+A -->|Reason / Explanation| B
+
+Section titles:
+Use subgraph titles to separate topics.
+
+Use bullet points and dashes frequently:
+• Point one
+• Point two
+- Detail
+- Example
+
+SHAPES:
 Start/end:
-A(["Start / End"])
+A(["Start"])
 
-Main process:
-A["Title<br/>• Key point<br/>• Important detail"]
+Process:
+A["Process"]
 
 Decision:
-A{"Question?<br/>Choose path"}
+A{"Decision"}
 
-Data/database:
-A[("Data<br/>• Stored information")]
+Database:
+A[("Stored Data")]
 
-Information/callout boxes:
-A["💡 Notes:<br/>• Explanation<br/>• Example<br/>• Important fact"]
+Important note:
+A["★ Key Idea:<br/>• Explanation"]
 
-Use:
-- <br/> for line breaks
-- • for bullet points
-- - for lists
+VISUAL DESIGN:
+Make it colorful and presentation-ready.
 
-VISUAL STYLE:
-Make the diagram colorful and professional.
-
-Create multiple style classes:
-- Start/end: green gradient style
-- Main steps: blue
+Create style classes:
+- Start/end: green
+- Main process: blue
+- Secondary information: light blue
 - Important concepts: purple
 - Decisions: yellow/orange
-- Data: pink/purple
-- Notes: light gray
-- Warnings or key ideas: red accent
+- Data: pink
+- Notes/callouts: gray
+- Warnings: red
 
 Add:
 - Rounded corners
-- Thick but clean borders
-- Readable text colors
-- Different colors for different categories
-- Clear visual hierarchy
+- Strong borders
+- Different colors for categories
+- Clean spacing
+- Clear hierarchy
 
 MERMAID RULES:
 - Every node must have a unique ID.
-- Wrap all node text in double quotes.
-- Never put raw [] or {} inside labels.
-- Only use {} for real decision diamonds.
-- Never put text after a closing bracket.
-- Replace mathematical symbols and unusual characters with words.
-- Escape special characters.
-- Ensure the output runs directly in Mermaid.js.
+- Every node label must be inside double quotes.
+- Never use raw brackets or braces inside text.
+- Only use curly braces for decision diamonds.
+- Never put text after closing brackets.
+- Use <br/> for line breaks.
+- Replace unsupported symbols with plain text.
+- Make sure the Mermaid code runs without errors.
 
-FINAL REQUIREMENT:
-The result should look like a finished infographic diagram, not a basic flowchart.
+IMPORTANT:
+Do not create only a vertical chain of boxes.
+Create a visually rich diagram with surrounding annotations, callouts, compartments, and supporting text.
 
-Return only valid Mermaid syntax.
+Return only Mermaid syntax.
 '
                 ],
                 [
