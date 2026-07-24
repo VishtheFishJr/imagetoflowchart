@@ -5,7 +5,7 @@ require_once 'db.php';
 // Ensure response is returned as valid JSON
 header('Content-Type: application/json');
 
-// Paste your actual Gemini API Key here
+// Your Gemini API Key
 $apiKey = 'AQ.Ab8RN6LlBIyYLF8zy-X8-pAIcEsNIJUcK96_3o78KzGd-YuI4w';
 
 // 1. Read input: Supports both JSON POST requests (from web) and CLI args
@@ -45,7 +45,7 @@ if (!$base64Image) {
     exit;
 }
 
-// 2. Prepare Gemini API Payload with strict Mermaid prompt (enhanced for visually rich diagrams)
+// 2. Prepare Gemini API Payload with strict Mermaid prompt
 $payload = [
     'contents' => [
         [
@@ -64,13 +64,14 @@ $payload = [
     ]
 ];
 
-// 3. Send cURL request to Gemini API (gemini-3.5-flash) using x-goog-api-key header
-$url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent)";
+// 3. Send cURL request to Gemini API using x-goog-api-key header and forcing IPv4
+$url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent)";
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); // Prevents IPv6 network resolution errors
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
     'x-goog-api-key: ' . trim($apiKey)
