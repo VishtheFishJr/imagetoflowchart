@@ -70,7 +70,7 @@ if (!$base64Image) {
 // Gemini Request
 // ----------------------------
 
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent";
+$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 
 $payload = [
     "contents" => [
