@@ -94,6 +94,10 @@ Create a clean, professional-looking flowchart:
 - Keep spacing clean and avoid overlapping nodes
 - Use text in bullet points and dashes in the diagram to make it look nice and detailed.
 - Make it relatively dense with information but not too much to make it look messy, find a balance.
+- Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, MAKE IT COMPACT. 
+- Dont add too many nodes, only add the most important ones
+- ADD SOME NOTES ON THE SIDE OF THE FLOWCHART, NOT IN THE BOXES BUT AROUND IT AND NEAR WHAT IT IS RELATED TO, USING BULLET POINTS AND DASHES, NOT JUST BOXES, MAKE IT LOOK NICE.
+- MAKE SURE THE FLOWCHART DOES NOT TAKE TOO MUCH SPACE VERTICALLY, BUT IT SHOULD STILL HAVE A LOT OF CONTENT.
 
 Add Mermaid styling:
 - Add classDef definitions for different node types.
@@ -131,12 +135,7 @@ Example:
 A["Start Process"]
 B{"Decision?"}
 C(["End"])
-- Add examples from the original image into the flowchart for better explanation, MAKE SURE THE FLOWCHART COVERS THE MAIN TOPIC WITHOUT
-BEING TOO DENSE IN INFORMATION
-- Make sure the arrows arent too long vertically, the flowchart shouldnt take up too much space, MAKE IT COMPACT. 
-- Dont add too many nodes, only add the most important ones
-- ADD SOME NOTES ON THE SIDE OF THE FLOWCHART, NOT IN THE BOXES BUT AROUND IT AND NEAR WHAT IT IS RELATED TO, USING BULLET POINTS AND DASHES, NOT JUST BOXES, MAKE IT LOOK NICE.
-- MAKE SURE THE FLOWCHART DOES NOT TAKE TOO MUCH SPACE VERTICALLY, BUT IT SHOULD STILL HAVE A LOT OF CONTENT.'
+'
                 ],
                 [
                     "inlineData" => [
