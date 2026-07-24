@@ -6,7 +6,7 @@ require_once 'db.php';
 header('Content-Type: application/json');
 
 // Paste your actual Gemini API Key here
-$apiKey = 'AQ.Ab8RN6KqGuabgIWkSzh5fgf_cKxvLkAUL8TuiJQEyHYaNaRVUQ';
+$apiKey = 'AQ.Ab8RN6LlBIyYLF8zy-X8-pAIcEsNIJUcK96_3o78KzGd-YuI4w';
 
 // 1. Read input: Supports both JSON POST requests (from web) and CLI args
 $input = json_decode(file_get_contents('php://input'), true);
