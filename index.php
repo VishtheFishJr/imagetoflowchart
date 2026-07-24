@@ -7,7 +7,13 @@
     <title>AI Flowchart Scanner</title>
     <script type="module">
         import mermaid from '[https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs](https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs)';
-        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: "default",
+            flowchart: {
+                curve: "basis"
+            }
+        });
         window.mermaid = mermaid;
     </script>
     <style>
