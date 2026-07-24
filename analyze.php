@@ -64,17 +64,17 @@ $payload = [
     ]
 ];
 
-// 3. Send cURL request to Gemini API
-$url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent)";
+// 3. Send cURL request to Gemini API (gemini-1.5-flash)
+// We trim everything to guarantee no stray spaces break the cURL address parser
+$url = trim("[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=)") . urlencode(trim($apiKey));
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); // Forces IPv4 to resolve cURL network issues
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); // Forces standard IPv4 resolution
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'x-goog-api-key: ' . trim($apiKey)
+    'Content-Type: application/json'
 ]);
 
 $response = curl_exec($ch);
