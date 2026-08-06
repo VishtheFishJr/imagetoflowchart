@@ -678,9 +678,13 @@
 
 
 
+                // temp
+                const text = await response.text();
 
-                const data =
-                    await response.json();
+                console.log("SERVER RESPONSE:");
+                console.log(text);
+
+                const data = JSON.parse(text);
 
 
 
