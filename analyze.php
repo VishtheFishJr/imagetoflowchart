@@ -414,26 +414,21 @@ $responseData =
 
 if ($httpCode !== 200) {
 
-
     echo json_encode([
-
 
         "error" => "Gemini API Error",
 
-
         "status" => $httpCode,
 
+        "raw_response" => $response
 
-        "response" => $responseData
-
-
-    ]);
-
+    ], JSON_PRETTY_PRINT);
 
     exit;
 
-
 }
+
+
 
 
 
