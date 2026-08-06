@@ -2,118 +2,486 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Study Scanner</title>
+
+
+    <title>
+        AI Study Scanner
+    </title>
+
+
 
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        import mermaid from
+            'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
 
         mermaid.initialize({
+
             startOnLoad: false,
+
             theme: "default",
+
             flowchart: {
+
                 curve: "basis",
+
                 htmlLabels: true
+
             },
+
             securityLevel: "loose"
+
         });
 
+
         window.mermaid = mermaid;
+
+
     </script>
+
+
 
 
     <style>
         body {
-            font-family: sans-serif;
+
+
+            font-family:
+                Arial, Helvetica, sans-serif;
+
+
+            background:
+                linear-gradient(135deg, #eef2ff, #f8fafc);
+
+
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background: #f4f4f9;
+
+            justify-content: center;
+
+            padding: 30px;
+
+
         }
+
 
 
         .container {
 
-            max-width: 900px;
+
             width: 100%;
+
+            max-width: 900px;
+
+
             text-align: center;
 
+
         }
+
+
+
+        h1 {
+
+
+            font-size: 36px;
+
+
+            color: #1e293b;
+
+
+        }
+
+
 
 
         video {
 
+
             width: 100%;
-            border-radius: 10px;
+
+
+            border-radius: 18px;
+
+
             background: black;
 
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, .2);
+
+
         }
+
+
 
 
         canvas {
+
+
             display: none;
+
+
         }
 
 
-        button {
 
-            margin: 10px;
-            padding: 12px 22px;
-            font-size: 16px;
+
+        .mode-container {
+
+
+            margin-top: 20px;
+
+
+            display: flex;
+
+
+            justify-content: center;
+
+
+            gap: 15px;
+
+
+            flex-wrap: wrap;
+
+
+        }
+
+
+
+
+        .mode-btn {
+
+
+            padding: 14px 25px;
+
+
             border: none;
-            border-radius: 6px;
+
+
+            border-radius: 12px;
+
+
+            font-size: 16px;
+
+
             cursor: pointer;
-            background: #007bff;
+
+
+            background: #2563eb;
+
+
             color: white;
 
+
+            transition: .2s;
+
+
         }
 
 
-        button:hover {
 
-            opacity: .85;
+        .mode-btn:hover {
+
+
+            transform: translateY(-2px);
+
+
+            background: #1d4ed8;
+
 
         }
+
+
 
 
         #result {
 
-            margin-top: 20px;
-            padding: 20px;
+
+            margin-top: 30px;
+
+
             background: white;
-            border-radius: 10px;
-            overflow-x: auto;
+
+
+            border-radius: 20px;
+
+
+            padding: 25px;
+
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, .12);
+
 
         }
+
+
 
 
         #flowchart-render {
 
-            margin-top: 20px;
+
+            margin-top: 25px;
+
 
         }
 
 
-        .mermaid {
 
-            display: flex;
-            justify-content: center;
+
+
+
+        /* QUIZ */
+
+
+        .study-card {
+
+
+            background: white;
+
+
+            padding: 25px;
+
+
+            border-radius: 18px;
+
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, .15);
+
+
+            text-align: left;
+
 
         }
 
 
-        pre {
+
+        .choice {
+
+
+            width: 100%;
+
+
+            padding: 15px;
+
+
+            margin: 10px 0;
+
+
+            border-radius: 12px;
+
+
+            border: none;
+
 
             font-size: 16px;
-            line-height: 1.5;
+
+
+            cursor: pointer;
+
+
+            background: #e2e8f0;
+
+
+            text-align: left;
+
+
+        }
+
+
+
+        .choice:hover {
+
+
+            background: #cbd5e1;
+
+
+        }
+
+
+
+        .choice.correct {
+
+
+            background: #86efac;
+
+
+        }
+
+
+
+        .choice.wrong {
+
+
+            background: #fca5a5;
+
+
+        }
+
+
+
+
+
+        /* FLASHCARDS */
+
+
+        .flashcard {
+
+
+            width: 400px;
+
+
+            height: 250px;
+
+
+            margin: 30px auto;
+
+
+            perspective: 1000px;
+
+
+        }
+
+
+
+        .flash-inner {
+
+
+            width: 100%;
+
+
+            height: 100%;
+
+
+            position: relative;
+
+
+            transition: .5s;
+
+
+            transform-style: preserve-3d;
+
+
+            cursor: pointer;
+
+
+        }
+
+
+
+        .flashcard.flip .flash-inner {
+
+
+            transform:
+                rotateY(180deg);
+
+
+        }
+
+
+
+
+        .flash-front,
+        .flash-back {
+
+
+            position: absolute;
+
+
+            width: 100%;
+
+
+            height: 100%;
+
+
+            display: flex;
+
+
+            align-items: center;
+
+
+            justify-content: center;
+
+
+            padding: 25px;
+
+
+            box-sizing: border-box;
+
+
+            border-radius: 20px;
+
+
+            backface-visibility: hidden;
+
+
+            font-size: 22px;
+
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, .2);
+
+
+            background: white;
+
+
+        }
+
+
+
+        .flash-back {
+
+
+            transform:
+                rotateY(180deg);
+
+
+            background: #eff6ff;
+
+
+        }
+
+
+
+
+        .action-btn {
+
+
+            padding: 12px 25px;
+
+
+            margin: 10px;
+
+
+            border: none;
+
+
+            border-radius: 10px;
+
+
+            background: #2563eb;
+
+
+            color: white;
+
+
+            cursor: pointer;
+
+
+            font-size: 16px;
+
 
         }
     </style>
 
-</head>
 
+</head>
 
 
 <body>
@@ -122,34 +490,44 @@
     <div class="container">
 
 
-        <h2>
+        <h1>
             AI Study Scanner
-        </h2>
+        </h1>
 
 
 
         <video id="webcam" autoplay playsinline></video>
 
 
+
         <canvas id="canvas"></canvas>
 
 
 
-        <div>
+        <div class="mode-container">
+
 
             <button class="mode-btn" data-mode="flowchart">
-                Generate Flowchart
+
+                📊 Flowchart
+
             </button>
 
 
             <button class="mode-btn" data-mode="quiz">
-                Generate Quiz
+
+                📝 Quiz
+
             </button>
 
 
             <button class="mode-btn" data-mode="flashcards">
-                Generate Flashcards
+
+                🃏 Flashcards
+
             </button>
+
+
 
         </div>
 
@@ -159,17 +537,22 @@
         <div id="result">
 
 
-            <strong>
-                Output:
-            </strong>
+            <h3>
+                Output
+            </h3>
+
 
 
             <p id="ai-status">
-                Select an option...
+
+                Select a mode and scan an image.
+
             </p>
 
 
+
             <div id="flowchart-render"></div>
+
 
 
         </div>
@@ -177,11 +560,6 @@
 
 
     </div>
-
-
-
-
-
     <script>
 
 
@@ -193,11 +571,11 @@
             document.getElementById("canvas");
 
 
-        const aiStatus =
+        const status =
             document.getElementById("ai-status");
 
 
-        const flowchartRender =
+        const output =
             document.getElementById("flowchart-render");
 
 
@@ -206,6 +584,11 @@
 
 
 
+
+
+        // ----------------------------
+        // CAMERA
+        // ----------------------------
 
 
         async function initCamera() {
@@ -233,7 +616,7 @@
             catch (err) {
 
 
-                aiStatus.innerText =
+                status.innerText =
                     "Camera error: " + err.message;
 
 
@@ -247,21 +630,28 @@
 
 
 
-        document.querySelectorAll(".mode-btn")
+
+        // ----------------------------
+        // BUTTONS
+        // ----------------------------
+
+
+        document
+            .querySelectorAll(".mode-btn")
             .forEach(button => {
 
 
-                button.addEventListener("click", () => {
+                button.onclick = () => {
 
 
                     selectedMode =
                         button.dataset.mode;
 
 
-                    analyzeImage();
+                    scanImage();
 
 
-                });
+                };
 
 
             });
@@ -272,15 +662,21 @@
 
 
 
-        async function analyzeImage() {
 
 
+        // ----------------------------
+        // IMAGE CAPTURE
+        // ----------------------------
 
-            aiStatus.innerText =
-                "Analyzing image...";
+
+        async function scanImage() {
 
 
-            flowchartRender.innerHTML = "";
+            status.innerText =
+                "Analyzing...";
+
+
+            output.innerHTML = "";
 
 
 
@@ -315,8 +711,7 @@
 
 
 
-
-            const imageData =
+            const image =
                 canvas.toDataURL("image/jpeg");
 
 
@@ -325,7 +720,6 @@
 
 
             try {
-
 
 
                 const response =
@@ -347,11 +741,12 @@
 
                             body: JSON.stringify({
 
-                                image: imageData,
+                                image: image,
 
                                 mode: selectedMode
 
                             })
+
 
                         }
 
@@ -368,87 +763,78 @@
 
 
 
-
-                if (data.success) {
-
+                if (!data.success) {
 
 
-                    aiStatus.innerText =
-                        selectedMode +
-                        " generated!";
+                    status.innerText =
+                        data.error;
 
 
+                    return;
 
 
-
-                    if (selectedMode === "flowchart") {
-
-
-
-                        let code =
-                            data.ai_response;
-
-
-
-                        code =
-                            code.replace(/```mermaid/gi, "")
-                                .replace(/```/g, "")
-                                .trim();
+                }
 
 
 
 
 
-                        const div =
-                            document.createElement("div");
-
-
-
-                        div.className =
-                            "mermaid";
-
-
-
-                        div.textContent =
-                            code;
+                status.innerText =
+                    "Generated successfully!";
 
 
 
 
-                        flowchartRender.appendChild(div);
+
+
+                // ------------------------
+                // FLOWCHART
+                // ------------------------
+
+
+                if (selectedMode === "flowchart") {
+
+
+
+                    let code =
+                        data.ai_response;
+
+
+
+                    code =
+                        code
+                            .replace(/```mermaid/gi, "")
+                            .replace(/```/g, "")
+                            .trim();
 
 
 
 
-                        await mermaid.run({
-
-                            nodes: [div]
-
-                        });
+                    const div =
+                        document.createElement("div");
 
 
 
-                    }
+                    div.className =
+                        "mermaid";
 
 
 
-                    else {
+                    div.textContent =
+                        code;
 
 
 
-                        flowchartRender.innerHTML =
-
-                            "<pre>" +
-
-                            data.ai_response +
-
-                            "</pre>";
+                    output.appendChild(div);
 
 
 
-                    }
 
+                    await mermaid.run({
 
+                        nodes: [div]
+
+                    });
 
 
 
@@ -456,14 +842,49 @@
 
 
 
-                else {
 
 
-                    aiStatus.innerText =
-                        "Error: " + data.error;
+
+                // ------------------------
+                // QUIZ
+                // ------------------------
+
+
+                else if (selectedMode === "quiz") {
+
+
+                    const quiz =
+                        JSON.parse(data.ai_response);
+
+
+                    createQuiz(quiz);
+
 
 
                 }
+
+
+
+
+
+
+                // ------------------------
+                // FLASHCARDS
+                // ------------------------
+
+
+                else if (selectedMode === "flashcards") {
+
+
+                    const cards =
+                        JSON.parse(data.ai_response);
+
+
+                    createFlashcards(cards);
+
+
+                }
+
 
 
 
@@ -474,14 +895,11 @@
             catch (err) {
 
 
-                aiStatus.innerText =
-                    "Network Error: " + err.message;
+                status.innerText =
+                    "Error: " + err.message;
 
 
             }
-
-
-
 
 
         }
@@ -492,10 +910,386 @@
 
 
         initCamera();
+        // ----------------------------
+        // INTERACTIVE QUIZ
+        // ----------------------------
+
+
+        function createQuiz(data) {
+
+
+            let current = 0;
+
+            let score = 0;
+
+
+
+            function showQuestion() {
+
+
+                const q =
+                    data.questions[current];
+
+
+
+                output.innerHTML = `
+
+        <div class="study-card">
+
+        <h2>
+        Question ${current + 1}/${data.questions.length}
+        </h2>
+
+
+        <h3>
+        ${q.question}
+        </h3>
+
+
+        <div id="choices"></div>
+
+
+        <p id="feedback"></p>
+
+
+        </div>
+
+        `;
+
+
+
+                const choices =
+                    document.getElementById("choices");
+
+
+
+                q.choices.forEach((choice, index) => {
+
+
+                    const button =
+                        document.createElement("button");
+
+
+                    button.className =
+                        "choice";
+
+
+                    button.innerText =
+                        choice;
+
+
+
+
+                    button.onclick = () => {
+
+
+                        document
+                            .querySelectorAll(".choice")
+                            .forEach(btn => {
+
+                                btn.disabled = true;
+
+                            });
+
+
+
+                        if (index === q.answer) {
+
+
+                            button.classList.add(
+                                "correct"
+                            );
+
+
+                            score++;
+
+
+                        }
+
+
+                        else {
+
+
+                            button.classList.add(
+                                "wrong"
+                            );
+
+
+                            document
+                                .querySelectorAll(".choice")
+                            [q.answer]
+                                .classList.add(
+                                    "correct"
+                                );
+
+
+                        }
+
+
+
+                        document
+                            .getElementById("feedback")
+                            .innerHTML = `
+
+
+                <br>
+
+                ${q.explanation}
+
+
+                <br><br>
+
+
+                <button class="action-btn"
+                onclick="nextQuestion()">
+
+                Next Question
+
+                </button>
+
+
+                `;
+
+
+
+                    };
+
+
+
+                    choices.appendChild(button);
+
+
+
+                });
+
+
+
+            }
+
+
+
+
+
+
+            window.nextQuestion = function () {
+
+
+                current++;
+
+
+
+                if (current >= data.questions.length) {
+
+
+
+                    output.innerHTML = `
+
+
+            <div class="study-card">
+
+
+            <h2>
+            Quiz Complete 🎉
+            </h2>
+
+
+            <h1>
+            ${score}/${data.questions.length}
+            </h1>
+
+
+            </div>
+
+
+            `;
+
+
+
+                    return;
+
+
+                }
+
+
+
+
+                showQuestion();
+
+
+
+            };
+
+
+
+
+
+            showQuestion();
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+        // ----------------------------
+        // QUIZLET STYLE FLASHCARDS
+        // ----------------------------
+
+
+        function createFlashcards(data) {
+
+
+            let current = 0;
+
+
+
+            function showCard() {
+
+
+
+                const card =
+                    data.cards[current];
+
+
+
+
+                output.innerHTML = `
+
+
+
+        <div>
+
+
+        <div class="flashcard"
+        onclick="this.classList.toggle('flip')">
+
+
+        <div class="flash-inner">
+
+
+        <div class="flash-front">
+
+        ${card.front}
+
+        </div>
+
+
+
+        <div class="flash-back">
+
+        ${card.back}
+
+        </div>
+
+
+
+        </div>
+
+
+        </div>
+
+
+
+
+        <h3>
+
+        Card ${current + 1}/${data.cards.length}
+
+        </h3>
+
+
+
+        <button class="action-btn"
+        onclick="previousCard()">
+
+        ← Previous
+
+        </button>
+
+
+
+
+        <button class="action-btn"
+        onclick="nextCard()">
+
+        Next →
+
+        </button>
+
+
+
+        </div>
+
+
+
+        `;
+
+
+            }
+
+
+
+
+
+
+
+            window.nextCard = function () {
+
+
+                if (current < data.cards.length - 1) {
+
+                    current++;
+
+                }
+
+
+                showCard();
+
+
+            };
+
+
+
+
+
+
+
+            window.previousCard = function () {
+
+
+                if (current > 0) {
+
+                    current--;
+
+                }
+
+
+                showCard();
+
+
+            };
+
+
+
+
+
+            showCard();
+
+
+
+        }
+
 
 
 
     </script>
+
 
 
 </body>

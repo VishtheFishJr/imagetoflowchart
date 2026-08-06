@@ -9,17 +9,24 @@ header('Content-Type: application/json');
 // API KEY
 // ----------------------------
 
-$apiKey = getenv('GEMINI_API_KEY');
+$apiKey = getenv("GEMINI_API_KEY");
+
 
 if (!$apiKey) {
 
+
     echo json_encode([
-        "error" => "GEMINI_API_KEY environment variable not set."
+
+        "error" => "Gemini API key missing"
+
     ]);
+
 
     exit;
 
+
 }
+
 
 
 
@@ -27,232 +34,255 @@ if (!$apiKey) {
 // READ INPUT
 // ----------------------------
 
-$input = json_decode(
-    file_get_contents("php://input"),
-    true
-);
+
+$input =
+    json_decode(
+        file_get_contents("php://input"),
+        true
+    );
 
 
-$mode = $input['mode'] ?? "flowchart";
+
+$mode =
+    $input["mode"] ?? "flowchart";
+
+
+
 
 
 
 // ----------------------------
-// IMAGE HANDLING
+// IMAGE PROCESSING
 // ----------------------------
+
 
 $base64Image = null;
 
 $mimeType = "image/jpeg";
 
 
-$uploadDir = __DIR__ . "/uploads";
+
+$uploadDir =
+    __DIR__ . "/uploads/";
+
 
 
 if (!is_dir($uploadDir)) {
 
-    mkdir($uploadDir, 0755, true);
+
+    mkdir(
+        $uploadDir,
+        0755,
+        true
+    );
+
 
 }
 
 
+
 $imagePathToSave =
-    "uploads/captured_" . time() . ".jpg";
+
+    "uploads/captured_" .
+    time() .
+    ".jpg";
 
 
 
-if (!empty($input['image'])) {
+
+
+
+
+if (!empty($input["image"])) {
+
 
 
     if (
         preg_match(
             '/^data:(image\/[\w.+-]+);base64,(.*)$/',
-            $input['image'],
+            $input["image"],
             $matches
         )
     ) {
 
 
-        $mimeType = $matches[1];
+        $mimeType =
+            $matches[1];
 
-        $base64Image = $matches[2];
+
+        $base64Image =
+            $matches[2];
+
 
 
         file_put_contents(
+
             __DIR__ . "/" . $imagePathToSave,
+
             base64_decode($base64Image)
+
         );
+
 
     }
 
+
 }
+
+
 
 
 
 if (!$base64Image) {
 
+
     echo json_encode([
-        "error" => "No valid image provided."
+
+        "error" => "No image received"
+
     ]);
 
+
     exit;
+
 
 }
 
 
 
+
+
+
+
 // ----------------------------
-// CREATE PROMPT
+// GEMINI PROMPTS
 // ----------------------------
 
 
 if ($mode === "flowchart") {
 
 
-    $prompt = '
 
-Analyze the image and convert it into a highly visual Mermaid.js infographic diagram.
+    $prompt = <<<PROMPT
 
-Return ONLY Mermaid syntax.
+Analyze the image and convert it into a highly visual Mermaid.js infographic.
+
+Return ONLY Mermaid code.
 
 Start with:
 
 flowchart TD
 
 
-Create a professional educational infographic.
+Requirements:
 
-Include:
-- Main flow boxes
-- Supporting explanations
-- Side annotations
-- Callout notes
-- Examples
-- Definitions
-- Relationships
-- Subgraph sections
-
-
-Use:
-
-Main nodes:
-A["Title<br/>• Point<br/>• Detail"]
-
-
-Side notes:
-B["Explanation:<br/>• Example"]
-
-
-Use dashed arrows for explanations.
-
-
-Visual design:
-- Blue main concepts
-- Purple important ideas
-- Green start/end
-- Yellow decisions
-- Gray notes
+- Create a detailed educational diagram
+- Include main concepts
+- Include supporting notes
+- Include examples
+- Include explanations
+- Use subgraphs when useful
+- Make it look like a textbook infographic
 
 
 Rules:
-- Every node must have a unique ID
+
+- Every node needs a unique ID
 - Every label must be inside quotes
 - Use <br/> for line breaks
-- No markdown
-- No explanations
-- Return only Mermaid code
+- Do not include markdown
+- Return only Mermaid syntax
+PROMPT;
 
-';
 
 
 } elseif ($mode === "quiz") {
 
 
-    $prompt = '
+
+    $prompt = <<<PROMPT
 
 Analyze the image.
 
-Create a quiz based on the information.
+Create an interactive multiple choice quiz.
 
-Return ONLY the quiz text.
+Return ONLY valid JSON.
 
-
-Create 10 questions.
-
-
-Format:
+Use exactly this structure:
 
 
-QUESTION 1:
-Question
+{
+ "questions":[
+  {
+   "question":"Question text",
+   "choices":[
+    "Choice A",
+    "Choice B",
+    "Choice C",
+    "Choice D"
+   ],
+   "answer":0,
+   "explanation":"Explanation"
+  }
+ ]
+}
 
 
-A) Option
 
-B) Option
+Rules:
 
-C) Option
+- Create 10 questions
+- answer is the index of the correct choice
+- Questions should test understanding
+- Include definitions and applications
 
-D) Option
+Do not include markdown.
+PROMPT;
 
-
-ANSWER:
-Correct answer
-
-
-EXPLANATION:
-Explanation
-
-
-Include:
-- Definitions
-- Important concepts
-- Applications
-- Understanding questions
-
-';
 
 
 } else {
 
 
-    $prompt = '
+
+    $prompt = <<<PROMPT
 
 Analyze the image.
 
-Create study flashcards.
+Create Quizlet-style flashcards.
 
-Return ONLY flashcards.
+Return ONLY valid JSON.
 
-
-Create 15 flashcards.
-
-
-Format:
+Use exactly this structure:
 
 
-FLASHCARD 1
+{
+ "cards":[
+  {
+   "front":"Question or term",
+   "back":"Answer or explanation"
+  }
+ ]
+}
 
 
-FRONT:
-Question or term
 
+Rules:
 
-BACK:
-Definition or explanation
+- Create 15 cards
+- Include important concepts
+- Include definitions
+- Include examples when helpful
 
+Do not include markdown.
+PROMPT;
 
-Include:
-- Important terms
-- Definitions
-- Processes
-- Examples
-- Key ideas
-
-';
 
 
 }
+
+
+
 
 
 
@@ -260,59 +290,99 @@ Include:
 // GEMINI REQUEST
 // ----------------------------
 
+
 $url =
+
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 
 
 
+
+
 $payload = [
+
+
     "contents" => [
+
         [
+
             "parts" => [
+
+
                 [
+
                     "text" => $prompt
+
                 ],
+
+
+
                 [
+
                     "inlineData" => [
+
                         "mimeType" => $mimeType,
+
                         "data" => $base64Image
+
                     ]
+
                 ]
+
+
             ]
+
         ]
+
     ]
+
 ];
 // ----------------------------
-// SEND GEMINI REQUEST
+// SEND REQUEST TO GEMINI
 // ----------------------------
 
 
 $ch = curl_init($url);
 
 
+
 curl_setopt_array($ch, [
+
 
     CURLOPT_RETURNTRANSFER => true,
 
+
     CURLOPT_POST => true,
+
 
     CURLOPT_POSTFIELDS => json_encode($payload),
 
+
     CURLOPT_HTTPHEADER => [
+
 
         "Content-Type: application/json",
 
+
         "x-goog-api-key: " . $apiKey
+
 
     ],
 
+
     CURLOPT_TIMEOUT => 60
+
 
 ]);
 
 
 
-$response = curl_exec($ch);
+
+
+$response =
+    curl_exec($ch);
+
+
 
 
 
@@ -321,91 +391,171 @@ if ($response === false) {
 
     echo json_encode([
 
-        "error" => "cURL Error: " . curl_error($ch)
+        "error" => curl_error($ch)
 
     ]);
 
 
     exit;
 
+
 }
 
 
 
-$httpCode = curl_getinfo(
-    $ch,
-    CURLINFO_HTTP_CODE
-);
+
+$httpCode =
+    curl_getinfo(
+        $ch,
+        CURLINFO_HTTP_CODE
+    );
 
 
 
-// curl_close removed because PHP 8.5 deprecates it
-
-
-
-$responseData = json_decode(
-    $response,
-    true
-);
+// Do not use curl_close()
+// PHP 8.5 deprecates it
 
 
 
 
 
-if ($httpCode != 200) {
+$responseData =
+    json_decode(
+        $response,
+        true
+    );
+
+
+
+
+
+
+if ($httpCode !== 200) {
 
 
     echo json_encode([
 
+
         "error" => "Gemini API Error",
 
-        "http_code" => $httpCode,
 
-        "response" => $responseData
+        "code" => $httpCode,
+
+
+        "details" => $responseData
+
 
     ]);
 
 
     exit;
 
+
 }
+
+
 
 
 
 
 
 // ----------------------------
-// GET AI RESPONSE
+// EXTRACT GEMINI RESPONSE
 // ----------------------------
 
 
 $aiAnswer =
 
-    $responseData['candidates'][0]['content']['parts'][0]['text']
+    $responseData
+    ["candidates"][0]
+    ["content"]
+    ["parts"][0]
+    ["text"]
 
-    ?? "No response";
-
-
-
-
-
-// Remove markdown fences if Gemini adds them
-
-$aiAnswer = preg_replace(
-    '/```(?:mermaid)?/i',
-    '',
-    $aiAnswer
-);
+    ?? "";
 
 
-$aiAnswer = str_replace(
-    "```",
-    "",
-    $aiAnswer
-);
 
 
-$aiAnswer = trim($aiAnswer);
+
+$aiAnswer =
+    trim($aiAnswer);
+
+
+
+
+
+
+// Remove markdown if Gemini adds it
+
+$aiAnswer =
+    preg_replace(
+        "/```(?:json|mermaid)?/i",
+        "",
+        $aiAnswer
+    );
+
+
+
+$aiAnswer =
+    str_replace(
+        "```",
+        "",
+        $aiAnswer
+    );
+
+
+
+$aiAnswer =
+    trim($aiAnswer);
+
+
+
+
+
+
+// ----------------------------
+// CLEAN JSON FOR QUIZ/CARDS
+// ----------------------------
+
+
+if ($mode !== "flowchart") {
+
+
+    $json =
+        json_decode(
+            $aiAnswer,
+            true
+        );
+
+
+
+    if ($json === null) {
+
+
+        echo json_encode([
+
+            "error" => "Gemini returned invalid JSON",
+
+            "raw" => $aiAnswer
+
+        ]);
+
+        exit;
+
+
+    }
+
+
+
+    $aiAnswer =
+        json_encode($json);
+
+
+
+}
+
+
 
 
 
@@ -420,24 +570,32 @@ $aiAnswer = trim($aiAnswer);
 try {
 
 
-    $stmt = $pdo->prepare(
 
-        "
+    $stmt =
+        $pdo->prepare(
+
+            "
         INSERT INTO scan_logs
         (image_path, ai_response)
         VALUES (?,?)
         "
 
-    );
+        );
+
 
 
     $stmt->execute([
 
+
         $imagePathToSave,
+
 
         $aiAnswer
 
+
     ]);
+
+
 
 
 
@@ -457,7 +615,10 @@ try {
         "ai_response" => $aiAnswer
 
 
+
     ]);
+
+
 
 
 
@@ -467,7 +628,7 @@ try {
     echo json_encode([
 
 
-        "error" => "Database Error: " . $e->getMessage()
+        "error" => "Database error: " . $e->getMessage()
 
 
     ]);
@@ -475,6 +636,7 @@ try {
 
 
 }
+
 
 
 ?>
