@@ -364,7 +364,7 @@ curl_setopt_array($ch, [
 
 
 
-
+curl_setopt($ch, CURLOPT_VERBOSE, true);
 
 $response = curl_exec($ch);
 
@@ -417,18 +417,14 @@ $responseData =
 
 if ($httpCode !== 200) {
 
-    echo json_encode([
+    header("Content-Type: application/json");
 
-        "error" => "Gemini API Error",
-
+    die(json_encode([
+        "success" => false,
         "status" => $httpCode,
-
-        "raw_response" => $response
-
-    ], JSON_PRETTY_PRINT);
-
-    exit;
-
+        "response" => json_decode($response, true),
+        "raw" => $response
+    ], JSON_PRETTY_PRINT));
 }
 
 
