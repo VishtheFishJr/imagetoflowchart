@@ -23,12 +23,9 @@ if (!$apiKey) {
 }
 
 
-
-
 // ----------------------------
 // READ REQUEST
 // ----------------------------
-
 
 $input = json_decode(
     file_get_contents("php://input"),
@@ -39,13 +36,9 @@ $input = json_decode(
 $mode = $input["mode"] ?? "flowchart";
 
 
-
-
-
 // ----------------------------
 // IMAGE PROCESSING
 // ----------------------------
-
 
 $base64Image = null;
 
@@ -53,7 +46,6 @@ $mimeType = "image/jpeg";
 
 
 $uploadDir = __DIR__ . "/uploads/";
-
 
 
 if (!is_dir($uploadDir)) {
@@ -67,11 +59,8 @@ if (!is_dir($uploadDir)) {
 }
 
 
-
 $imagePathToSave =
     "uploads/captured_" . time() . ".jpg";
-
-
 
 
 
@@ -92,7 +81,6 @@ if (!empty($input["image"])) {
         $base64Image = $matches[2];
 
 
-
         file_put_contents(
 
             __DIR__ . "/" . $imagePathToSave,
@@ -104,10 +92,7 @@ if (!empty($input["image"])) {
 
     }
 
-
 }
-
-
 
 
 
@@ -123,20 +108,13 @@ if (!$base64Image) {
 
     exit;
 
-
 }
-
-
-
-
-
 
 
 
 // ----------------------------
 // GEMINI PROMPTS
 // ----------------------------
-
 
 
 if ($mode === "flowchart") {
@@ -146,20 +124,15 @@ if ($mode === "flowchart") {
 
 Analyze the image and convert it into a highly visual Mermaid.js infographic.
 
-
 Return ONLY Mermaid syntax.
-
 
 Start with:
 
 flowchart TD
 
-
 Create a professional educational diagram.
 
-
 Include:
-
 - Main concepts
 - Supporting explanations
 - Examples
@@ -167,26 +140,15 @@ Include:
 - Side notes
 - Relationships
 
-
-Use:
-
-Main nodes:
-A["Title<br/>• Point<br/>• Detail"]
-
-
-Notes:
-B["Explanation<br/>• Example"]
-
-
 Rules:
-
 - Every node needs a unique ID
 - Every label must be inside quotes
 - Use <br/> for line breaks
 - Use subgraphs when useful
-- Do not use markdown
+- No markdown
 - Return only Mermaid code
 PROMPT;
+
 
 
 } elseif ($mode === "quiz") {
@@ -196,15 +158,11 @@ PROMPT;
 
 Analyze the image.
 
-
 Create a multiple choice quiz.
-
 
 Return ONLY valid JSON.
 
-
-Use exactly this structure:
-
+Use this structure:
 
 {
  "questions":[
@@ -222,34 +180,28 @@ Use exactly this structure:
  ]
 }
 
-
-
 Rules:
 
 - Create 10 questions
-- answer is the index of the correct choice
+- answer is the index
 - Test understanding
-- Include definitions
-- Include applications
+- Include definitions and applications
 PROMPT;
 
 
-} else {
+
+} elseif ($mode === "flashcards") {
 
 
     $prompt = <<<PROMPT
 
 Analyze the image.
 
-
 Create Quizlet-style flashcards.
-
 
 Return ONLY valid JSON.
 
-
-Use exactly this structure:
-
+Structure:
 
 {
  "cards":[
@@ -260,15 +212,65 @@ Use exactly this structure:
  ]
 }
 
-
-
 Rules:
 
-- Create 15 flashcards
+- Create 15 cards
 - Include important concepts
 - Include definitions
 - Include examples
 PROMPT;
+
+
+
+} elseif ($mode === "presentation") {
+
+
+    $prompt = <<<PROMPT
+
+Analyze the image.
+
+Create a professional educational slide presentation.
+
+Return ONLY valid JSON.
+
+The output will be converted into editable Google Slides.
+
+Use this exact format:
+
+{
+"title":"Presentation title",
+"slides":[
+ {
+  "layout":"title",
+  "title":"Slide title",
+  "subtitle":"Subtitle text"
+ },
+ {
+  "layout":"bullet",
+  "title":"Topic title",
+  "points":[
+    "Point one",
+    "Point two",
+    "Point three"
+  ]
+ }
+]
+}
+
+
+Rules:
+
+- Create 6-8 slides
+- First slide must use layout "title"
+- Other slides should use layout "bullet"
+- Make slides concise
+- Use educational wording
+- Include examples
+- Include important definitions
+- Do not include markdown
+- Return JSON only
+PROMPT;
+
 
 
 }
@@ -280,6 +282,7 @@ PROMPT;
 $url =
 
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
+
 
 
 
@@ -317,7 +320,6 @@ $payload = [
     ]
 
 ];
-
 
 
 
@@ -393,6 +395,10 @@ $httpCode =
 
 
 
+curl_close($ch);
+
+
+
 
 
 $responseData =
@@ -427,7 +433,6 @@ if ($httpCode !== 200) {
 
 
 }
-
 
 
 
@@ -491,20 +496,21 @@ $aiAnswer = trim($aiAnswer);
 
 // ----------------------------
 // VALIDATE JSON OUTPUT
-// FOR QUIZZES AND FLASHCARDS
 // ----------------------------
+// Everything except flowcharts is JSON
 
 
 if ($mode !== "flowchart") {
 
 
-    $jsonCheck = json_decode(
+    $jsonCheck =
+        json_decode(
 
-        $aiAnswer,
+            $aiAnswer,
 
-        true
+            true
 
-    );
+        );
 
 
 
@@ -513,9 +519,12 @@ if ($mode !== "flowchart") {
 
         echo json_encode([
 
+
             "error" => "Gemini returned invalid JSON",
 
+
             "raw" => $aiAnswer
+
 
         ]);
 
@@ -527,15 +536,16 @@ if ($mode !== "flowchart") {
 
 
 
-    // Normalize JSON
 
-    $aiAnswer = json_encode(
 
-        $jsonCheck,
+    $aiAnswer =
+        json_encode(
 
-        JSON_UNESCAPED_UNICODE
+            $jsonCheck,
 
-    );
+            JSON_UNESCAPED_UNICODE
+
+        );
 
 
 }
@@ -566,12 +576,9 @@ try {
 
         $stmt->execute([
 
-
             $imagePathToSave,
 
-
             $aiAnswer
-
 
         ]);
 
@@ -595,12 +602,9 @@ try {
 
         $stmt->execute([
 
-
             $imagePathToSave,
 
-
             $aiAnswer
-
 
         ]);
 
@@ -624,15 +628,55 @@ try {
 
         $stmt->execute([
 
-
             $imagePathToSave,
-
 
             $aiAnswer
 
-
         ]);
 
+
+
+    } elseif ($mode === "presentation") {
+
+
+
+        // Only save if table exists
+        // We will create this table next
+
+
+        try {
+
+
+            $stmt = $pdo->prepare(
+
+                "
+                INSERT INTO presentation_logs
+                (image_path, presentation_data)
+                VALUES (?,?)
+                "
+
+            );
+
+
+
+            $stmt->execute([
+
+
+                $imagePathToSave,
+
+
+                $aiAnswer
+
+
+            ]);
+
+
+
+        } catch (PDOException $e) {
+
+            // Ignore until table is created
+
+        }
 
 
     }
