@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-$apiKey = "AQ.Ab8RN6KqPNv_bG0ujCRwUIERsaOaQkxbHooydz-KwAS1HcT2Fg";
+$apiKey = "AQ.Ab8RN6LrFi6zmoD7p1BZ57ar2P0N-0iA3MqD3u0EeE5pNdsLQw";
 
 
 if (!$apiKey) {
