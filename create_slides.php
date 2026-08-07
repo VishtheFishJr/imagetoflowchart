@@ -1,19 +1,14 @@
 <?php
 
-
 require_once 'vendor/autoload.php';
-
 require_once 'presentation_templates.php';
 
 
 session_name("PHPSESSID");
-
 session_start();
 
 
 header("Content-Type: application/json");
-
-
 
 
 // ----------------------------
@@ -23,15 +18,12 @@ header("Content-Type: application/json");
 if (!isset($_SESSION["google_token"])) {
 
     echo json_encode([
-
         "error" => "Google account not connected"
-
     ]);
 
     exit;
 
 }
-
 
 
 
@@ -50,22 +42,17 @@ $client->setAccessToken(
 
 
 
-
-// Refresh token if expired
+// Refresh token
 
 if ($client->isAccessTokenExpired()) {
 
     echo json_encode([
-
         "error" => "Google token expired. Reconnect account."
-
     ]);
 
     exit;
 
 }
-
-
 
 
 
@@ -75,11 +62,8 @@ $service =
 
 
 
-
-
-
 // ----------------------------
-// READ GEMINI DATA
+// READ AI DATA
 // ----------------------------
 
 
@@ -94,16 +78,12 @@ $data =
 if (!$data) {
 
     echo json_encode([
-
         "error" => "Invalid JSON input"
-
     ]);
 
     exit;
 
 }
-
-
 
 
 
@@ -113,10 +93,16 @@ $slidesData =
 
 
 
-// Default theme if Gemini fails
+
+// ----------------------------
+// THEME
+// ----------------------------
+
 
 $theme =
     $data["theme"] ?? [
+
+        "name" => "Modern",
 
         "background" => "#FFFFFF",
 
@@ -134,8 +120,6 @@ $theme =
 
 
 
-
-
 // ----------------------------
 // CREATE PRESENTATION
 // ----------------------------
@@ -147,22 +131,15 @@ $presentation =
 
 
 $presentation->setTitle(
-
     $data["title"] ?? "AI Presentation"
-
 );
-
-
 
 
 
 $created =
     $service->presentations->create(
-
         $presentation
-
     );
-
 
 
 
@@ -172,11 +149,8 @@ $presentationId =
 
 
 
-
-
-
 // ----------------------------
-// BUILD SLIDES
+// BUILD REQUESTS
 // ----------------------------
 
 
@@ -195,7 +169,6 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
-
     // Create blank slide
 
     $requests[] = [
@@ -203,7 +176,6 @@ foreach ($slidesData as $index => $slideData) {
         "createSlide" => [
 
             "objectId" => $slideId,
-
 
             "slideLayoutReference" => [
 
@@ -219,15 +191,18 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
+    $layout =
+        $slideData["layout"] ?? "bullet";
 
 
-    // TITLE SLIDE
 
-    if (
 
-        $slideData["layout"] === "title"
 
-    ) {
+    // ----------------------------
+    // TITLE
+    // ----------------------------
+
+    if ($layout === "title") {
 
 
 
@@ -235,12 +210,11 @@ foreach ($slidesData as $index => $slideData) {
 
             $requests,
 
-
             titleSlide(
 
                 $slideId,
 
-                $slideData["title"],
+                $slideData["title"] ?? "",
 
                 $slideData["subtitle"] ?? "",
 
@@ -258,13 +232,10 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
-
-    // BULLET SLIDE
-    elseif (
-
-        $slideData["layout"] === "bullet"
-
-    ) {
+    // ----------------------------
+    // BULLET
+    // ----------------------------
+    elseif ($layout === "bullet") {
 
 
 
@@ -272,14 +243,49 @@ foreach ($slidesData as $index => $slideData) {
 
             $requests,
 
-
             bulletSlide(
 
                 $slideId,
 
-                $slideData["title"],
+                $slideData["title"] ?? "",
 
-                $slideData["points"],
+                $slideData["points"] ?? [],
+
+                $theme,
+
+                $slideData["visual"] ?? ""
+
+            )
+
+        );
+
+
+    }
+
+
+
+
+
+    // ----------------------------
+    // IMAGE + TEXT
+    // ----------------------------
+    elseif ($layout === "image_text") {
+
+
+
+        $requests = array_merge(
+
+            $requests,
+
+            imageTextSlide(
+
+                $slideId,
+
+                $slideData["title"] ?? "",
+
+                $slideData["points"] ?? [],
+
+                $slideData["visual"] ?? "",
 
                 $theme
 
@@ -292,6 +298,101 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
+
+
+    // ----------------------------
+    // COMPARISON
+    // ----------------------------
+    elseif ($layout === "comparison") {
+
+
+
+        $requests = array_merge(
+
+            $requests,
+
+            comparisonSlide(
+
+                $slideId,
+
+                $slideData,
+
+                $theme
+
+            )
+
+        );
+
+
+    }
+
+
+
+
+
+    // ----------------------------
+    // TIMELINE
+    // ----------------------------
+    elseif ($layout === "timeline") {
+
+
+
+        $requests = array_merge(
+
+            $requests,
+
+            timelineSlide(
+
+                $slideId,
+
+                $slideData,
+
+                $theme
+
+            )
+
+        );
+
+
+    }
+
+
+
+
+
+    // ----------------------------
+    // FALLBACK
+    // ----------------------------
+    else {
+
+
+
+        $requests = array_merge(
+
+            $requests,
+
+            bulletSlide(
+
+                $slideId,
+
+                $slideData["title"] ?? "",
+
+                $slideData["points"] ?? [],
+
+                $theme,
+
+                $slideData["visual"] ?? ""
+
+            )
+
+        );
+
+
+    }
+
+
+
+
 }
 
 
@@ -300,15 +401,12 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
-
-
 // ----------------------------
-// SEND REQUESTS
+// SEND TO GOOGLE
 // ----------------------------
 
 
 if (count($requests) > 0) {
-
 
 
     $batch =
@@ -321,12 +419,8 @@ if (count($requests) > 0) {
 
 
 
-
-
     $service
-
         ->presentations
-
         ->batchUpdate(
 
             $presentationId,
@@ -343,22 +437,24 @@ if (count($requests) > 0) {
 
 
 
+// ----------------------------
+// RESPONSE
+// ----------------------------
 
 
 echo json_encode([
 
     "success" => true,
 
+    "theme" => $theme,
+
     "presentationId" => $presentationId,
 
     "url" =>
-
         "https://docs.google.com/presentation/d/"
-
         . $presentationId
 
 ]);
-
 
 
 ?>
