@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-$apiKey = "AQ.Ab8RN6LL_ATMe2gZaQOGsORBU5PFbNGXic05CM46ymrNwb6xgA";
+$apiKey = getenv("GEMINI_API_KEY");
 
 
 if (!$apiKey) {
