@@ -1,7 +1,6 @@
 <?php
 
 
-// Convert HEX color to Google Slides RGB format
 function hexToRgb($hex)
 {
 
@@ -30,6 +29,7 @@ function setBackground($slide, $color)
     return [
 
         [
+
             "updatePageProperties" => [
 
                 "objectId" => $slide,
@@ -52,6 +52,7 @@ function setBackground($slide, $color)
 
                 ],
 
+
                 "fields" =>
                     "pageBackgroundFill.solidFill.color"
 
@@ -67,11 +68,13 @@ function setBackground($slide, $color)
 
 
 
+
+
+
 function addAccentBar($slide, $color)
 {
 
-
-    $id = uniqid("bar_");
+    $id = uniqid("accent_");
 
 
     return [
@@ -84,29 +87,34 @@ function addAccentBar($slide, $color)
 
                 "shapeType" => "RECTANGLE",
 
+
                 "elementProperties" => [
 
+
                     "pageObjectId" => $slide,
+
 
                     "size" => [
 
                         "width" => [
 
-                            "magnitude" => 7000000,
+                            "magnitude" => 7200000,
 
                             "unit" => "EMU"
 
                         ],
 
+
                         "height" => [
 
-                            "magnitude" => 150000,
+                            "magnitude" => 180000,
 
                             "unit" => "EMU"
 
                         ]
 
                     ],
+
 
 
                     "transform" => [
@@ -130,11 +138,13 @@ function addAccentBar($slide, $color)
         ],
 
 
+
         [
 
             "updateShapeProperties" => [
 
                 "objectId" => $id,
+
 
                 "shapeProperties" => [
 
@@ -154,6 +164,7 @@ function addAccentBar($slide, $color)
 
                 ],
 
+
                 "fields" =>
                     "shapeBackgroundFill.solidFill.color"
 
@@ -172,17 +183,77 @@ function addAccentBar($slide, $color)
 
 
 
+
+
+function styleText($id, $color, $size, $bold = true)
+{
+
+    return [
+
+        "updateTextStyle" => [
+
+
+            "objectId" => $id,
+
+
+            "style" => [
+
+
+                "foregroundColor" => [
+
+                    "opaqueColor" => [
+
+                        "rgbColor" => hexToRgb($color)
+
+                    ]
+
+                ],
+
+
+                "fontSize" => [
+
+                    "magnitude" => $size,
+
+                    "unit" => "PT"
+
+                ],
+
+
+                "bold" => $bold
+
+
+            ],
+
+
+
+            "fields" =>
+                "foregroundColor,fontSize,bold"
+
+
+        ]
+
+    ];
+
+}
+
+
+
+
+
+
+
+
+
 function titleSlide($slide, $title, $subtitle, $theme)
 {
 
 
-    $titleId = uniqid("title_");
+    $id = uniqid("title_");
 
 
     $requests = [];
 
 
-    // Background
 
     $requests = array_merge(
 
@@ -199,8 +270,6 @@ function titleSlide($slide, $title, $subtitle, $theme)
     );
 
 
-
-    // Accent
 
     $requests = array_merge(
 
@@ -220,19 +289,22 @@ function titleSlide($slide, $title, $subtitle, $theme)
 
 
 
-    // Text box
+
 
     $requests[] = [
 
         "createShape" => [
 
-            "objectId" => $titleId,
+            "objectId" => $id,
 
             "shapeType" => "TEXT_BOX",
 
+
             "elementProperties" => [
 
+
                 "pageObjectId" => $slide,
+
 
                 "size" => [
 
@@ -243,6 +315,7 @@ function titleSlide($slide, $title, $subtitle, $theme)
                         "unit" => "EMU"
 
                     ],
+
 
                     "height" => [
 
@@ -283,12 +356,9 @@ function titleSlide($slide, $title, $subtitle, $theme)
 
         "insertText" => [
 
-            "objectId" => $titleId,
+            "objectId" => $id,
 
-            "text" =>
-                $title .
-                "\n\n" .
-                $subtitle
+            "text" => $title . "\n" . $subtitle
 
         ]
 
@@ -297,9 +367,22 @@ function titleSlide($slide, $title, $subtitle, $theme)
 
 
 
+    $requests[] = styleText(
+
+        $id,
+
+        $theme["textColor"],
+
+        28,
+
+        true
+
+    );
+
+
+
 
     return $requests;
-
 
 }
 
@@ -315,7 +398,7 @@ function bulletSlide($slide, $title, $points, $theme)
 {
 
 
-    $textboxId = uniqid("content_");
+    $id = uniqid("content_");
 
 
     $requests = [];
@@ -339,6 +422,7 @@ function bulletSlide($slide, $title, $points, $theme)
 
 
 
+
     $requests = array_merge(
 
         $requests,
@@ -357,18 +441,15 @@ function bulletSlide($slide, $title, $points, $theme)
 
 
 
-    $text =
-        $title .
-        "\n\n";
+
+
+    $text = $title . "\n\n";
 
 
 
-    foreach ($points as $point) {
+    foreach ($points as $p) {
 
-        $text .=
-            "• " .
-            $point .
-            "\n";
+        $text .= "• " . $p . "\n";
 
     }
 
@@ -378,19 +459,25 @@ function bulletSlide($slide, $title, $points, $theme)
 
     $requests[] = [
 
+
         "createShape" => [
 
-            "objectId" => $textboxId,
+
+            "objectId" => $id,
+
 
             "shapeType" => "TEXT_BOX",
 
 
+
             "elementProperties" => [
+
 
                 "pageObjectId" => $slide,
 
 
                 "size" => [
+
 
                     "width" => [
 
@@ -403,14 +490,13 @@ function bulletSlide($slide, $title, $points, $theme)
 
                     "height" => [
 
-                        "magnitude" => 4000000,
+                        "magnitude" => 4500000,
 
                         "unit" => "EMU"
 
                     ]
 
                 ],
-
 
 
                 "transform" => [
@@ -437,12 +523,11 @@ function bulletSlide($slide, $title, $points, $theme)
 
 
 
-
     $requests[] = [
 
         "insertText" => [
 
-            "objectId" => $textboxId,
+            "objectId" => $id,
 
             "text" => $text
 
@@ -454,8 +539,23 @@ function bulletSlide($slide, $title, $points, $theme)
 
 
 
-    return $requests;
 
+    $requests[] = styleText(
+
+        $id,
+
+        $theme["textColor"],
+
+        18,
+
+        false
+
+    );
+
+
+
+
+    return $requests;
 
 }
 
@@ -464,7 +564,7 @@ function bulletSlide($slide, $title, $points, $theme)
 
 
 
-// Future image support
+
 function addImage($slide, $url)
 {
 
@@ -474,13 +574,18 @@ function addImage($slide, $url)
 
             "createImage" => [
 
+
                 "url" => $url,
+
 
                 "elementProperties" => [
 
+
                     "pageObjectId" => $slide,
 
+
                     "size" => [
+
 
                         "width" => [
 
@@ -490,13 +595,29 @@ function addImage($slide, $url)
 
                         ],
 
+
                         "height" => [
 
-                            "magnitude" => 2000000,
+                            "magnitude" => 1800000,
 
                             "unit" => "EMU"
 
                         ]
+
+                    ],
+
+
+                    "transform" => [
+
+                        "translateX" => 4500000,
+
+                        "translateY" => 1000000,
+
+                        "scaleX" => 1,
+
+                        "scaleY" => 1,
+
+                        "unit" => "EMU"
 
                     ]
 
@@ -509,7 +630,6 @@ function addImage($slide, $url)
     ];
 
 }
-
 
 
 ?>
