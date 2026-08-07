@@ -13,16 +13,9 @@ header('Content-Type: application/json');
 // ----------------------------
 
 $apiKey = "AQ.Ab8RN6KqPNv_bG0ujCRwUIERsaOaQkxbHooydz-KwAS1HcT2Fg";
-
-
 if (!$apiKey) {
-
-    echo json_encode([
-        "error" => "Gemini API key not set."
-    ]);
-
+    echo json_encode(["error" => "GEMINI_API_KEY environment variable not set."]);
     exit;
-
 }
 
 
