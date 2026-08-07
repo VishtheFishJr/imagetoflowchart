@@ -4,7 +4,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once 'db.php';
-require_once 'config.php';
 
 header('Content-Type: application/json');
 
@@ -12,7 +11,7 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-
+define('GEMINI_API_KEY', 'AQ.Ab8RN6IxW4sfxn7I-fZMwKXxlurU1PBvfq-b8AAGMZJDePmHzA');
 $apiKey = trim(GEMINI_API_KEY);
 
 if (!$apiKey) {
