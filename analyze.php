@@ -240,48 +240,107 @@ Rules:
 
 Analyze the image.
 
-Create an editable Google Slides presentation outline.
+Create a professional AI-designed Google Slides presentation.
 
 Return ONLY valid JSON.
 
 No markdown.
 No code fences.
+No explanations outside JSON.
+
+The presentation should look like it was made by a professional designer.
+
+Use the image content to decide:
+
+- Color theme
+- Background style
+- Typography style
+- Layout style
+- Visual elements
+- Accent colors
+- Image placement
+
 
 Use exactly this format:
 
 {
  "title":"Presentation title",
+
+ "theme":{
+   "name":"Theme name",
+   "background":"Background color or style",
+   "primaryColor":"Main accent color",
+   "secondaryColor":"Secondary accent color",
+   "textColor":"Text color",
+   "style":"Modern, minimal, scientific, creative, etc."
+ },
+
  "slides":[
+
   {
    "layout":"title",
    "title":"Title",
-   "subtitle":"Subtitle"
+   "subtitle":"Subtitle",
+   "visual":"Description of image or graphic to include"
   },
+
+
   {
    "layout":"bullet",
    "title":"Slide title",
    "points":[
-    "Point 1",
-    "Point 2",
-    "Point 3"
-   ]
+      "Point 1",
+      "Point 2",
+      "Point 3"
+   ],
+   "visual":"Image, diagram, icon, or graphic suggestion"
   }
+
+ ],
+
+ "images":[
+   {
+    "description":"Image that would improve the presentation",
+    "slide":2
+   }
  ]
+
 }
+
 
 Rules:
 
-- Create 6-10 slides.
+- Create 7-10 slides.
 - First slide must be title.
-- Remaining slides should be bullet slides.
-- Each bullet slide needs 3-6 points.
-- Make it educational.
-- Use only information from the image.
-- Return JSON only.
+- Every slide should have visual variety.
+- Avoid walls of text.
+- Use diagrams when possible.
+- Add relevant images or cropped sections of the scanned image.
+- Choose colors that match the subject.
+
+Examples:
+
+Biology:
+green/blue scientific theme
+
+History:
+warm parchment theme
+
+Technology:
+dark futuristic theme
+
+Math:
+clean geometric theme
+
+Art:
+creative colorful theme
+
+
+Make it visually impressive.
+
+Return JSON only.
 
 ';
-
-
 }
 // ----------------------------
 // GEMINI REQUEST
