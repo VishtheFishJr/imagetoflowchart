@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-$apiKey = "my-key";
+// $apiKey = "my-key";
 
 
 if (!$apiKey) {
