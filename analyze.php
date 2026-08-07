@@ -242,101 +242,237 @@ Analyze the image.
 
 Create a professional AI-designed Google Slides presentation.
 
+The output should feel like a presentation made by a human designer using Canva or Beautiful.ai.
+
 Return ONLY valid JSON.
 
 No markdown.
 No code fences.
 No explanations outside JSON.
 
-The presentation should look like it was made by a professional designer.
 
-Use the image content to decide:
+Analyze:
 
-- Color theme
+- Subject matter
+- Important concepts
+- Visual style
+- Appropriate colors
+- Best educational structure
+- Possible diagrams
+- Useful images
+
+
+Design the presentation:
+
+Choose:
+
+- Color palette
 - Background style
 - Typography style
-- Layout style
-- Visual elements
-- Accent colors
+- Layout variety
+- Visual hierarchy
+- Decorative elements
 - Image placement
 
 
-Use exactly this format:
+Use this exact JSON format:
+
 
 {
  "title":"Presentation title",
 
+
  "theme":{
+
    "name":"Theme name",
-   "background":"Background color or style",
-   "primaryColor":"Main accent color",
-   "secondaryColor":"Secondary accent color",
-   "textColor":"Text color",
-   "style":"Modern, minimal, scientific, creative, etc."
+
+   "background":"HEX color",
+
+   "primaryColor":"HEX color",
+
+   "secondaryColor":"HEX color",
+
+   "textColor":"HEX color",
+
+   "style":"Modern, scientific, futuristic, minimal, creative, etc."
+
  },
+
 
  "slides":[
 
-  {
-   "layout":"title",
-   "title":"Title",
-   "subtitle":"Subtitle",
-   "visual":"Description of image or graphic to include"
-  },
+
+ {
+
+  "layout":"title",
+
+  "title":"Main title",
+
+  "subtitle":"Subtitle",
+
+  "visual":"Description of hero image, diagram, or graphic"
+
+ },
 
 
-  {
-   "layout":"bullet",
-   "title":"Slide title",
-   "points":[
-      "Point 1",
-      "Point 2",
-      "Point 3"
-   ],
-   "visual":"Image, diagram, icon, or graphic suggestion"
-  }
+
+ {
+
+  "layout":"bullet",
+
+  "title":"Slide title",
+
+  "points":[
+
+    "Point 1",
+
+    "Point 2",
+
+    "Point 3"
+
+  ],
+
+  "visual":"Image, diagram, chart, icon, or illustration"
+
+ },
+
+
+
+ {
+
+  "layout":"image_text",
+
+  "title":"Slide title",
+
+  "text":[
+
+    "Important explanation",
+
+    "Additional information"
+
+  ],
+
+  "image":"Description of image to display"
+
+ },
+
+
+
+ {
+
+  "layout":"comparison",
+
+  "title":"Comparison title",
+
+  "leftTitle":"Left side",
+
+  "leftPoints":[
+
+    "Point"
+
+  ],
+
+  "rightTitle":"Right side",
+
+  "rightPoints":[
+
+    "Point"
+
+  ]
+
+ },
+
+
+
+ {
+
+  "layout":"diagram",
+
+  "title":"Diagram title",
+
+  "steps":[
+
+    "Step 1",
+
+    "Step 2",
+
+    "Step 3"
+
+  ]
+
+ }
+
 
  ],
 
+
+
  "images":[
-   {
-    "description":"Image that would improve the presentation",
-    "slide":2
-   }
+
+ {
+
+  "description":"Image or illustration that improves the slide",
+
+  "slide":2
+
+ }
+
  ]
 
 }
 
 
+
 Rules:
 
 - Create 7-10 slides.
-- First slide must be title.
-- Every slide should have visual variety.
-- Avoid walls of text.
-- Use diagrams when possible.
-- Add relevant images or cropped sections of the scanned image.
-- Choose colors that match the subject.
+- First slide MUST use layout "title".
+- Use different layouts throughout the presentation.
+- Do not make every slide bullet points.
+- Avoid large paragraphs.
+- Keep text concise.
+- Make slides visually balanced.
+- Add diagrams, comparisons, and visual explanations when appropriate.
+- Use the scanned image as inspiration.
+- Suggest images that would improve understanding.
+- Pick colors that match the topic.
 
-Examples:
+
+Subject style examples:
+
 
 Biology:
-green/blue scientific theme
+- green/blue palette
+- scientific diagrams
+- microscope imagery
+
 
 History:
-warm parchment theme
+- parchment colors
+- timeline layouts
+- historical imagery
+
 
 Technology:
-dark futuristic theme
+- dark backgrounds
+- neon accents
+- futuristic graphics
 
-Math:
-clean geometric theme
+
+Mathematics:
+- geometric layouts
+- clean colors
+- equations and diagrams
+
 
 Art:
-creative colorful theme
+- bold colors
+- creative layouts
+- visual emphasis
 
 
-Make it visually impressive.
+
+The final presentation should look professionally designed, not like plain notes.
 
 Return JSON only.
 
