@@ -5,6 +5,7 @@ require_once 'vendor/autoload.php';
 
 require_once 'presentation_templates.php';
 
+session_name("PHPSESSID");
 
 session_start();
 
