@@ -215,7 +215,7 @@ PROMPT;
 // ----------------------------
 
 // Use query parameter for the API key and the updated model alias
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . urlencode($apiKey);
+$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" . urlencode($apiKey);
 
 $payload = [
     "contents" => [
