@@ -5,10 +5,10 @@ require_once 'vendor/autoload.php';
 
 require_once 'presentation_templates.php';
 
+
 session_name("PHPSESSID");
 
 session_start();
-
 
 
 header("Content-Type: application/json");
@@ -16,7 +16,9 @@ header("Content-Type: application/json");
 
 
 
-// Check Google connection
+// ----------------------------
+// CHECK GOOGLE CONNECTION
+// ----------------------------
 
 if (!isset($_SESSION["google_token"])) {
 
@@ -48,11 +50,37 @@ $client->setAccessToken(
 
 
 
+
+// Refresh token if expired
+
+if ($client->isAccessTokenExpired()) {
+
+    echo json_encode([
+
+        "error" => "Google token expired. Reconnect account."
+
+    ]);
+
+    exit;
+
+}
+
+
+
+
+
 $service =
     new Google_Service_Slides($client);
 
 
 
+
+
+
+
+// ----------------------------
+// READ GEMINI DATA
+// ----------------------------
 
 
 $data =
@@ -63,29 +91,78 @@ $data =
 
 
 
+if (!$data) {
+
+    echo json_encode([
+
+        "error" => "Invalid JSON input"
+
+    ]);
+
+    exit;
+
+}
+
+
+
+
+
 $slidesData =
-    $data["slides"];
+    $data["slides"] ?? [];
+
+
+
+
+// Default theme if Gemini fails
+
+$theme =
+    $data["theme"] ?? [
+
+        "background" => "#FFFFFF",
+
+        "primaryColor" => "#2563EB",
+
+        "secondaryColor" => "#60A5FA",
+
+        "textColor" => "#111111",
+
+        "style" => "Modern"
+
+    ];
 
 
 
 
 
-// Create presentation
+
+
+// ----------------------------
+// CREATE PRESENTATION
+// ----------------------------
+
 
 $presentation =
     new Google_Service_Slides_Presentation();
 
 
+
 $presentation->setTitle(
+
     $data["title"] ?? "AI Presentation"
+
 );
+
+
 
 
 
 $created =
     $service->presentations->create(
+
         $presentation
+
     );
+
 
 
 
@@ -94,6 +171,13 @@ $presentationId =
 
 
 
+
+
+
+
+// ----------------------------
+// BUILD SLIDES
+// ----------------------------
 
 
 $requests = [];
@@ -106,15 +190,20 @@ foreach ($slidesData as $index => $slideData) {
 
 
     $slideId =
-        "slide" . $index;
+        "slide_" . $index;
 
 
+
+
+
+    // Create blank slide
 
     $requests[] = [
 
         "createSlide" => [
 
             "objectId" => $slideId,
+
 
             "slideLayoutReference" => [
 
@@ -129,50 +218,78 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
-    if ($slideData["layout"] == "title") {
-
-
-        $requests =
-            array_merge(
-
-                $requests,
-
-                titleSlide(
-
-                    $slideId,
-
-                    $slideData["title"],
-
-                    $slideData["subtitle"] ?? ""
-
-                )
-
-            );
-
-
-    } elseif ($slideData["layout"] == "bullet") {
 
 
 
-        $requests =
-            array_merge(
+    // TITLE SLIDE
 
-                $requests,
+    if (
 
-                bulletSlide(
+        $slideData["layout"] === "title"
 
-                    $slideId,
+    ) {
 
-                    $slideData["title"],
 
-                    $slideData["points"]
 
-                )
+        $requests = array_merge(
 
-            );
+            $requests,
+
+
+            titleSlide(
+
+                $slideId,
+
+                $slideData["title"],
+
+                $slideData["subtitle"] ?? "",
+
+                $theme
+
+            )
+
+        );
+
 
 
     }
+
+
+
+
+
+
+    // BULLET SLIDE
+    elseif (
+
+        $slideData["layout"] === "bullet"
+
+    ) {
+
+
+
+        $requests = array_merge(
+
+            $requests,
+
+
+            bulletSlide(
+
+                $slideId,
+
+                $slideData["title"],
+
+                $slideData["points"],
+
+                $theme
+
+            )
+
+        );
+
+
+    }
+
 
 
 }
@@ -183,10 +300,19 @@ foreach ($slidesData as $index => $slideData) {
 
 
 
+
+
+// ----------------------------
+// SEND REQUESTS
+// ----------------------------
+
+
 if (count($requests) > 0) {
 
 
+
     $batch =
+
         new Google_Service_Slides_BatchUpdatePresentationRequest([
 
             "requests" => $requests
@@ -195,8 +321,12 @@ if (count($requests) > 0) {
 
 
 
+
+
     $service
+
         ->presentations
+
         ->batchUpdate(
 
             $presentationId,
@@ -209,16 +339,26 @@ if (count($requests) > 0) {
 }
 
 
-// hi
+
+
+
+
+
 
 echo json_encode([
 
     "success" => true,
 
+    "presentationId" => $presentationId,
+
     "url" =>
-        "https://docs.google.com/presentation/d/" . $presentationId
+
+        "https://docs.google.com/presentation/d/"
+
+        . $presentationId
 
 ]);
+
 
 
 ?>
