@@ -13,7 +13,7 @@ header('Content-Type: application/json');
 // ----------------------------
 // $apiKey = "my-key";
 
-
+'
 if (!$apiKey) {
 
     echo json_encode([
@@ -23,7 +23,7 @@ if (!$apiKey) {
     exit;
 
 }
-
+'
 
 // ----------------------------
 // READ INPUT
