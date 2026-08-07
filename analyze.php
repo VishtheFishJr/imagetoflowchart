@@ -11,13 +11,14 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-$apiKey = "AQ.Ab8RN6KqPNv_bG0ujCRwUIERsaOaQkxbHooydz-KwAS1HcT2Fg";
+
+$apiKey = "YOUR_GEMINI_API_KEY_HERE";
 
 
 if (!$apiKey) {
 
     echo json_encode([
-        "error" => "GEMINI_API_KEY environment variable not set."
+        "error" => "Gemini API key not set."
     ]);
 
     exit;
@@ -38,6 +39,7 @@ $input = json_decode(
 $mode = $input["mode"] ?? "flowchart";
 
 
+
 // ----------------------------
 // IMAGE HANDLING
 // ----------------------------
@@ -54,6 +56,7 @@ if (!is_dir($uploadDir)) {
 
 $imagePathToSave =
     "uploads/captured_" . time() . ".jpg";
+
 
 
 if (!empty($input["image"])) {
@@ -81,6 +84,7 @@ if (!empty($input["image"])) {
 }
 
 
+
 if (!$base64Image) {
 
     echo json_encode([
@@ -97,6 +101,7 @@ if (!$base64Image) {
 // PROMPTS
 // ----------------------------
 
+
 if ($mode === "flowchart") {
 
 
@@ -105,16 +110,14 @@ if ($mode === "flowchart") {
 Analyze the image and convert it into a highly visual Mermaid.js infographic diagram.
 
 Return ONLY Mermaid syntax.
-No markdown. No explanations.
 
 Start with:
 
 flowchart TD
 
-Create a polished educational infographic.
+Create a professional educational infographic.
 
 Include:
-
 - Main concepts
 - Supporting explanations
 - Examples
@@ -124,47 +127,20 @@ Include:
 - Callouts
 
 Layout:
-
-- Use subgraphs as visual sections
-- Add supporting information boxes
-- Use dashed arrows for explanations
-- Keep the main flow simple
-- Add details around the main path
-
-Text:
-
-Use:
-- Bullet points
-- Definitions
-- Examples
-- Important notes
-
-Use <br/> for line breaks.
-
-Shapes:
-
-Start/end:
-A(["Start"])
-
-Process:
-A["Process"]
-
-Decision:
-A{"Decision"}
-
-Database:
-A[("Data")]
-
+- Use subgraphs
+- Use supporting boxes
+- Use dashed arrows
+- Create visual hierarchy
 
 Rules:
-
 - Every node needs a unique ID
-- Every label must be inside quotes
+- Labels must be inside quotes
+- Use <br/> for line breaks
 - No markdown
 - Return only Mermaid code
-- Make it visually rich and presentation ready
 
 ';
+
 
 
 } elseif ($mode === "quiz") {
@@ -176,33 +152,77 @@ Analyze the image.
 
 Create a multiple choice quiz.
 
-Return ONLY text.
-
-Create 10 questions.
+Return ONLY valid JSON.
 
 Format:
 
-QUESTION 1:
-Question
+{
+"questions":[
+{
+"question":"",
+"choices":["","","",""],
+"answer":0,
+"explanation":""
+}
+]
+}
 
-A) Option
-B) Option
-C) Option
-D) Option
-
-ANSWER:
-Correct answer
-
-EXPLANATION:
-Explanation
-
-
-Include:
-- Definitions
-- Concepts
-- Applications
+Rules:
+- Create 10 questions
+- Test understanding
+- Include definitions and applications
 
 ';
+
+
+
+} elseif ($mode === "presentation") {
+
+
+    $prompt = '
+
+Analyze the image.
+
+Create an educational Google Slides presentation.
+
+Return ONLY valid JSON.
+
+Use exactly this format:
+
+{
+"title":"Presentation title",
+"slides":[
+{
+"layout":"title",
+"title":"Slide title",
+"subtitle":"Subtitle"
+},
+{
+"layout":"bullet",
+"title":"Slide title",
+"points":[
+"Point one",
+"Point two",
+"Point three"
+]
+}
+]
+}
+
+Rules:
+
+- Create 6-8 slides
+- First slide must use layout "title"
+- Remaining slides use layout "bullet"
+- Keep text concise
+- Include definitions
+- Include examples
+- Include important concepts
+- No markdown
+- JSON only
+
+';
+
 
 
 } else {
@@ -212,28 +232,24 @@ Include:
 
 Analyze the image.
 
-Create Quizlet style flashcards.
+Create Quizlet-style flashcards.
 
-Return ONLY text.
-
-Create 15 flashcards.
+Return ONLY valid JSON.
 
 Format:
 
-FLASHCARD 1
+{
+"cards":[
+{
+"front":"",
+"back":""
+}
+]
+}
 
-FRONT:
-Term or question
-
-BACK:
-Definition or explanation
-
-
-Include:
-- Important terms
-- Definitions
-- Examples
-- Key ideas
+Rules:
+- Create 15 cards
+- Include concepts, definitions, examples
 
 ';
 
@@ -246,8 +262,10 @@ Include:
 // GEMINI REQUEST
 // ----------------------------
 
+
 $url =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
+
 
 
 $payload = [
@@ -255,7 +273,6 @@ $payload = [
     "contents" => [
 
         [
-
             "parts" => [
 
                 [
@@ -316,7 +333,7 @@ if ($response === false) {
 
     echo json_encode([
 
-        "error" => "cURL Error: " . curl_error($ch)
+        "error" => curl_error($ch)
 
     ]);
 
@@ -345,17 +362,15 @@ $responseData = json_decode(
 
 if ($httpCode != 200) {
 
-
     echo json_encode([
 
         "error" => "Gemini API Error",
 
-        "http_code" => $httpCode,
+        "status" => $httpCode,
 
         "response" => $responseData
 
-    ], JSON_PRETTY_PRINT);
-
+    ]);
 
     exit;
 
@@ -370,12 +385,12 @@ if ($httpCode != 200) {
 
 $aiAnswer =
     $responseData["candidates"][0]["content"]["parts"][0]["text"]
-    ?? "No response";
+    ?? "";
 
 
 
 $aiAnswer = preg_replace(
-    '/```(?:mermaid)?/i',
+    '/```(?:json|mermaid)?/i',
     '',
     $aiAnswer
 );
@@ -393,7 +408,7 @@ $aiAnswer = trim($aiAnswer);
 
 
 // ----------------------------
-// SAVE DATABASE
+// SAVE LOG
 // ----------------------------
 
 
@@ -401,11 +416,13 @@ try {
 
 
     $stmt = $pdo->prepare(
+
         "
-        INSERT INTO scan_logs
-        (image_path, ai_response)
-        VALUES (?, ?)
-        "
+INSERT INTO scan_logs
+(image_path, ai_response)
+VALUES (?,?)
+"
+
     );
 
 
@@ -418,17 +435,17 @@ try {
     ]);
 
 
-
 } catch (PDOException $e) {
 
 
     echo json_encode([
 
-        "error" => "Database Error: " . $e->getMessage()
+        "error" => $e->getMessage()
 
     ]);
 
     exit;
+
 
 }
 
@@ -450,5 +467,6 @@ echo json_encode([
     "ai_response" => $aiAnswer
 
 ]);
+
 
 ?>
