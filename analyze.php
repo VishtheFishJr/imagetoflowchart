@@ -11,9 +11,9 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-// $apiKey = "my-key";
+$apiKey = "AQ.Ab8RN6LL_ATMe2gZaQOGsORBU5PFbNGXic05CM46ymrNwb6xgA";
 
-'
+
 if (!$apiKey) {
 
     echo json_encode([
@@ -23,12 +23,11 @@ if (!$apiKey) {
     exit;
 
 }
-'
+
 
 // ----------------------------
 // READ INPUT
 // ----------------------------
-
 $input = json_decode(
     file_get_contents("php://input"),
     true
@@ -97,6 +96,7 @@ if (!$base64Image) {
 // PROMPTS
 // ----------------------------
 
+
 if ($mode === "flowchart") {
 
 
@@ -105,7 +105,8 @@ if ($mode === "flowchart") {
 Analyze the image and convert it into a highly visual Mermaid.js infographic diagram.
 
 Return ONLY Mermaid syntax.
-No markdown. No explanations.
+No markdown.
+No explanations.
 
 Start with:
 
@@ -141,28 +142,12 @@ Use:
 
 Use <br/> for line breaks.
 
-Shapes:
-
-Start/end:
-A(["Start"])
-
-Process:
-A["Process"]
-
-Decision:
-A{"Decision"}
-
-Database:
-A[("Data")]
-
-
 Rules:
 
 - Every node needs a unique ID
 - Every label must be inside quotes
-- No markdown
 - Return only Mermaid code
-- Make it visually rich and presentation ready
+- Make it presentation ready
 
 ';
 
@@ -174,80 +159,136 @@ Rules:
 
 Analyze the image.
 
-Create a multiple choice quiz.
+Create a 10 question multiple choice quiz.
 
-Return ONLY text.
+Return ONLY valid JSON.
 
-Create 10 questions.
+No markdown.
+No code fences.
+No explanations outside JSON.
 
-Format:
+Use exactly this format:
 
-QUESTION 1:
-Question
+{
+ "questions":[
+  {
+   "question":"Question text",
+   "choices":[
+    "Choice 1",
+    "Choice 2",
+    "Choice 3",
+    "Choice 4"
+   ],
+   "answer":0,
+   "explanation":"Explanation"
+  }
+ ]
+}
 
-A) Option
-B) Option
-C) Option
-D) Option
+Rules:
 
-ANSWER:
-Correct answer
-
-EXPLANATION:
-Explanation
-
-
-Include:
-- Definitions
-- Concepts
-- Applications
+- Create exactly 10 questions.
+- answer must be 0,1,2,or 3.
+- Include definitions and applications.
+- Make incorrect choices realistic.
+- Return JSON only.
 
 ';
 
 
-} else {
+} elseif ($mode === "flashcards") {
 
 
     $prompt = '
 
 Analyze the image.
 
-Create Quizlet style flashcards.
+Create 15 Quizlet style flashcards.
 
-Return ONLY text.
+Return ONLY valid JSON.
 
-Create 15 flashcards.
+No markdown.
+No code fences.
 
-Format:
+Use exactly this format:
 
-FLASHCARD 1
+{
+ "cards":[
+  {
+   "front":"Term or question",
+   "back":"Definition or explanation"
+  }
+ ]
+}
 
-FRONT:
-Term or question
+Rules:
 
-BACK:
-Definition or explanation
+- Create exactly 15 cards.
+- Include important terms.
+- Include definitions.
+- Include examples.
+- Make them useful for studying.
+- Return JSON only.
+
+';
 
 
-Include:
-- Important terms
-- Definitions
-- Examples
-- Key ideas
+} elseif ($mode === "presentation") {
+
+
+    $prompt = '
+
+Analyze the image.
+
+Create an editable Google Slides presentation outline.
+
+Return ONLY valid JSON.
+
+No markdown.
+No code fences.
+
+Use exactly this format:
+
+{
+ "title":"Presentation title",
+ "slides":[
+  {
+   "layout":"title",
+   "title":"Title",
+   "subtitle":"Subtitle"
+  },
+  {
+   "layout":"bullet",
+   "title":"Slide title",
+   "points":[
+    "Point 1",
+    "Point 2",
+    "Point 3"
+   ]
+  }
+ ]
+}
+
+Rules:
+
+- Create 6-10 slides.
+- First slide must be title.
+- Remaining slides should be bullet slides.
+- Each bullet slide needs 3-6 points.
+- Make it educational.
+- Use only information from the image.
+- Return JSON only.
 
 ';
 
 
 }
-
-
-
 // ----------------------------
 // GEMINI REQUEST
 // ----------------------------
 
 $url =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
 
 
 $payload = [
@@ -364,18 +405,36 @@ if ($httpCode != 200) {
 
 
 // ----------------------------
-// GET RESPONSE
+// GET AI RESPONSE
 // ----------------------------
 
 
 $aiAnswer =
     $responseData["candidates"][0]["content"]["parts"][0]["text"]
-    ?? "No response";
+    ?? "";
 
 
+
+if (!$aiAnswer) {
+
+    echo json_encode([
+
+        "error" => "Gemini returned empty response",
+
+        "response" => $responseData
+
+    ]);
+
+    exit;
+
+}
+
+
+
+// Remove markdown fences if Gemini adds them
 
 $aiAnswer = preg_replace(
-    '/```(?:mermaid)?/i',
+    '/```(?:json|mermaid)?/i',
     '',
     $aiAnswer
 );
@@ -389,6 +448,54 @@ $aiAnswer = str_replace(
 
 
 $aiAnswer = trim($aiAnswer);
+
+
+
+
+// ----------------------------
+// FIX JSON OUTPUT MODES
+// ----------------------------
+
+if (
+    $mode === "quiz" ||
+    $mode === "flashcards" ||
+    $mode === "presentation"
+) {
+
+
+    $decoded = json_decode(
+        $aiAnswer,
+        true
+    );
+
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+
+
+        echo json_encode([
+
+            "error" => "AI did not return valid JSON",
+
+            "json_error" => json_last_error_msg(),
+
+            "raw_response" => $aiAnswer
+
+        ]);
+
+        exit;
+
+    }
+
+
+
+    // Make sure frontend receives clean JSON string
+    $aiAnswer = json_encode(
+        $decoded,
+        JSON_UNESCAPED_UNICODE
+    );
+
+
+}
 
 
 
