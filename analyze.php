@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
-$apiKey = "AQ.Ab8RN6LrFi6zmoD7p1BZ57ar2P0N-0iA3MqD3u0EeE5pNdsLQw";
+$apiKey = "AQ.Ab8RN6LL_ATMe2gZaQOGsORBU5PFbNGXic05CM46ymrNwb6xgA";
 
 
 if (!$apiKey) {
@@ -247,7 +247,7 @@ Include:
 // ----------------------------
 
 $url =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 
 $payload = [
