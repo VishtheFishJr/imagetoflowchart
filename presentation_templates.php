@@ -1,20 +1,88 @@
 <?php
 
 
-function titleSlide($slide, $title, $subtitle)
+// Convert HEX color to Google Slides RGB format
+function hexToRgb($hex)
 {
 
-    $titleId = uniqid("title_");
+    $hex = str_replace("#", "", $hex);
+
+
+    return [
+
+        "red" => hexdec(substr($hex, 0, 2)) / 255,
+
+        "green" => hexdec(substr($hex, 2, 2)) / 255,
+
+        "blue" => hexdec(substr($hex, 4, 2)) / 255
+
+    ];
+
+}
+
+
+
+
+
+function setBackground($slide, $color)
+{
+
+    return [
+
+        [
+            "updatePageProperties" => [
+
+                "objectId" => $slide,
+
+                "pageProperties" => [
+
+                    "pageBackgroundFill" => [
+
+                        "solidFill" => [
+
+                            "color" => [
+
+                                "rgbColor" => hexToRgb($color)
+
+                            ]
+
+                        ]
+
+                    ]
+
+                ],
+
+                "fields" =>
+                    "pageBackgroundFill.solidFill.color"
+
+            ]
+
+        ]
+
+    ];
+
+}
+
+
+
+
+
+function addAccentBar($slide, $color)
+{
+
+
+    $id = uniqid("bar_");
 
 
     return [
 
         [
+
             "createShape" => [
 
-                "objectId" => $titleId,
+                "objectId" => $id,
 
-                "shapeType" => "TEXT_BOX",
+                "shapeType" => "RECTANGLE",
 
                 "elementProperties" => [
 
@@ -23,16 +91,23 @@ function titleSlide($slide, $title, $subtitle)
                     "size" => [
 
                         "width" => [
-                            "magnitude" => 6000000,
+
+                            "magnitude" => 7000000,
+
                             "unit" => "EMU"
+
                         ],
 
                         "height" => [
-                            "magnitude" => 1000000,
+
+                            "magnitude" => 150000,
+
                             "unit" => "EMU"
+
                         ]
 
                     ],
+
 
                     "transform" => [
 
@@ -40,9 +115,9 @@ function titleSlide($slide, $title, $subtitle)
 
                         "scaleY" => 1,
 
-                        "translateX" => 800000,
+                        "translateX" => 0,
 
-                        "translateY" => 1500000,
+                        "translateY" => 0,
 
                         "unit" => "EMU"
 
@@ -56,11 +131,31 @@ function titleSlide($slide, $title, $subtitle)
 
 
         [
-            "insertText" => [
 
-                "objectId" => $titleId,
+            "updateShapeProperties" => [
 
-                "text" => $title . "\n\n" . $subtitle
+                "objectId" => $id,
+
+                "shapeProperties" => [
+
+                    "shapeBackgroundFill" => [
+
+                        "solidFill" => [
+
+                            "color" => [
+
+                                "rgbColor" => hexToRgb($color)
+
+                            ]
+
+                        ]
+
+                    ]
+
+                ],
+
+                "fields" =>
+                    "shapeBackgroundFill.solidFill.color"
 
             ]
 
@@ -73,32 +168,313 @@ function titleSlide($slide, $title, $subtitle)
 
 
 
-function bulletSlide($slide, $title, $points)
+
+
+
+
+function titleSlide($slide, $title, $subtitle, $theme)
 {
 
-    $textboxId = uniqid("bullet_");
+
+    $titleId = uniqid("title_");
 
 
-    $text = $title . "\n\n";
+    $requests = [];
+
+
+    // Background
+
+    $requests = array_merge(
+
+        $requests,
+
+        setBackground(
+
+            $slide,
+
+            $theme["background"]
+
+        )
+
+    );
+
+
+
+    // Accent
+
+    $requests = array_merge(
+
+        $requests,
+
+        addAccentBar(
+
+            $slide,
+
+            $theme["primaryColor"]
+
+        )
+
+    );
+
+
+
+
+
+    // Text box
+
+    $requests[] = [
+
+        "createShape" => [
+
+            "objectId" => $titleId,
+
+            "shapeType" => "TEXT_BOX",
+
+            "elementProperties" => [
+
+                "pageObjectId" => $slide,
+
+                "size" => [
+
+                    "width" => [
+
+                        "magnitude" => 6500000,
+
+                        "unit" => "EMU"
+
+                    ],
+
+                    "height" => [
+
+                        "magnitude" => 1500000,
+
+                        "unit" => "EMU"
+
+                    ]
+
+                ],
+
+
+                "transform" => [
+
+                    "translateX" => 700000,
+
+                    "translateY" => 1500000,
+
+                    "scaleX" => 1,
+
+                    "scaleY" => 1,
+
+                    "unit" => "EMU"
+
+                ]
+
+            ]
+
+        ]
+
+    ];
+
+
+
+
+
+    $requests[] = [
+
+        "insertText" => [
+
+            "objectId" => $titleId,
+
+            "text" =>
+                $title .
+                "\n\n" .
+                $subtitle
+
+        ]
+
+    ];
+
+
+
+
+
+    return $requests;
+
+
+}
+
+
+
+
+
+
+
+
+
+function bulletSlide($slide, $title, $points, $theme)
+{
+
+
+    $textboxId = uniqid("content_");
+
+
+    $requests = [];
+
+
+
+    $requests = array_merge(
+
+        $requests,
+
+        setBackground(
+
+            $slide,
+
+            $theme["background"]
+
+        )
+
+    );
+
+
+
+
+    $requests = array_merge(
+
+        $requests,
+
+        addAccentBar(
+
+            $slide,
+
+            $theme["secondaryColor"]
+
+        )
+
+    );
+
+
+
+
+
+    $text =
+        $title .
+        "\n\n";
+
 
 
     foreach ($points as $point) {
 
-        $text .= "• " . $point . "\n";
+        $text .=
+            "• " .
+            $point .
+            "\n";
 
     }
 
 
 
+
+
+    $requests[] = [
+
+        "createShape" => [
+
+            "objectId" => $textboxId,
+
+            "shapeType" => "TEXT_BOX",
+
+
+            "elementProperties" => [
+
+                "pageObjectId" => $slide,
+
+
+                "size" => [
+
+                    "width" => [
+
+                        "magnitude" => 6500000,
+
+                        "unit" => "EMU"
+
+                    ],
+
+
+                    "height" => [
+
+                        "magnitude" => 4000000,
+
+                        "unit" => "EMU"
+
+                    ]
+
+                ],
+
+
+
+                "transform" => [
+
+                    "translateX" => 700000,
+
+                    "translateY" => 900000,
+
+                    "scaleX" => 1,
+
+                    "scaleY" => 1,
+
+                    "unit" => "EMU"
+
+                ]
+
+            ]
+
+        ]
+
+    ];
+
+
+
+
+
+
+    $requests[] = [
+
+        "insertText" => [
+
+            "objectId" => $textboxId,
+
+            "text" => $text
+
+        ]
+
+    ];
+
+
+
+
+
+    return $requests;
+
+
+}
+
+
+
+
+
+
+// Future image support
+function addImage($slide, $url)
+{
+
     return [
 
         [
 
-            "createShape" => [
+            "createImage" => [
 
-                "objectId" => $textboxId,
-
-                "shapeType" => "TEXT_BOX",
+                "url" => $url,
 
                 "elementProperties" => [
 
@@ -107,45 +483,24 @@ function bulletSlide($slide, $title, $points)
                     "size" => [
 
                         "width" => [
-                            "magnitude" => 6000000,
+
+                            "magnitude" => 2500000,
+
                             "unit" => "EMU"
+
                         ],
 
                         "height" => [
-                            "magnitude" => 4000000,
+
+                            "magnitude" => 2000000,
+
                             "unit" => "EMU"
+
                         ]
-
-                    ],
-
-                    "transform" => [
-
-                        "scaleX" => 1,
-
-                        "scaleY" => 1,
-
-                        "translateX" => 700000,
-
-                        "translateY" => 800000,
-
-                        "unit" => "EMU"
 
                     ]
 
                 ]
-
-            ]
-
-        ],
-
-
-        [
-
-            "insertText" => [
-
-                "objectId" => $textboxId,
-
-                "text" => $text
 
             ]
 
@@ -154,6 +509,7 @@ function bulletSlide($slide, $title, $points)
     ];
 
 }
+
 
 
 ?>
