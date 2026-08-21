@@ -26,8 +26,6 @@ if (!isset($_SESSION["google_token"])) {
 }
 
 
-
-
 $client = new Google_Client();
 
 
@@ -39,7 +37,6 @@ $client->setAuthConfig(
 $client->setAccessToken(
     $_SESSION["google_token"]
 );
-
 
 
 // Refresh token
@@ -55,10 +52,28 @@ if ($client->isAccessTokenExpired()) {
 }
 
 
-
 $service =
     new Google_Service_Slides($client);
 
+
+
+// ----------------------------
+// GEMINI API KEY
+// ----------------------------
+
+$apiKey =
+    getenv("GEMINI_API_KEY");
+
+
+if (!$apiKey) {
+
+    echo json_encode([
+        "error" => "GEMINI_API_KEY environment variable not set."
+    ]);
+
+    exit;
+
+}
 
 
 
@@ -66,13 +81,11 @@ $service =
 // READ AI DATA
 // ----------------------------
 
-
 $data =
     json_decode(
         file_get_contents("php://input"),
         true
     );
-
 
 
 if (!$data) {
@@ -86,18 +99,14 @@ if (!$data) {
 }
 
 
-
 $slidesData =
     $data["slides"] ?? [];
-
-
 
 
 
 // ----------------------------
 // THEME
 // ----------------------------
-
 
 $theme =
     $data["theme"] ?? [
@@ -118,22 +127,321 @@ $theme =
 
 
 
+// ----------------------------
+// IMAGE GENERATION FUNCTION
+// ----------------------------
+
+function generateSlideImage(
+    $description,
+    $theme,
+    $slideTitle = ""
+) {
+
+    global $apiKey;
+
+
+    if (!$description) {
+        return null;
+    }
+
+
+    /*
+     * Ask Gemini to create an image specifically
+     * for a presentation slide.
+     */
+    $prompt =
+
+        "Create a professional educational presentation graphic.
+
+"
+
+        . "Subject: "
+        . $slideTitle
+        . "
+
+"
+
+        . "Visual description:
+"
+        . $description
+        . "
+
+"
+
+        . "Presentation style:
+"
+        . ($theme["style"] ?? "modern")
+        . "
+
+"
+
+        . "Color palette:
+"
+        . "Background: "
+        . ($theme["background"] ?? "#FFFFFF")
+        . "
+Primary: "
+        . ($theme["primaryColor"] ?? "#2563EB")
+        . "
+Secondary: "
+        . ($theme["secondaryColor"] ?? "#60A5FA")
+        . "
+
+"
+
+        . "Requirements:
+"
+        . "- Professional educational graphic
+"
+        . "- Clean composition
+"
+        . "- Suitable for Google Slides
+"
+        . "- 16:9 composition
+"
+        . "- No unnecessary text
+"
+        . "- No watermarks other than the model's required watermark
+"
+        . "- Make the visual directly relevant to the subject
+"
+        . "- Use the requested color palette
+";
+
+
+    $url =
+        "https://generativelanguage.googleapis.com/v1/models/gemini-3.1-flash-image:generateContent";
+
+
+    $payload = [
+
+        "contents" => [
+
+            [
+
+                "parts" => [
+
+                    [
+                        "text" => $prompt
+                    ]
+
+                ]
+
+            ]
+
+        ],
+
+        "generationConfig" => [
+
+            "responseModalities" => [
+                "IMAGE"
+            ],
+
+            "responseFormat" => [
+
+                "image" => [
+
+                    "aspectRatio" => "16:9",
+
+                    "imageSize" => "1K"
+
+                ]
+
+            ]
+
+        ]
+
+    ];
+
+
+    $ch =
+        curl_init($url);
+
+
+    curl_setopt_array($ch, [
+
+        CURLOPT_RETURNTRANSFER => true,
+
+        CURLOPT_POST => true,
+
+        CURLOPT_POSTFIELDS =>
+            json_encode($payload),
+
+        CURLOPT_HTTPHEADER => [
+
+            "Content-Type: application/json",
+
+            "X-goog-api-key: " . $apiKey
+
+        ],
+
+        CURLOPT_TIMEOUT => 120
+
+    ]);
+
+
+    $response =
+        curl_exec($ch);
+
+
+    if ($response === false) {
+
+        curl_close($ch);
+
+        return null;
+
+    }
+
+
+    $httpCode =
+        curl_getinfo(
+            $ch,
+            CURLINFO_HTTP_CODE
+        );
+
+
+    curl_close($ch);
+
+
+    if ($httpCode !== 200) {
+
+        error_log(
+            "Gemini image generation failed: "
+            . $httpCode
+            . " "
+            . $response
+        );
+
+        return null;
+
+    }
+
+
+    $responseData =
+        json_decode(
+            $response,
+            true
+        );
+
+
+    if (!$responseData) {
+        return null;
+    }
+
+
+    /*
+     * Find the generated image in the response.
+     */
+    $imageData = null;
+
+
+    foreach (
+        $responseData["candidates"][0]["content"]["parts"]
+        ?? []
+        as $part
+    ) {
+
+        if (
+            isset($part["inlineData"]["data"])
+        ) {
+
+            $imageData =
+                $part["inlineData"]["data"];
+
+            break;
+
+        }
+
+    }
+
+
+    if (!$imageData) {
+        return null;
+    }
+
+
+    $imageBytes =
+        base64_decode(
+            $imageData
+        );
+
+
+    if (!$imageBytes) {
+        return null;
+    }
+
+
+    // ----------------------------
+    // SAVE IMAGE
+    // ----------------------------
+
+    $uploadDir =
+        __DIR__ . "/uploads/";
+
+
+    if (!is_dir($uploadDir)) {
+
+        mkdir(
+            $uploadDir,
+            0755,
+            true
+        );
+
+    }
+
+
+    $filename =
+        "generated_slide_"
+        . time()
+        . "_"
+        . uniqid()
+        . ".png";
+
+
+    $filePath =
+        $uploadDir . $filename;
+
+
+    $written =
+        file_put_contents(
+            $filePath,
+            $imageBytes
+        );
+
+
+    if ($written === false) {
+        return null;
+    }
+
+
+    /*
+     * This is the public URL Google Slides will use.
+     *
+     * Your uploads directory is:
+     *
+     * /var/www/html/imagetoflowchart/uploads/
+     */
+    $publicUrl =
+        "https://vishthefishjr.me/imagetoflowchart/uploads/"
+        . $filename;
+
+
+    return $publicUrl;
+}
+
 
 
 // ----------------------------
 // CREATE PRESENTATION
 // ----------------------------
 
-
 $presentation =
     new Google_Service_Slides_Presentation();
-
 
 
 $presentation->setTitle(
     $data["title"] ?? "AI Presentation"
 );
-
 
 
 $created =
@@ -142,10 +450,8 @@ $created =
     );
 
 
-
 $presentationId =
     $created->presentationId;
-
 
 
 
@@ -153,23 +459,27 @@ $presentationId =
 // BUILD REQUESTS
 // ----------------------------
 
-
 $requests = [];
 
 
+// Keep track of generated images
+$generatedImages = [];
 
 
-foreach ($slidesData as $index => $slideData) {
 
+foreach (
+    $slidesData
+    as $index => $slideData
+) {
 
 
     $slideId =
         "slide_" . $index;
 
 
-
-
-    // Create blank slide
+    // ----------------------------
+    // CREATE BLANK SLIDE
+    // ----------------------------
 
     $requests[] = [
 
@@ -179,7 +489,8 @@ foreach ($slidesData as $index => $slideData) {
 
             "slideLayoutReference" => [
 
-                "predefinedLayout" => "BLANK"
+                "predefinedLayout" =>
+                    "BLANK"
 
             ]
 
@@ -188,13 +499,9 @@ foreach ($slidesData as $index => $slideData) {
     ];
 
 
-
-
-
     $layout =
-        $slideData["layout"] ?? "bullet";
-
-
+        $slideData["layout"]
+        ?? "bullet";
 
 
 
@@ -203,8 +510,6 @@ foreach ($slidesData as $index => $slideData) {
     // ----------------------------
 
     if ($layout === "title") {
-
-
 
         $requests = array_merge(
 
@@ -225,10 +530,7 @@ foreach ($slidesData as $index => $slideData) {
         );
 
 
-
     }
-
-
 
 
 
@@ -236,8 +538,6 @@ foreach ($slidesData as $index => $slideData) {
     // BULLET
     // ----------------------------
     elseif ($layout === "bullet") {
-
-
 
         $requests = array_merge(
 
@@ -253,16 +553,65 @@ foreach ($slidesData as $index => $slideData) {
 
                 $theme,
 
-                $slideData["visual"] ?? ""
-
+                ""
             )
 
         );
 
 
+        /*
+         * Generate an image if Gemini
+         * suggested one.
+         */
+        if (
+            !empty($slideData["visual"])
+        ) {
+
+            $imageUrl =
+                generateSlideImage(
+
+                    $slideData["visual"],
+
+                    $theme,
+
+                    $slideData["title"] ?? ""
+
+                );
+
+
+            if ($imageUrl) {
+
+                $generatedImages[] =
+                    $imageUrl;
+
+
+                $requests = array_merge(
+
+                    $requests,
+
+                    addImage(
+
+                        $slideId,
+
+                        $imageUrl,
+
+                        4500000,
+
+                        1100000,
+
+                        2400000,
+
+                        2200000
+
+                    )
+
+                );
+
+            }
+
+        }
+
     }
-
-
 
 
 
@@ -271,6 +620,41 @@ foreach ($slidesData as $index => $slideData) {
     // ----------------------------
     elseif ($layout === "image_text") {
 
+
+        $imageUrl = null;
+
+
+        $visual =
+            $slideData["image"]
+            ?? $slideData["visual"]
+            ?? "";
+
+
+        /*
+         * Generate the actual image.
+         */
+        if ($visual) {
+
+            $imageUrl =
+                generateSlideImage(
+
+                    $visual,
+
+                    $theme,
+
+                    $slideData["title"] ?? ""
+
+                );
+
+
+            if ($imageUrl) {
+
+                $generatedImages[] =
+                    $imageUrl;
+
+            }
+
+        }
 
 
         $requests = array_merge(
@@ -283,20 +667,21 @@ foreach ($slidesData as $index => $slideData) {
 
                 $slideData["title"] ?? "",
 
-                $slideData["points"] ?? [],
+                $slideData["text"]
+                ?? $slideData["points"]
+                ?? [],
 
-                $slideData["visual"] ?? "",
+                $visual,
 
-                $theme
+                $theme,
+
+                $imageUrl
 
             )
 
         );
 
-
     }
-
-
 
 
 
@@ -304,8 +689,6 @@ foreach ($slidesData as $index => $slideData) {
     // COMPARISON
     // ----------------------------
     elseif ($layout === "comparison") {
-
-
 
         $requests = array_merge(
 
@@ -323,10 +706,7 @@ foreach ($slidesData as $index => $slideData) {
 
         );
 
-
     }
-
-
 
 
 
@@ -334,8 +714,6 @@ foreach ($slidesData as $index => $slideData) {
     // TIMELINE
     // ----------------------------
     elseif ($layout === "timeline") {
-
-
 
         $requests = array_merge(
 
@@ -353,10 +731,122 @@ foreach ($slidesData as $index => $slideData) {
 
         );
 
-
     }
 
 
+
+    // ----------------------------
+    // DIAGRAM
+    // ----------------------------
+    elseif ($layout === "diagram") {
+
+
+        $steps =
+            $slideData["steps"]
+            ?? [];
+
+
+        $text =
+            ($slideData["title"] ?? "Diagram")
+            . "\n\n";
+
+
+        foreach (
+            $steps
+            as $stepIndex => $step
+        ) {
+
+            $text .=
+                ($stepIndex + 1)
+                . ". "
+                . $step
+                . "\n\n";
+
+        }
+
+
+        $requests = array_merge(
+
+            $requests,
+
+            createTextBox(
+
+                $slideId,
+
+                $text,
+
+                700000,
+
+                900000,
+
+                6500000,
+
+                4000000,
+
+                $theme,
+
+                20,
+
+                false
+
+            )
+
+        );
+
+
+        /*
+         * Generate a diagram image if
+         * Gemini supplied a visual.
+         */
+        if (
+            !empty($slideData["visual"])
+        ) {
+
+            $imageUrl =
+                generateSlideImage(
+
+                    $slideData["visual"],
+
+                    $theme,
+
+                    $slideData["title"] ?? ""
+
+                );
+
+
+            if ($imageUrl) {
+
+                $generatedImages[] =
+                    $imageUrl;
+
+
+                $requests = array_merge(
+
+                    $requests,
+
+                    addImage(
+
+                        $slideId,
+
+                        $imageUrl,
+
+                        4300000,
+
+                        1200000,
+
+                        2400000,
+
+                        2600000
+
+                    )
+
+                );
+
+            }
+
+        }
+
+    }
 
 
 
@@ -364,8 +854,6 @@ foreach ($slidesData as $index => $slideData) {
     // FALLBACK
     // ----------------------------
     else {
-
-
 
         $requests = array_merge(
 
@@ -381,23 +869,14 @@ foreach ($slidesData as $index => $slideData) {
 
                 $theme,
 
-                $slideData["visual"] ?? ""
-
+                ""
             )
 
         );
 
-
     }
 
-
-
-
 }
-
-
-
-
 
 
 
@@ -405,9 +884,9 @@ foreach ($slidesData as $index => $slideData) {
 // SEND TO GOOGLE
 // ----------------------------
 
-
-if (count($requests) > 0) {
-
+if (
+    count($requests) > 0
+) {
 
     $batch =
 
@@ -418,22 +897,35 @@ if (count($requests) > 0) {
         ]);
 
 
+    try {
 
-    $service
-        ->presentations
-        ->batchUpdate(
+        $service
+            ->presentations
+            ->batchUpdate(
 
-            $presentationId,
+                $presentationId,
 
-            $batch
+                $batch
 
-        );
+            );
 
+    } catch (Exception $e) {
+
+        echo json_encode([
+
+            "error" =>
+                "Google Slides error",
+
+            "message" =>
+                $e->getMessage()
+
+        ]);
+
+        exit;
+
+    }
 
 }
-
-
-
 
 
 
@@ -441,20 +933,22 @@ if (count($requests) > 0) {
 // RESPONSE
 // ----------------------------
 
-
 echo json_encode([
 
     "success" => true,
 
     "theme" => $theme,
 
-    "presentationId" => $presentationId,
+    "presentationId" =>
+        $presentationId,
+
+    "generatedImages" =>
+        $generatedImages,
 
     "url" =>
         "https://docs.google.com/presentation/d/"
         . $presentationId
 
 ]);
-
 
 ?>
