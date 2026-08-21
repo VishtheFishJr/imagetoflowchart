@@ -146,12 +146,14 @@ function generateSlideImage(
 
 
     /*
-     * Ask Gemini to create an image specifically
-     * for a presentation slide.
+     * Ask Gemini to create an actual image.
      */
+
     $prompt =
 
-        "Create a professional educational presentation graphic.\n\n"
+        "Create an actual image, not a description.\n\n"
+
+        . "Create a professional educational presentation graphic.\n\n"
 
         . "Subject: "
         . $slideTitle
@@ -175,12 +177,14 @@ function generateSlideImage(
         . "\n\n"
 
         . "Requirements:\n"
+        . "- Generate the actual visual\n"
+        . "- Do NOT return a text description\n"
+        . "- Do NOT explain the image\n"
         . "- Professional educational graphic\n"
         . "- Clean composition\n"
         . "- Suitable for Google Slides\n"
         . "- 16:9 composition\n"
         . "- No unnecessary text\n"
-        . "- No watermarks other than the model's required watermark\n"
         . "- Make the visual directly relevant to the subject\n"
         . "- Use the requested color palette\n";
 
@@ -212,6 +216,7 @@ function generateSlideImage(
         "generationConfig" => [
 
             "responseModalities" => [
+                "TEXT",
                 "IMAGE"
             ],
 
@@ -308,13 +313,20 @@ function generateSlideImage(
 
 
     if (!$responseData) {
+
+        error_log(
+            "Gemini returned invalid JSON."
+        );
+
         return null;
+
     }
 
 
     /*
-     * Find the generated image in the response.
+     * Find the actual generated image.
      */
+
     $imageData = null;
 
 
@@ -324,7 +336,19 @@ function generateSlideImage(
         as $part
     ) {
 
+        // Ignore text descriptions
+
+        if (isset($part["text"])) {
+
+            continue;
+
+        }
+
+
+        // Get actual generated image
+
         if (
+            isset($part["inlineData"]) &&
             isset($part["inlineData"]["data"])
         ) {
 
@@ -339,18 +363,36 @@ function generateSlideImage(
 
 
     if (!$imageData) {
+
+        error_log(
+            "Gemini returned no image data: "
+            . $response
+        );
+
         return null;
+
     }
 
 
+    // ----------------------------
+    // DECODE IMAGE
+    // ----------------------------
+
     $imageBytes =
         base64_decode(
-            $imageData
+            $imageData,
+            true
         );
 
 
-    if (!$imageBytes) {
+    if ($imageBytes === false) {
+
+        error_log(
+            "Could not decode Gemini image."
+        );
+
         return null;
+
     }
 
 
@@ -393,23 +435,29 @@ function generateSlideImage(
 
 
     if ($written === false) {
+
+        error_log(
+            "Could not save generated image: "
+            . $filePath
+        );
+
         return null;
+
     }
 
 
     /*
-     * IMPORTANT:
+     * The Apache DocumentRoot is:
      *
-     * /var/www/html/imagetoflowchart/
-     * is already the DocumentRoot.
+     * /var/www/html/imagetoflowchart
      *
-     * Therefore the public URL is:
+     * Therefore:
      *
-     * https://vishthefishjr.me/uploads/...
+     * /var/www/html/imagetoflowchart/uploads/
      *
-     * NOT:
+     * becomes:
      *
-     * /imagetoflowchart/uploads/...
+     * https://vishthefishjr.me/uploads/
      */
 
     $publicUrl =
@@ -418,6 +466,7 @@ function generateSlideImage(
 
 
     return $publicUrl;
+
 }
 
 
@@ -552,7 +601,7 @@ foreach (
 
 
         /*
-         * Generate an image if Gemini
+         * Generate an actual image if Gemini
          * suggested one.
          */
 
