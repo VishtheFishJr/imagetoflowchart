@@ -213,23 +213,19 @@ function generateSlideImage(
 
         ],
 
+        /*
+         * IMPORTANT:
+         *
+         * Do not specify responseFormat here.
+         * The previous aspectRatio and imageSize
+         * values were invalid for this model/API.
+         */
+
         "generationConfig" => [
 
             "responseModalities" => [
                 "TEXT",
                 "IMAGE"
-            ],
-
-            "responseFormat" => [
-
-                "image" => [
-
-                    "aspectRatio" => "16:9",
-
-                    "imageSize" => "1K"
-
-                ]
-
             ]
 
         ]
@@ -265,6 +261,7 @@ function generateSlideImage(
 
     $response =
         curl_exec($ch);
+
 
     file_put_contents(
         __DIR__ . "/gemini_image_debug.json",
