@@ -266,6 +266,11 @@ function generateSlideImage(
     $response =
         curl_exec($ch);
 
+    file_put_contents(
+        __DIR__ . "/gemini_image_debug.json",
+        $response
+    );
+
 
     if ($response === false) {
 
