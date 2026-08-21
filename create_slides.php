@@ -151,63 +151,41 @@ function generateSlideImage(
      */
     $prompt =
 
-        "Create a professional educational presentation graphic.
-
-"
+        "Create a professional educational presentation graphic.\n\n"
 
         . "Subject: "
         . $slideTitle
-        . "
+        . "\n\n"
 
-"
-
-        . "Visual description:
-"
+        . "Visual description:\n"
         . $description
-        . "
+        . "\n\n"
 
-"
-
-        . "Presentation style:
-"
+        . "Presentation style:\n"
         . ($theme["style"] ?? "modern")
-        . "
+        . "\n\n"
 
-"
-
-        . "Color palette:
-"
+        . "Color palette:\n"
         . "Background: "
         . ($theme["background"] ?? "#FFFFFF")
-        . "
-Primary: "
+        . "\nPrimary: "
         . ($theme["primaryColor"] ?? "#2563EB")
-        . "
-Secondary: "
+        . "\nSecondary: "
         . ($theme["secondaryColor"] ?? "#60A5FA")
-        . "
+        . "\n\n"
 
-"
+        . "Requirements:\n"
+        . "- Professional educational graphic\n"
+        . "- Clean composition\n"
+        . "- Suitable for Google Slides\n"
+        . "- 16:9 composition\n"
+        . "- No unnecessary text\n"
+        . "- No watermarks other than the model's required watermark\n"
+        . "- Make the visual directly relevant to the subject\n"
+        . "- Use the requested color palette\n";
 
-        . "Requirements:
-"
-        . "- Professional educational graphic
-"
-        . "- Clean composition
-"
-        . "- Suitable for Google Slides
-"
-        . "- 16:9 composition
-"
-        . "- No unnecessary text
-"
-        . "- No watermarks other than the model's required watermark
-"
-        . "- Make the visual directly relevant to the subject
-"
-        . "- Use the requested color palette
-";
 
+    // KEEPING YOUR GEMINI MODEL EXACTLY THE SAME
 
     $url =
         "https://generativelanguage.googleapis.com/v1/models/gemini-3.1-flash-image:generateContent";
@@ -285,6 +263,11 @@ Secondary: "
 
 
     if ($response === false) {
+
+        error_log(
+            "Gemini image cURL error: "
+            . curl_error($ch)
+        );
 
         curl_close($ch);
 
@@ -415,14 +398,22 @@ Secondary: "
 
 
     /*
-     * This is the public URL Google Slides will use.
+     * IMPORTANT:
      *
-     * Your uploads directory is:
+     * /var/www/html/imagetoflowchart/
+     * is already the DocumentRoot.
      *
-     * /var/www/html/imagetoflowchart/uploads/
+     * Therefore the public URL is:
+     *
+     * https://vishthefishjr.me/uploads/...
+     *
+     * NOT:
+     *
+     * /imagetoflowchart/uploads/...
      */
+
     $publicUrl =
-        "https://vishthefishjr.me/imagetoflowchart/uploads/"
+        "https://vishthefishjr.me/uploads/"
         . $filename;
 
 
@@ -463,6 +454,7 @@ $requests = [];
 
 
 // Keep track of generated images
+
 $generatedImages = [];
 
 
@@ -529,7 +521,6 @@ foreach (
 
         );
 
-
     }
 
 
@@ -554,6 +545,7 @@ foreach (
                 $theme,
 
                 ""
+
             )
 
         );
@@ -563,6 +555,7 @@ foreach (
          * Generate an image if Gemini
          * suggested one.
          */
+
         if (
             !empty($slideData["visual"])
         ) {
@@ -620,7 +613,6 @@ foreach (
     // ----------------------------
     elseif ($layout === "image_text") {
 
-
         $imageUrl = null;
 
 
@@ -633,6 +625,7 @@ foreach (
         /*
          * Generate the actual image.
          */
+
         if ($visual) {
 
             $imageUrl =
@@ -740,7 +733,6 @@ foreach (
     // ----------------------------
     elseif ($layout === "diagram") {
 
-
         $steps =
             $slideData["steps"]
             ?? [];
@@ -798,6 +790,7 @@ foreach (
          * Generate a diagram image if
          * Gemini supplied a visual.
          */
+
         if (
             !empty($slideData["visual"])
         ) {
@@ -870,6 +863,7 @@ foreach (
                 $theme,
 
                 ""
+
             )
 
         );

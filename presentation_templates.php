@@ -1,12 +1,9 @@
 <?php
 
+
 function hexToRgb($hex)
 {
     $hex = str_replace("#", "", $hex);
-
-    if (strlen($hex) !== 6) {
-        $hex = "FFFFFF";
-    }
 
     return [
         "red" => hexdec(substr($hex, 0, 2)) / 255,
@@ -14,6 +11,8 @@ function hexToRgb($hex)
         "blue" => hexdec(substr($hex, 4, 2)) / 255
     ];
 }
+
+
 
 
 function setBackground($slide, $color)
@@ -40,11 +39,15 @@ function setBackground($slide, $color)
 }
 
 
+
+
+
 function addAccentBar($slide, $color)
 {
     $id = uniqid("accent_");
 
     return [
+
         [
             "createShape" => [
                 "objectId" => $id,
@@ -58,7 +61,6 @@ function addAccentBar($slide, $color)
                             "magnitude" => 7200000,
                             "unit" => "EMU"
                         ],
-
                         "height" => [
                             "magnitude" => 180000,
                             "unit" => "EMU"
@@ -93,17 +95,25 @@ function addAccentBar($slide, $color)
                 "fields" => "shapeBackgroundFill.solidFill.color"
             ]
         ]
+
     ];
 }
+
+
+
+
+
 
 
 function styleText($id, $color, $size, $bold = true)
 {
     return [
         "updateTextStyle" => [
+
             "objectId" => $id,
 
             "style" => [
+
                 "foregroundColor" => [
                     "opaqueColor" => [
                         "rgbColor" => hexToRgb($color)
@@ -118,13 +128,20 @@ function styleText($id, $color, $size, $bold = true)
                 "bold" => $bold,
 
                 "fontFamily" => "Aptos"
+
             ],
 
             "fields" =>
                 "foregroundColor,fontSize,bold,fontFamily"
+
         ]
     ];
 }
+
+
+
+
+
 
 
 function createTextBox(
@@ -141,14 +158,18 @@ function createTextBox(
 
     $id = uniqid("text_");
 
+
     return [
+
         [
             "createShape" => [
+
                 "objectId" => $id,
 
                 "shapeType" => "TEXT_BOX",
 
                 "elementProperties" => [
+
                     "pageObjectId" => $slide,
 
                     "size" => [
@@ -171,8 +192,10 @@ function createTextBox(
                         "unit" => "EMU"
                     ]
                 ]
+
             ]
         ],
+
 
         [
             "insertText" => [
@@ -181,37 +204,46 @@ function createTextBox(
             ]
         ],
 
+
         styleText(
             $id,
             $theme["textColor"],
             $size,
             $bold
         )
+
     ];
+
 }
+
+
+
+
+
+
+
 
 
 function titleSlide($slide, $title, $subtitle, $theme)
 {
+
     $requests = [];
 
-    $requests = array_merge(
-        $requests,
-        setBackground(
-            $slide,
-            $theme["background"]
-        )
-    );
 
     $requests = array_merge(
         $requests,
-        addAccentBar(
-            $slide,
-            $theme["primaryColor"]
-        )
+        setBackground($slide, $theme["background"])
     );
 
+
     $requests = array_merge(
+        $requests,
+        addAccentBar($slide, $theme["primaryColor"])
+    );
+
+
+    $requests = array_merge(
+
         $requests,
 
         createTextBox(
@@ -225,53 +257,56 @@ function titleSlide($slide, $title, $subtitle, $theme)
             30,
             true
         )
+
     );
 
+
     return $requests;
+
 }
 
 
-function bulletSlide(
-    $slide,
-    $title,
-    $points,
-    $theme,
-    $visual = ""
-) {
+
+
+
+
+
+
+
+
+function bulletSlide($slide, $title, $points, $theme, $visual = "")
+{
 
     $requests = [];
 
-    $requests = array_merge(
-        $requests,
-        setBackground(
-            $slide,
-            $theme["background"]
-        )
-    );
 
     $requests = array_merge(
         $requests,
-        addAccentBar(
-            $slide,
-            $theme["secondaryColor"]
-        )
+        setBackground($slide, $theme["background"])
     );
+
+
+    $requests = array_merge(
+        $requests,
+        addAccentBar($slide, $theme["secondaryColor"])
+    );
+
 
     $text = $title . "\n\n";
+
 
     foreach ($points as $p) {
         $text .= "• " . $p . "\n";
     }
 
-    /*
-     * Only display the visual description if
-     * an actual generated image was not supplied.
-     */
+
     if ($visual) {
-        $text .= "\n" . $visual;
+        $text .= "\nVisual:\n" . $visual;
     }
 
+
     $requests = array_merge(
+
         $requests,
 
         createTextBox(
@@ -285,10 +320,20 @@ function bulletSlide(
             18,
             false
         )
+
     );
 
+
     return $requests;
+
 }
+
+
+
+
+
+
+
 
 
 function imageTextSlide(
@@ -302,34 +347,23 @@ function imageTextSlide(
 
     $requests = [];
 
-    $requests = array_merge(
-        $requests,
-        setBackground(
-            $slide,
-            $theme["background"]
-        )
-    );
 
     $requests = array_merge(
         $requests,
-        addAccentBar(
-            $slide,
-            $theme["primaryColor"]
-        )
+        setBackground($slide, $theme["background"])
     );
 
-
-    // -------------------------
-    // LEFT TEXT
-    // -------------------------
 
     $text = $title . "\n\n";
+
 
     foreach ($points as $p) {
         $text .= "• " . $p . "\n";
     }
 
+
     $requests = array_merge(
+
         $requests,
 
         createTextBox(
@@ -340,19 +374,21 @@ function imageTextSlide(
             3500000,
             4000000,
             $theme,
-            18,
-            false
+            18
         )
+
     );
 
 
-    // -------------------------
-    // GENERATED IMAGE
-    // -------------------------
+    /*
+     * If an AI-generated image was successfully created,
+     * put the actual image into the slide.
+     */
 
     if ($imageUrl) {
 
         $requests = array_merge(
+
             $requests,
 
             addImage(
@@ -361,99 +397,85 @@ function imageTextSlide(
                 4200000,
                 1200000,
                 2500000,
-                3000000
+                2500000
             )
+
         );
 
     } else {
 
-        // Fallback if image generation failed
+        /*
+         * Fallback if image generation failed.
+         */
 
         $requests = array_merge(
+
             $requests,
 
             createTextBox(
                 $slide,
-                "Visual:\n" . $visual,
+                "IMAGE:\n" . $visual,
                 4200000,
                 1300000,
                 2500000,
                 2500000,
                 $theme,
-                14,
-                false
+                16
             )
+
         );
 
     }
 
 
     return $requests;
+
 }
+
+
+
+
+
+
+
 
 
 function comparisonSlide($slide, $data, $theme)
 {
+
     $requests = [];
 
-    $requests = array_merge(
-        $requests,
-        setBackground(
-            $slide,
-            $theme["background"]
-        )
-    );
 
     $requests = array_merge(
         $requests,
-        addAccentBar(
-            $slide,
-            $theme["primaryColor"]
-        )
+        setBackground($slide, $theme["background"])
     );
 
-    $leftTitle =
-        $data["leftTitle"]
-        ?? "Left";
 
-    $rightTitle =
-        $data["rightTitle"]
-        ?? "Right";
+    $left =
+        implode(
+            "\n• ",
+            $data["left"] ?? []
+        );
 
-    $leftPoints =
-        $data["leftPoints"]
-        ?? $data["left"]
-        ?? [];
 
-    $rightPoints =
-        $data["rightPoints"]
-        ?? $data["right"]
-        ?? [];
+    $right =
+        implode(
+            "\n• ",
+            $data["right"] ?? []
+        );
 
 
     $text =
         ($data["title"] ?? "Comparison")
-        . "\n\n"
-
-        . $leftTitle
-        . "\n";
-
-    foreach ($leftPoints as $point) {
-        $text .= "• " . $point . "\n";
-    }
-
-    $text .= "\n";
-
-    $text .=
-        $rightTitle
-        . "\n";
-
-    foreach ($rightPoints as $point) {
-        $text .= "• " . $point . "\n";
-    }
+        . "\n\nLEFT:\n• "
+        . $left
+        . "\n\nRIGHT:\n• "
+        . $right;
 
 
     $requests = array_merge(
+
         $requests,
 
         createTextBox(
@@ -464,49 +486,53 @@ function comparisonSlide($slide, $data, $theme)
             6500000,
             4000000,
             $theme,
-            18,
-            false
+            18
         )
+
     );
 
+
     return $requests;
+
 }
+
+
+
+
+
+
+
 
 
 function timelineSlide($slide, $data, $theme)
 {
+
     $requests = [];
 
-    $requests = array_merge(
-        $requests,
-        setBackground(
-            $slide,
-            $theme["background"]
-        )
-    );
 
     $requests = array_merge(
         $requests,
-        addAccentBar(
-            $slide,
-            $theme["primaryColor"]
-        )
+        setBackground($slide, $theme["background"])
     );
+
 
     $text =
         ($data["title"] ?? "Timeline")
         . "\n\n";
 
-    $points =
-        $data["points"]
-        ?? $data["steps"]
-        ?? [];
 
-    foreach ($points as $point) {
+    foreach (
+        $data["points"] ?? []
+        as $point
+    ) {
+
         $text .= "→ " . $point . "\n";
+
     }
 
+
     $requests = array_merge(
+
         $requests,
 
         createTextBox(
@@ -517,20 +543,34 @@ function timelineSlide($slide, $data, $theme)
             6500000,
             4000000,
             $theme,
-            18,
-            false
+            18
         )
+
     );
 
+
     return $requests;
+
 }
 
 
+
+
+
+
+
+
 /*
- * Add an image to a slide.
+ * Add an image to a Google Slides slide.
  *
- * Google Slides requires the URL to be publicly accessible.
+ * $x      = horizontal position
+ * $y      = vertical position
+ * $width  = image width
+ * $height = image height
+ *
+ * All measurements are EMU.
  */
+
 function addImage(
     $slide,
     $url,
@@ -540,19 +580,20 @@ function addImage(
     $height = 1800000
 ) {
 
-    $id = uniqid("image_");
-
     return [
+
         [
+
             "createImage" => [
-                "objectId" => $id,
 
                 "url" => $url,
 
                 "elementProperties" => [
+
                     "pageObjectId" => $slide,
 
                     "size" => [
+
                         "width" => [
                             "magnitude" => $width,
                             "unit" => "EMU"
@@ -562,19 +603,32 @@ function addImage(
                             "magnitude" => $height,
                             "unit" => "EMU"
                         ]
+
                     ],
 
                     "transform" => [
+
                         "translateX" => $x,
+
                         "translateY" => $y,
+
                         "scaleX" => 1,
+
                         "scaleY" => 1,
+
                         "unit" => "EMU"
+
                     ]
+
                 ]
+
             ]
+
         ]
+
     ];
+
 }
+
 
 ?>
