@@ -44,1185 +44,653 @@
             box-sizing: border-box;
         }
 
-
         body {
-
             margin: 0;
-
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            background:
-                linear-gradient(135deg,
-                    #eef2ff,
-                    #f8fafc);
-
-            color: #1e293b;
-
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+            background: #fff;
+            color: #111;
         }
-
-
-
-        /* =====================================================
-           MAIN APP
-        ===================================================== */
 
         .app {
-
             min-height: 100vh;
-
             display: flex;
-
             flex-direction: column;
-
         }
 
-
-
-        /* =====================================================
-           TOP BAR
-        ===================================================== */
-
+        /* TOP BAR — retained */
         .topbar {
-
             height: 64px;
-
-            background: rgba(255, 255, 255, .92);
-
-            backdrop-filter: blur(15px);
-
-            border-bottom:
-                1px solid #dbe3ef;
-
+            background: #fff;
+            border-bottom: 1px solid #ddd;
             display: flex;
-
             align-items: center;
-
-            padding:
-                0 22px;
-
+            padding: 0 22px;
             gap: 20px;
-
             position: sticky;
-
             top: 0;
-
             z-index: 100;
-
         }
-
-
 
         .app-title {
-
             font-size: 20px;
-
             font-weight: 700;
-
             white-space: nowrap;
-
-            color: #172033;
-
+            color: #111;
         }
-
-
 
         .topbar-spacer {
-
             flex: 1;
-
         }
 
-
-
-        .storage-toggle {
-
-            border: none;
-
-            background: #2563eb;
-
-            color: white;
-
-            padding:
-                10px 17px;
-
-            border-radius: 10px;
-
+        .storage-toggle,
+        .dark-mode-toggle {
+            border: 1px solid #bbb;
+            background: #fff;
+            color: #111;
+            padding: 9px 14px;
+            border-radius: 6px;
             cursor: pointer;
-
             font-size: 14px;
-
             font-weight: 600;
-
         }
 
-
-
-        .storage-toggle:hover {
-
-            background: #1d4ed8;
-
+        .storage-toggle:hover,
+        .dark-mode-toggle:hover {
+            background: #f0f0f0;
         }
 
-
-
-        /* =====================================================
-           FINDER
-        ===================================================== */
-
+        /* FINDER — retained */
         #finder {
-
             display: none;
-
             position: fixed;
-
             inset: 64px 0 0 0;
-
-            background: #f8fafc;
-
+            background: #fff;
             z-index: 90;
-
         }
-
-
 
         #finder.visible {
-
             display: flex;
-
         }
 
-
-
-        /* =====================================================
-           FINDER SIDEBAR
-        ===================================================== */
-
+        /* FINDER SIDEBAR — retained */
         .finder-sidebar {
-
             width: 245px;
-
             flex-shrink: 0;
-
-            background:
-                rgba(241, 245, 249, .96);
-
-            border-right:
-                1px solid #d8e0ea;
-
-            padding:
-                20px 12px;
-
+            background: #f5f5f5;
+            border-right: 1px solid #ddd;
+            padding: 20px 12px;
             overflow-y: auto;
-
         }
-
-
 
         .sidebar-section-title {
-
             font-size: 12px;
-
             font-weight: 700;
-
-            color: #64748b;
-
+            color: #666;
             text-transform: uppercase;
-
             letter-spacing: .06em;
-
-            padding:
-                8px 12px;
-
+            padding: 8px 12px;
             margin-top: 5px;
-
         }
-
-
 
         .sidebar-item {
-
             width: 100%;
-
             border: none;
-
             background: transparent;
-
             text-align: left;
-
-            padding:
-                10px 12px;
-
-            border-radius: 8px;
-
+            padding: 10px 12px;
+            border-radius: 6px;
             font-size: 14px;
-
             cursor: pointer;
-
-            color: #334155;
-
+            color: #333;
             display: flex;
-
             align-items: center;
-
             gap: 10px;
-
             margin-bottom: 2px;
-
         }
-
-
 
         .sidebar-item:hover {
-
-            background: #e2e8f0;
-
+            background: #e5e5e5;
         }
-
-
 
         .sidebar-item.active {
-
-            background: #dbeafe;
-
-            color: #1d4ed8;
-
+            background: #ddd;
+            color: #111;
             font-weight: 600;
-
         }
-
-
 
         .sidebar-icon {
-
             width: 22px;
-
             text-align: center;
-
             font-size: 17px;
-
         }
-
-
 
         .sidebar-count {
-
             margin-left: auto;
-
-            color: #64748b;
-
+            color: #777;
             font-size: 12px;
-
         }
-
-
-
-        /* =====================================================
-           FINDER MAIN
-        ===================================================== */
 
         .finder-main {
-
             flex: 1;
-
             min-width: 0;
-
             display: flex;
-
             flex-direction: column;
-
         }
-
-
 
         .finder-toolbar {
-
             height: 60px;
-
-            background: white;
-
-            border-bottom:
-                1px solid #dbe3ef;
-
+            background: #fff;
+            border-bottom: 1px solid #ddd;
             display: flex;
-
             align-items: center;
-
-            padding:
-                0 18px;
-
+            padding: 0 18px;
             gap: 12px;
-
         }
-
-
 
         .finder-title {
-
             font-size: 18px;
-
             font-weight: 700;
-
             white-space: nowrap;
-
         }
-
-
 
         .finder-search {
-
             margin-left: auto;
-
             width: 250px;
-
-            padding:
-                9px 13px;
-
-            border:
-                1px solid #cbd5e1;
-
-            border-radius: 9px;
-
+            padding: 9px 13px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
             outline: none;
-
             font-size: 14px;
-
+            background: #fff;
+            color: #111;
         }
-
-
-
-        .finder-search:focus {
-
-            border-color: #2563eb;
-
-        }
-
-
 
         .sort-select {
-
-            padding:
-                9px 10px;
-
-            border:
-                1px solid #cbd5e1;
-
-            border-radius: 9px;
-
-            background: white;
-
+            padding: 9px 10px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            background: #fff;
             font-size: 13px;
-
+            color: #111;
         }
-
-
-
-        /* =====================================================
-           BREADCRUMB
-        ===================================================== */
 
         .finder-breadcrumb {
-
             min-height: 45px;
-
             display: flex;
-
             align-items: center;
-
             gap: 7px;
-
-            padding:
-                0 20px;
-
-            background: #f8fafc;
-
-            border-bottom:
-                1px solid #e2e8f0;
-
+            padding: 0 20px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
             font-size: 13px;
-
-            color: #64748b;
-
+            color: #666;
         }
-
-
 
         .breadcrumb-button {
-
             border: none;
-
             background: transparent;
-
-            color: #2563eb;
-
+            color: #333;
             cursor: pointer;
-
             font-size: 13px;
-
             padding: 3px;
-
         }
-
-
-
-        /* =====================================================
-           COLUMN VIEW
-        ===================================================== */
 
         .finder-content {
-
             flex: 1;
-
             overflow: hidden;
-
             display: flex;
-
         }
-
-
 
         .finder-column {
-
             width: 300px;
-
             min-width: 300px;
-
             overflow-y: auto;
-
             overflow-x: hidden;
-
-            background: white;
-
-            border-right:
-                1px solid #dbe3ef;
-
-            padding:
-                8px;
-
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 8px;
         }
-
-
 
         .finder-column:last-child {
-
             flex: 1;
-
             border-right: none;
-
         }
-
-
 
         .column-empty {
-
             text-align: center;
-
-            color: #94a3b8;
-
+            color: #888;
             padding: 45px 20px;
-
             font-size: 14px;
-
         }
-
-
-
-        /* =====================================================
-           FOLDERS
-        ===================================================== */
 
         .folder-item,
         .file-item {
-
             width: 100%;
-
             min-height: 54px;
-
             border: none;
-
             background: transparent;
-
-            border-radius: 8px;
-
+            border-radius: 5px;
             display: flex;
-
             align-items: center;
-
             text-align: left;
-
-            padding:
-                7px 10px;
-
+            padding: 7px 10px;
             cursor: pointer;
-
             margin-bottom: 2px;
-
+            color: #111;
         }
-
-
 
         .folder-item:hover,
         .file-item:hover {
-
-            background: #f1f5f9;
-
+            background: #f0f0f0;
         }
-
-
 
         .folder-item.selected,
         .file-item.selected {
-
-            background: #dbeafe;
-
+            background: #ddd;
         }
-
-
 
         .file-icon,
         .folder-icon {
-
             width: 40px;
-
             font-size: 25px;
-
             text-align: center;
-
             flex-shrink: 0;
-
         }
-
-
 
         .item-info {
-
             min-width: 0;
-
             flex: 1;
-
         }
-
-
 
         .item-name {
-
             font-size: 14px;
-
             font-weight: 600;
-
-            color: #1e293b;
-
+            color: #111;
             overflow: hidden;
-
             text-overflow: ellipsis;
-
             white-space: nowrap;
-
         }
-
-
 
         .item-meta {
-
             margin-top: 3px;
-
             font-size: 11px;
-
-            color: #94a3b8;
-
+            color: #777;
         }
-
-
 
         .folder-arrow {
-
-            color: #94a3b8;
-
+            color: #777;
             font-size: 18px;
-
         }
-
-
-
-        /* =====================================================
-           FILE DETAILS
-        ===================================================== */
 
         .file-details {
-
             padding: 35px;
-
             max-width: 600px;
-
         }
-
-
 
         .details-icon {
-
             font-size: 70px;
-
             margin-bottom: 15px;
-
         }
-
-
 
         .details-name {
-
             font-size: 25px;
-
             font-weight: 700;
-
             margin-bottom: 12px;
-
             word-break: break-word;
-
         }
-
-
 
         .details-row {
-
             display: flex;
-
             justify-content: space-between;
-
-            border-bottom:
-                1px solid #e2e8f0;
-
-            padding:
-                11px 0;
-
+            border-bottom: 1px solid #ddd;
+            padding: 11px 0;
             font-size: 14px;
-
         }
-
-
 
         .details-label {
-
-            color: #64748b;
-
+            color: #666;
         }
-
-
 
         .details-value {
-
             font-weight: 600;
-
             text-align: right;
-
             max-width: 65%;
-
             word-break: break-word;
-
         }
-
-
 
         .open-file-button {
-
             margin-top: 25px;
-
-            padding:
-                12px 22px;
-
-            border: none;
-
-            border-radius: 9px;
-
-            background: #2563eb;
-
-            color: white;
-
+            padding: 10px 18px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
             cursor: pointer;
-
-            font-size: 15px;
-
+            font-size: 14px;
             font-weight: 600;
-
         }
-
-
-
-        .open-file-button:hover {
-
-            background: #1d4ed8;
-
-        }
-
-
-
-        /* =====================================================
-           RENAME
-        ===================================================== */
 
         .rename-input {
-
             width: 100%;
-
-            padding:
-                5px 7px;
-
-            border:
-                2px solid #2563eb;
-
-            border-radius: 5px;
-
+            padding: 5px 7px;
+            border: 1px solid #777;
+            border-radius: 3px;
             font-size: 14px;
-
             outline: none;
-
         }
-
-
-
-        /* =====================================================
-           CONTEXT MENU
-        ===================================================== */
 
         #contextMenu {
-
             display: none;
-
             position: fixed;
-
             z-index: 500;
-
-            background: white;
-
-            border:
-                1px solid #cbd5e1;
-
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, .18);
-
-            border-radius: 8px;
-
+            background: #fff;
+            border: 1px solid #bbb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            border-radius: 5px;
             min-width: 160px;
-
             padding: 5px;
-
         }
-
-
 
         .context-option {
-
             width: 100%;
-
-            padding:
-                9px 12px;
-
+            padding: 9px 12px;
             border: none;
-
             background: transparent;
-
             text-align: left;
-
-            border-radius: 6px;
-
+            border-radius: 3px;
             cursor: pointer;
-
             font-size: 13px;
-
+            color: #111;
         }
-
-
 
         .context-option:hover {
-
-            background: #f1f5f9;
-
+            background: #eee;
         }
 
-
-
-        /* =====================================================
-           SCANNER
-        ===================================================== */
-
+        /* SCANNER — functionality retained, added visual styling removed */
         #scanner {
-
             min-height: 100vh;
-
         }
-
-
 
         .container {
-
             width: 100%;
-
             max-width: 900px;
-
             margin: 0 auto;
-
             text-align: center;
-
             padding: 30px;
-
         }
-
-
 
         h1 {
-
-            font-size: 36px;
-
-            color: #1e293b;
-
+            font-size: 32px;
+            color: #111;
         }
-
-
 
         video {
-
             width: 100%;
-
-            border-radius: 18px;
-
-            background: black;
-
-            box-shadow:
-                0 10px 25px rgba(0, 0, 0, .2);
-
+            border-radius: 0;
+            background: #000;
+            box-shadow: none;
         }
-
-
 
         canvas {
-
             display: none;
-
         }
-
-
 
         .mode-container {
-
             margin-top: 20px;
-
             display: flex;
-
             justify-content: center;
-
-            gap: 15px;
-
+            gap: 10px;
             flex-wrap: wrap;
-
         }
-
-
 
         .mode-btn {
-
-            padding:
-                14px 25px;
-
-            border: none;
-
-            border-radius: 12px;
-
-            font-size: 16px;
-
+            padding: 10px 18px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            font-size: 15px;
             cursor: pointer;
-
-            background: #2563eb;
-
-            color: white;
-
-            transition: .2s;
-
+            background: #fff;
+            color: #111;
         }
-
-
 
         .mode-btn:hover {
-
-            transform: translateY(-2px);
-
-            background: #1d4ed8;
-
+            background: #eee;
         }
-
-
 
         #result {
-
             margin-top: 30px;
-
-            background: white;
-
-            border-radius: 20px;
-
-            padding: 25px;
-
-            box-shadow:
-                0 10px 25px rgba(0, 0, 0, .12);
-
+            background: #fff;
+            border-radius: 0;
+            padding: 20px 0;
+            box-shadow: none;
         }
-
-
 
         #flowchart-render {
-
             margin-top: 25px;
-
         }
-
-
-
-        /* =====================================================
-           STUDY CARDS
-        ===================================================== */
 
         .study-card {
-
-            background: white;
-
-            padding: 25px;
-
-            border-radius: 18px;
-
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, .15);
-
+            background: #fff;
+            padding: 20px;
+            border-radius: 0;
+            box-shadow: none;
+            border-top: 1px solid #ddd;
             text-align: left;
-
         }
-
-
 
         .choice {
-
             width: 100%;
-
-            padding: 15px;
-
-            margin: 10px 0;
-
-            border-radius: 12px;
-
-            border: none;
-
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border: 1px solid #bbb;
             font-size: 16px;
-
             cursor: pointer;
-
-            background: #e2e8f0;
-
+            background: #fff;
+            color: #111;
             text-align: left;
-
         }
-
-
 
         .choice:hover {
-
-            background: #cbd5e1;
-
+            background: #eee;
         }
-
-
 
         .choice.correct {
-
-            background: #86efac;
-
+            background: #d9f2d9;
         }
-
-
 
         .choice.wrong {
-
-            background: #fca5a5;
-
+            background: #f5d6d6;
         }
-
-
-
-        /* =====================================================
-           FLASHCARDS
-        ===================================================== */
 
         .flashcard {
-
             width: 400px;
-
             height: 250px;
-
             margin: 30px auto;
-
             perspective: 1000px;
-
         }
-
-
 
         .flash-inner {
-
             width: 100%;
-
             height: 100%;
-
             position: relative;
-
             transition: .5s;
-
             transform-style: preserve-3d;
-
             cursor: pointer;
-
         }
-
-
 
         .flashcard.flip .flash-inner {
-
             transform: rotateY(180deg);
-
         }
-
-
 
         .flash-front,
         .flash-back {
-
             position: absolute;
-
             width: 100%;
-
             height: 100%;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             padding: 25px;
-
             box-sizing: border-box;
-
-            border-radius: 20px;
-
+            border: 1px solid #bbb;
+            border-radius: 0;
             backface-visibility: hidden;
-
             font-size: 22px;
-
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, .2);
-
-            background: white;
-
+            box-shadow: none;
+            background: #fff;
+            color: #111;
         }
-
-
 
         .flash-back {
-
             transform: rotateY(180deg);
-
-            background: #eff6ff;
-
+            background: #f5f5f5;
         }
-
-
 
         .action-btn {
-
-            padding:
-                12px 25px;
-
-            margin: 10px;
-
-            border: none;
-
-            border-radius: 10px;
-
-            background: #2563eb;
-
-            color: white;
-
+            padding: 10px 18px;
+            margin: 8px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
             cursor: pointer;
-
-            font-size: 16px;
-
+            font-size: 15px;
         }
-
-
-
-        /* =====================================================
-           PRESENTATION
-        ===================================================== */
 
         .presentation-link {
-
             display: inline-block;
-
             margin-top: 25px;
-
-            padding:
-                15px 30px;
-
-            border-radius: 12px;
-
-            background: #16a34a;
-
-            color: white;
-
+            padding: 12px 22px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
             text-decoration: none;
-
-            font-size: 18px;
-
-            font-weight: bold;
-
+            font-size: 16px;
+            font-weight: 600;
         }
 
-
-
-        .presentation-link:hover {
-
-            background: #15803d;
-
+        /* DARK MODE — retained */
+        body.dark-mode {
+            background: #111;
+            color: #eee;
         }
 
+        body.dark-mode .topbar,
+        body.dark-mode #scanner,
+        body.dark-mode #result,
+        body.dark-mode .study-card,
+        body.dark-mode .finder-toolbar,
+        body.dark-mode .finder-breadcrumb,
+        body.dark-mode .finder-column,
+        body.dark-mode .flash-front,
+        body.dark-mode .flash-back {
+            background: #181818;
+            color: #eee;
+        }
 
+        body.dark-mode .topbar {
+            border-bottom-color: #333;
+        }
 
-        /* =====================================================
-           MOBILE
-        ===================================================== */
+        body.dark-mode .app-title,
+        body.dark-mode h1,
+        body.dark-mode .item-name,
+        body.dark-mode .finder-title,
+        body.dark-mode .details-name,
+        body.dark-mode .flash-front,
+        body.dark-mode .flash-back {
+            color: #eee;
+        }
+
+        body.dark-mode .finder-sidebar {
+            background: #151515;
+            border-right-color: #333;
+        }
+
+        body.dark-mode .sidebar-section-title,
+        body.dark-mode .sidebar-count,
+        body.dark-mode .item-meta,
+        body.dark-mode .details-label,
+        body.dark-mode .column-empty {
+            color: #aaa;
+        }
+
+        body.dark-mode .sidebar-item {
+            color: #ddd;
+        }
+
+        body.dark-mode .sidebar-item:hover,
+        body.dark-mode .folder-item:hover,
+        body.dark-mode .file-item:hover,
+        body.dark-mode .context-option:hover,
+        body.dark-mode .mode-btn:hover,
+        body.dark-mode .choice:hover {
+            background: #292929;
+        }
+
+        body.dark-mode .sidebar-item.active,
+        body.dark-mode .folder-item.selected,
+        body.dark-mode .file-item.selected {
+            background: #333;
+            color: #fff;
+        }
+
+        body.dark-mode .finder-toolbar,
+        body.dark-mode .finder-breadcrumb,
+        body.dark-mode .finder-column,
+        body.dark-mode .finder-sidebar,
+        body.dark-mode .finder-breadcrumb,
+        body.dark-mode .details-row {
+            border-color: #333;
+        }
+
+        body.dark-mode .finder-search,
+        body.dark-mode .sort-select,
+        body.dark-mode .storage-toggle,
+        body.dark-mode .dark-mode-toggle,
+        body.dark-mode .mode-btn,
+        body.dark-mode .choice,
+        body.dark-mode .action-btn,
+        body.dark-mode .open-file-button,
+        body.dark-mode .presentation-link {
+            background: #181818;
+            color: #eee;
+            border-color: #555;
+        }
+
+        body.dark-mode #contextMenu {
+            background: #181818;
+            border-color: #555;
+        }
+
+        body.dark-mode .context-option {
+            color: #eee;
+        }
+
+        body.dark-mode .flash-back {
+            background: #222;
+        }
 
         @media (max-width: 800px) {
-
             .finder-sidebar {
-
                 width: 190px;
-
             }
 
             .finder-column {
-
                 min-width: 240px;
-
                 width: 240px;
-
             }
 
             .finder-search {
-
                 width: 150px;
-
             }
 
+            .dark-mode-toggle {
+                padding: 8px 10px;
+            }
         }
     </style>
 
@@ -1247,6 +715,11 @@
 
 
             <div class="topbar-spacer"></div>
+
+
+            <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode">
+                🌙 Dark
+            </button>
 
 
             <button class="storage-toggle" onclick="toggleFinder()">
@@ -3837,10 +3310,53 @@
 
 
         /* =========================================================
+           DARK MODE
+        ========================================================= */
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+
+            const enabled =
+                document.body.classList.contains("dark-mode");
+
+            localStorage.setItem(
+                "aiStudyScannerDarkMode",
+                enabled ? "1" : "0"
+            );
+
+            const button =
+                document.getElementById("darkModeToggle");
+
+            if (button) {
+                button.innerText =
+                    enabled ? "☀️ Light" : "🌙 Dark";
+            }
+        }
+
+        function loadDarkMode() {
+            const enabled =
+                localStorage.getItem("aiStudyScannerDarkMode") === "1";
+
+            if (enabled) {
+                document.body.classList.add("dark-mode");
+            }
+
+            const button =
+                document.getElementById("darkModeToggle");
+
+            if (button) {
+                button.innerText =
+                    enabled ? "☀️ Light" : "🌙 Dark";
+            }
+        }
+
+
+        /* =========================================================
            START
         ========================================================= */
 
 
+        loadDarkMode();
         initCamera();
 
         loadItems();
