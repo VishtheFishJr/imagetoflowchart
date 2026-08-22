@@ -11,13 +11,15 @@ header('Content-Type: application/json');
 // ----------------------------
 // API KEY
 // ----------------------------
+
 $apiKey = getenv("GEMINI_API_KEY");
 
 
 if (!$apiKey) {
 
     echo json_encode([
-        "error" => "GEMINI_API_KEY environment variable not set."
+        "error" =>
+            "GEMINI_API_KEY environment variable not set."
     ]);
 
     exit;
@@ -28,13 +30,15 @@ if (!$apiKey) {
 // ----------------------------
 // READ INPUT
 // ----------------------------
+
 $input = json_decode(
     file_get_contents("php://input"),
     true
 );
 
 
-$mode = $input["mode"] ?? "flowchart";
+$mode =
+    $input["mode"] ?? "flowchart";
 
 
 // ----------------------------
@@ -42,17 +46,32 @@ $mode = $input["mode"] ?? "flowchart";
 // ----------------------------
 
 $base64Image = null;
-$mimeType = "image/jpeg";
 
-$uploadDir = __DIR__ . "/uploads/";
+$mimeType =
+    "image/jpeg";
+
+
+$uploadDir =
+    __DIR__ . "/uploads/";
+
 
 if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0755, true);
+
+    mkdir(
+        $uploadDir,
+        0755,
+        true
+    );
+
 }
 
 
 $imagePathToSave =
-    "uploads/captured_" . time() . ".jpg";
+    "uploads/captured_"
+    . time()
+    . "_"
+    . uniqid()
+    . ".jpg";
 
 
 if (!empty($input["image"])) {
@@ -65,14 +84,23 @@ if (!empty($input["image"])) {
         )
     ) {
 
-        $mimeType = $matches[1];
+        $mimeType =
+            $matches[1];
 
-        $base64Image = $matches[2];
+        $base64Image =
+            $matches[2];
 
 
         file_put_contents(
-            __DIR__ . "/" . $imagePathToSave,
-            base64_decode($base64Image)
+
+            __DIR__ .
+            "/" .
+            $imagePathToSave,
+
+            base64_decode(
+                $base64Image
+            )
+
         );
 
     }
@@ -83,7 +111,8 @@ if (!empty($input["image"])) {
 if (!$base64Image) {
 
     echo json_encode([
-        "error" => "No valid image provided."
+        "error" =>
+            "No valid image provided."
     ]);
 
     exit;
@@ -250,7 +279,6 @@ No markdown.
 No code fences.
 No explanations outside JSON.
 
-
 Analyze:
 
 - Subject matter
@@ -260,7 +288,6 @@ Analyze:
 - Best educational structure
 - Possible diagrams
 - Useful images
-
 
 Design the presentation:
 
@@ -274,13 +301,10 @@ Choose:
 - Decorative elements
 - Image placement
 
-
 Use this exact JSON format:
-
 
 {
  "title":"Presentation title",
-
 
  "theme":{
 
@@ -298,9 +322,7 @@ Use this exact JSON format:
 
  },
 
-
  "slides":[
-
 
  {
 
@@ -313,8 +335,6 @@ Use this exact JSON format:
   "visual":"Description of hero image, diagram, or graphic"
 
  },
-
-
 
  {
 
@@ -336,8 +356,6 @@ Use this exact JSON format:
 
  },
 
-
-
  {
 
   "layout":"image_text",
@@ -355,8 +373,6 @@ Use this exact JSON format:
   "image":"Description of image to display"
 
  },
-
-
 
  {
 
@@ -382,8 +398,6 @@ Use this exact JSON format:
 
  },
 
-
-
  {
 
   "layout":"diagram",
@@ -402,10 +416,7 @@ Use this exact JSON format:
 
  }
 
-
  ],
-
-
 
  "images":[
 
@@ -421,8 +432,6 @@ Use this exact JSON format:
 
 }
 
-
-
 Rules:
 
 - Create 7-10 slides.
@@ -437,47 +446,43 @@ Rules:
 - Suggest images that would improve understanding.
 - Pick colors that match the topic.
 
-
 Subject style examples:
-
 
 Biology:
 - green/blue palette
 - scientific diagrams
 - microscope imagery
 
-
 History:
 - parchment colors
 - timeline layouts
 - historical imagery
-
 
 Technology:
 - dark backgrounds
 - neon accents
 - futuristic graphics
 
-
 Mathematics:
 - geometric layouts
 - clean colors
 - equations and diagrams
-
 
 Art:
 - bold colors
 - creative layouts
 - visual emphasis
 
-
-
 The final presentation should look professionally designed, not like plain notes.
 
 Return JSON only.
 
 ';
+
 }
+
+
+
 // ----------------------------
 // GEMINI REQUEST
 // ----------------------------
@@ -495,15 +500,19 @@ $payload = [
             "parts" => [
 
                 [
-                    "text" => $prompt
+                    "text" =>
+                        $prompt
                 ],
 
                 [
+
                     "inlineData" => [
 
-                        "mimeType" => $mimeType,
+                        "mimeType" =>
+                            $mimeType,
 
-                        "data" => $base64Image
+                        "data" =>
+                            $base64Image
 
                     ]
 
@@ -519,16 +528,20 @@ $payload = [
 
 
 
-$ch = curl_init($url);
+$ch =
+    curl_init($url);
 
 
 curl_setopt_array($ch, [
 
-    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_RETURNTRANSFER =>
+        true,
 
-    CURLOPT_POST => true,
+    CURLOPT_POST =>
+        true,
 
-    CURLOPT_POSTFIELDS => json_encode($payload),
+    CURLOPT_POSTFIELDS =>
+        json_encode($payload),
 
     CURLOPT_HTTPHEADER => [
 
@@ -538,13 +551,15 @@ curl_setopt_array($ch, [
 
     ],
 
-    CURLOPT_TIMEOUT => 60
+    CURLOPT_TIMEOUT =>
+        60
 
 ]);
 
 
 
-$response = curl_exec($ch);
+$response =
+    curl_exec($ch);
 
 
 
@@ -552,7 +567,9 @@ if ($response === false) {
 
     echo json_encode([
 
-        "error" => "cURL Error: " . curl_error($ch)
+        "error" =>
+            "cURL Error: " .
+            curl_error($ch)
 
     ]);
 
@@ -562,33 +579,37 @@ if ($response === false) {
 
 
 
-$httpCode = curl_getinfo(
-    $ch,
-    CURLINFO_HTTP_CODE
-);
+$httpCode =
+    curl_getinfo(
+        $ch,
+        CURLINFO_HTTP_CODE
+    );
 
 
 curl_close($ch);
 
 
 
-$responseData = json_decode(
-    $response,
-    true
-);
+$responseData =
+    json_decode(
+        $response,
+        true
+    );
 
 
 
 if ($httpCode != 200) {
 
-
     echo json_encode([
 
-        "error" => "Gemini API Error",
+        "error" =>
+            "Gemini API Error",
 
-        "http_code" => $httpCode,
+        "http_code" =>
+            $httpCode,
 
-        "response" => $responseData
+        "response" =>
+            $responseData
 
     ], JSON_PRETTY_PRINT);
 
@@ -603,9 +624,14 @@ if ($httpCode != 200) {
 // GET AI RESPONSE
 // ----------------------------
 
-
 $aiAnswer =
-    $responseData["candidates"][0]["content"]["parts"][0]["text"]
+    $responseData
+    ["candidates"]
+    [0]
+    ["content"]
+    ["parts"]
+    [0]
+    ["text"]
     ?? "";
 
 
@@ -614,9 +640,11 @@ if (!$aiAnswer) {
 
     echo json_encode([
 
-        "error" => "Gemini returned empty response",
+        "error" =>
+            "Gemini returned empty response",
 
-        "response" => $responseData
+        "response" =>
+            $responseData
 
     ]);
 
@@ -626,24 +654,28 @@ if (!$aiAnswer) {
 
 
 
-// Remove markdown fences if Gemini adds them
+// ----------------------------
+// CLEAN RESPONSE
+// ----------------------------
 
-$aiAnswer = preg_replace(
-    '/```(?:json|mermaid)?/i',
-    '',
-    $aiAnswer
-);
-
-
-$aiAnswer = str_replace(
-    "```",
-    "",
-    $aiAnswer
-);
+$aiAnswer =
+    preg_replace(
+        '/```(?:json|mermaid)?/i',
+        '',
+        $aiAnswer
+    );
 
 
-$aiAnswer = trim($aiAnswer);
+$aiAnswer =
+    str_replace(
+        "```",
+        "",
+        $aiAnswer
+    );
 
+
+$aiAnswer =
+    trim($aiAnswer);
 
 
 
@@ -658,22 +690,28 @@ if (
 ) {
 
 
-    $decoded = json_decode(
-        $aiAnswer,
-        true
-    );
+    $decoded =
+        json_decode(
+            $aiAnswer,
+            true
+        );
 
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-
+    if (
+        json_last_error() !==
+        JSON_ERROR_NONE
+    ) {
 
         echo json_encode([
 
-            "error" => "AI did not return valid JSON",
+            "error" =>
+                "AI did not return valid JSON",
 
-            "json_error" => json_last_error_msg(),
+            "json_error" =>
+                json_last_error_msg(),
 
-            "raw_response" => $aiAnswer
+            "raw_response" =>
+                $aiAnswer
 
         ]);
 
@@ -682,51 +720,109 @@ if (
     }
 
 
-
-    // Make sure frontend receives clean JSON string
-    $aiAnswer = json_encode(
-        $decoded,
-        JSON_UNESCAPED_UNICODE
-    );
-
+    $aiAnswer =
+        json_encode(
+            $decoded,
+            JSON_UNESCAPED_UNICODE
+        );
 
 }
 
 
 
 // ----------------------------
-// SAVE DATABASE
+// GENERATE ITEM NAME
 // ----------------------------
 
+if ($mode === "presentation") {
+
+    $decodedPresentation =
+        json_decode(
+            $aiAnswer,
+            true
+        );
+
+    $itemName =
+        $decodedPresentation["title"]
+        ?? "Untitled Presentation";
+
+} elseif ($mode === "quiz") {
+
+    $itemName =
+        "Quiz - " .
+        date("M j, Y g:i A");
+
+} elseif ($mode === "flashcards") {
+
+    $itemName =
+        "Flashcards - " .
+        date("M j, Y g:i A");
+
+} elseif ($mode === "flowchart") {
+
+    $itemName =
+        "Flowchart - " .
+        date("M j, Y g:i A");
+
+} else {
+
+    $itemName =
+        "Study Item - " .
+        date("M j, Y g:i A");
+
+}
+
+
+
+// ----------------------------
+// SAVE TO generated_items
+// ----------------------------
 
 try {
 
-
-    $stmt = $pdo->prepare(
-        "
-        INSERT INTO scan_logs
-        (image_path, ai_response)
-        VALUES (?, ?)
-        "
-    );
+    $stmt =
+        $pdo->prepare(
+            "
+            INSERT INTO generated_items
+            (
+                name,
+                type,
+                content,
+                presentation_url
+            )
+            VALUES
+            (
+                ?,
+                ?,
+                ?,
+                NULL
+            )
+            "
+        );
 
 
     $stmt->execute([
 
-        $imagePathToSave,
+        $itemName,
+
+        $mode,
 
         $aiAnswer
 
     ]);
 
 
+    $generatedItemId =
+        $pdo->lastInsertId();
+
 
 } catch (PDOException $e) {
 
-
     echo json_encode([
 
-        "error" => "Database Error: " . $e->getMessage()
+        "error" =>
+            "Generated item database error: "
+            . $e->getMessage()
 
     ]);
 
@@ -740,16 +836,25 @@ try {
 // OUTPUT
 // ----------------------------
 
-
 echo json_encode([
 
-    "success" => true,
+    "success" =>
+        true,
 
-    "mode" => $mode,
+    "mode" =>
+        $mode,
 
-    "image_path" => $imagePathToSave,
+    "image_path" =>
+        $imagePathToSave,
 
-    "ai_response" => $aiAnswer
+    "ai_response" =>
+        $aiAnswer,
+
+    "item_id" =>
+        $generatedItemId,
+
+    "item_name" =>
+        $itemName
 
 ]);
 
