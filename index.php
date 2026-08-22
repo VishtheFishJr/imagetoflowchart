@@ -7,12 +7,16 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>StudySpace — AI Study Scanner</title>
+    <title>
+        AI Study Scanner
+    </title>
+
 
     <script type="module">
 
         import mermaid from
             'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
 
         mermaid.initialize({
 
@@ -29,255 +33,219 @@
 
         });
 
+
         window.mermaid = mermaid;
 
     </script>
 
 
     <style>
-        /* =========================================================
-   GLOBAL
-========================================================= */
-
         * {
             box-sizing: border-box;
         }
 
-        :root {
 
-            --bg: #f5f7fb;
-
-            --sidebar: #ffffff;
-
-            --card: #ffffff;
-
-            --border: #e2e8f0;
-
-            --text: #172033;
-
-            --muted: #64748b;
-
-            --primary: #4f46e5;
-
-            --primary-hover: #4338ca;
-
-            --secondary: #eef2ff;
-
-            --hover: #f1f5f9;
-
-            --input: #f8fafc;
-
-            --shadow:
-                0 8px 30px rgba(15, 23, 42, .08);
-
-            --radius: 16px;
-
-        }
-
-
-        /* DARK MODE */
-
-        body.dark {
-
-            --bg: #0f172a;
-
-            --sidebar: #111827;
-
-            --card: #1e293b;
-
-            --border: #334155;
-
-            --text: #f8fafc;
-
-            --muted: #94a3b8;
-
-            --primary: #818cf8;
-
-            --primary-hover: #6366f1;
-
-            --secondary: #312e81;
-
-            --hover: #273449;
-
-            --input: #172033;
-
-            --shadow:
-                0 8px 30px rgba(0, 0, 0, .3);
-
-        }
-
-
-        html,
         body {
 
             margin: 0;
-
-            padding: 0;
-
-            width: 100%;
-
-            min-height: 100%;
-
-        }
-
-
-        body {
 
             font-family:
                 -apple-system,
                 BlinkMacSystemFont,
                 "Segoe UI",
-                Roboto,
-                Helvetica,
                 Arial,
+                Helvetica,
                 sans-serif;
 
-            background: var(--bg);
+            background:
+                linear-gradient(135deg,
+                    #eef2ff,
+                    #f8fafc);
 
-            color: var(--text);
-
-            transition:
-                background .25s,
-                color .25s;
+            color: #1e293b;
 
         }
 
 
-        /* =========================================================
-   APP
-========================================================= */
+
+        /* =====================================================
+           MAIN APP
+        ===================================================== */
 
         .app {
 
-            display: flex;
-
             min-height: 100vh;
-
-        }
-
-
-        /* =========================================================
-   SIDEBAR
-========================================================= */
-
-        .sidebar {
-
-            width: 250px;
-
-            min-height: 100vh;
-
-            background: var(--sidebar);
-
-            border-right:
-                1px solid var(--border);
-
-            padding: 22px 15px;
 
             display: flex;
 
             flex-direction: column;
 
-            position: fixed;
+        }
 
-            left: 0;
+
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .topbar {
+
+            height: 64px;
+
+            background: rgba(255, 255, 255, .92);
+
+            backdrop-filter: blur(15px);
+
+            border-bottom:
+                1px solid #dbe3ef;
+
+            display: flex;
+
+            align-items: center;
+
+            padding:
+                0 22px;
+
+            gap: 20px;
+
+            position: sticky;
 
             top: 0;
 
-            bottom: 0;
-
-            z-index: 20;
+            z-index: 100;
 
         }
 
 
-        .logo {
 
-            display: flex;
-
-            align-items: center;
-
-            gap: 11px;
-
-            padding:
-                5px 10px 20px;
-
-        }
-
-
-        .logo-icon {
-
-            width: 42px;
-
-            height: 42px;
-
-            border-radius: 13px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            background:
-                linear-gradient(135deg,
-                    #6366f1,
-                    #8b5cf6);
-
-            color: white;
-
-            font-size: 21px;
-
-        }
-
-
-        .logo-text {
+        .app-title {
 
             font-size: 20px;
 
-            font-weight: 800;
+            font-weight: 700;
 
-            letter-spacing: -.5px;
+            white-space: nowrap;
 
-        }
-
-
-        .logo-sub {
-
-            font-size: 11px;
-
-            color: var(--muted);
-
-            margin-top: 1px;
+            color: #172033;
 
         }
 
 
-        .sidebar-section {
 
-            margin-top: 14px;
+        .topbar-spacer {
+
+            flex: 1;
 
         }
 
 
-        .sidebar-label {
+
+        .storage-toggle {
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding:
+                10px 17px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+        }
+
+
+
+        .storage-toggle:hover {
+
+            background: #1d4ed8;
+
+        }
+
+
+
+        /* =====================================================
+           FINDER
+        ===================================================== */
+
+        #finder {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 64px 0 0 0;
+
+            background: #f8fafc;
+
+            z-index: 90;
+
+        }
+
+
+
+        #finder.visible {
+
+            display: flex;
+
+        }
+
+
+
+        /* =====================================================
+           FINDER SIDEBAR
+        ===================================================== */
+
+        .finder-sidebar {
+
+            width: 245px;
+
+            flex-shrink: 0;
+
+            background:
+                rgba(241, 245, 249, .96);
+
+            border-right:
+                1px solid #d8e0ea;
+
+            padding:
+                20px 12px;
+
+            overflow-y: auto;
+
+        }
+
+
+
+        .sidebar-section-title {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            color: #64748b;
+
+            text-transform: uppercase;
+
+            letter-spacing: .06em;
 
             padding:
                 8px 12px;
 
-            font-size: 11px;
-
-            font-weight: 700;
-
-            text-transform: uppercase;
-
-            letter-spacing: .08em;
-
-            color: var(--muted);
+            margin-top: 5px;
 
         }
 
 
-        .nav-item {
+
+        .sidebar-item {
 
             width: 100%;
 
@@ -285,53 +253,54 @@
 
             background: transparent;
 
-            color: var(--muted);
+            text-align: left;
 
             padding:
-                11px 12px;
+                10px 12px;
 
-            border-radius: 10px;
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+            color: #334155;
 
             display: flex;
 
             align-items: center;
 
-            gap: 12px;
+            gap: 10px;
 
-            font-size: 14px;
+            margin-bottom: 2px;
+
+        }
+
+
+
+        .sidebar-item:hover {
+
+            background: #e2e8f0;
+
+        }
+
+
+
+        .sidebar-item.active {
+
+            background: #dbeafe;
+
+            color: #1d4ed8;
 
             font-weight: 600;
 
-            cursor: pointer;
-
-            text-align: left;
-
-            margin-bottom: 3px;
-
         }
 
 
-        .nav-item:hover {
 
-            background: var(--hover);
+        .sidebar-icon {
 
-            color: var(--text);
-
-        }
-
-
-        .nav-item.active {
-
-            background: var(--secondary);
-
-            color: var(--primary);
-
-        }
-
-
-        .nav-icon {
-
-            width: 23px;
+            width: 22px;
 
             text-align: center;
 
@@ -340,188 +309,84 @@
         }
 
 
-        .sidebar-bottom {
 
-            margin-top: auto;
+        .sidebar-count {
+
+            margin-left: auto;
+
+            color: #64748b;
+
+            font-size: 12px;
 
         }
 
 
-        /* =========================================================
-   THEME TOGGLE
-========================================================= */
 
-        .theme-row {
+        /* =====================================================
+           FINDER MAIN
+        ===================================================== */
+
+        .finder-main {
+
+            flex: 1;
+
+            min-width: 0;
 
             display: flex;
 
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding:
-                12px;
-
-            color: var(--muted);
-
-            font-size: 13px;
-
-            font-weight: 600;
+            flex-direction: column;
 
         }
 
 
-        .theme-switch {
 
-            position: relative;
+        .finder-toolbar {
 
-            width: 48px;
-
-            height: 26px;
-
-        }
-
-
-        .theme-switch input {
-
-            opacity: 0;
-
-            width: 0;
-
-            height: 0;
-
-        }
-
-
-        .slider {
-
-            position: absolute;
-
-            cursor: pointer;
-
-            inset: 0;
-
-            background: #cbd5e1;
-
-            border-radius: 30px;
-
-            transition: .25s;
-
-        }
-
-
-        .slider:before {
-
-            content: "";
-
-            position: absolute;
-
-            width: 20px;
-
-            height: 20px;
-
-            left: 3px;
-
-            top: 3px;
+            height: 60px;
 
             background: white;
 
-            border-radius: 50%;
-
-            transition: .25s;
-
-            box-shadow:
-                0 2px 5px rgba(0, 0, 0, .2);
-
-        }
-
-
-        .theme-switch input:checked+.slider {
-
-            background: #6366f1;
-
-        }
-
-
-        .theme-switch input:checked+.slider:before {
-
-            transform:
-                translateX(22px);
-
-        }
-
-
-        /* =========================================================
-   MAIN
-========================================================= */
-
-        .main {
-
-            margin-left: 250px;
-
-            width:
-                calc(100% - 250px);
-
-            min-height: 100vh;
-
-        }
-
-
-        /* =========================================================
-   TOPBAR
-========================================================= */
-
-        .topbar {
-
-            height: 70px;
-
-            background: var(--sidebar);
-
             border-bottom:
-                1px solid var(--border);
+                1px solid #dbe3ef;
 
             display: flex;
 
             align-items: center;
 
-            justify-content: space-between;
+            padding:
+                0 18px;
+
+            gap: 12px;
+
+        }
+
+
+
+        .finder-title {
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+        }
+
+
+
+        .finder-search {
+
+            margin-left: auto;
+
+            width: 250px;
 
             padding:
-                0 30px;
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 10;
-
-        }
-
-
-        .search {
-
-            width: 360px;
-
-            position: relative;
-
-        }
-
-
-        .search input {
-
-            width: 100%;
+                9px 13px;
 
             border:
-                1px solid var(--border);
+                1px solid #cbd5e1;
 
-            background: var(--input);
-
-            color: var(--text);
-
-            padding:
-                11px 15px 11px 40px;
-
-            border-radius: 11px;
+            border-radius: 9px;
 
             outline: none;
 
@@ -530,501 +395,227 @@
         }
 
 
-        .search input:focus {
 
-            border-color:
-                var(--primary);
+        .finder-search:focus {
 
-        }
-
-
-        .search-icon {
-
-            position: absolute;
-
-            left: 14px;
-
-            top: 50%;
-
-            transform:
-                translateY(-50%);
-
-            color: var(--muted);
+            border-color: #2563eb;
 
         }
 
 
-        .top-actions {
 
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-
-        .student-badge {
+        .sort-select {
 
             padding:
-                9px 13px;
-
-            border-radius: 10px;
-
-            background: var(--secondary);
-
-            color: var(--primary);
-
-            font-size: 13px;
-
-            font-weight: 700;
-
-        }
-
-
-        /* =========================================================
-   CONTENT
-========================================================= */
-
-        .content {
-
-            padding: 30px;
-
-        }
-
-
-        /* =========================================================
-   DASHBOARD HEADER
-========================================================= */
-
-        .welcome {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: flex-start;
-
-            gap: 20px;
-
-            margin-bottom: 25px;
-
-        }
-
-
-        .welcome h1 {
-
-            margin: 0;
-
-            font-size: 29px;
-
-            letter-spacing: -.8px;
-
-        }
-
-
-        .welcome p {
-
-            margin:
-                7px 0 0;
-
-            color: var(--muted);
-
-            font-size: 14px;
-
-        }
-
-
-        .scan-button {
-
-            border: none;
-
-            background:
-                linear-gradient(135deg,
-                    #4f46e5,
-                    #7c3aed);
-
-            color: white;
-
-            border-radius: 11px;
-
-            padding:
-                12px 18px;
-
-            font-size: 14px;
-
-            font-weight: 700;
-
-            cursor: pointer;
-
-            box-shadow:
-                0 6px 15px rgba(79, 70, 229, .25);
-
-        }
-
-
-        .scan-button:hover {
-
-            transform:
-                translateY(-1px);
-
-        }
-
-
-        /* =========================================================
-   STORAGE TOOLBAR
-========================================================= */
-
-        .storage-toolbar {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-bottom: 18px;
-
-        }
-
-
-        .breadcrumb {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 6px;
-
-            font-size: 14px;
-
-            font-weight: 700;
-
-        }
-
-
-        .breadcrumb span {
-
-            color: var(--muted);
-
-        }
-
-
-        .toolbar-actions {
-
-            display: flex;
-
-            gap: 7px;
-
-        }
-
-
-        .tool-btn {
+                9px 10px;
 
             border:
-                1px solid var(--border);
-
-            background: var(--card);
-
-            color: var(--text);
+                1px solid #cbd5e1;
 
             border-radius: 9px;
 
-            padding:
-                8px 11px;
-
-            cursor: pointer;
+            background: white;
 
             font-size: 13px;
 
         }
 
 
-        .tool-btn:hover {
 
-            background: var(--hover);
+        /* =====================================================
+           BREADCRUMB
+        ===================================================== */
 
-        }
+        .finder-breadcrumb {
 
+            min-height: 45px;
 
-        /* =========================================================
-   FINDER
-========================================================= */
-
-        .finder {
-
-            background: var(--card);
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius);
-
-            box-shadow: var(--shadow);
-
-            overflow: hidden;
-
-            min-height: 390px;
-
-        }
-
-
-        .finder-header {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 130px 180px;
-
-            padding:
-                12px 18px;
-
-            border-bottom:
-                1px solid var(--border);
-
-            color: var(--muted);
-
-            font-size: 11px;
-
-            text-transform: uppercase;
-
-            letter-spacing: .07em;
-
-            font-weight: 700;
-
-        }
-
-
-        .finder-items {
-
-            padding: 5px;
-
-        }
-
-
-        .file-row {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 130px 180px;
+            display: flex;
 
             align-items: center;
 
-            padding:
-                13px;
+            gap: 7px;
 
-            border-radius: 10px;
+            padding:
+                0 20px;
+
+            background: #f8fafc;
+
+            border-bottom:
+                1px solid #e2e8f0;
+
+            font-size: 13px;
+
+            color: #64748b;
+
+        }
+
+
+
+        .breadcrumb-button {
+
+            border: none;
+
+            background: transparent;
+
+            color: #2563eb;
 
             cursor: pointer;
 
-            user-select: none;
+            font-size: 13px;
+
+            padding: 3px;
 
         }
 
 
-        .file-row:hover {
 
-            background: var(--hover);
+        /* =====================================================
+           COLUMN VIEW
+        ===================================================== */
+
+        .finder-content {
+
+            flex: 1;
+
+            overflow: hidden;
+
+            display: flex;
 
         }
 
 
-        .file-row.selected {
 
-            background: var(--secondary);
+        .finder-column {
+
+            width: 300px;
+
+            min-width: 300px;
+
+            overflow-y: auto;
+
+            overflow-x: hidden;
+
+            background: white;
+
+            border-right:
+                1px solid #dbe3ef;
+
+            padding:
+                8px;
 
         }
 
 
-        .file-name {
+
+        .finder-column:last-child {
+
+            flex: 1;
+
+            border-right: none;
+
+        }
+
+
+
+        .column-empty {
+
+            text-align: center;
+
+            color: #94a3b8;
+
+            padding: 45px 20px;
+
+            font-size: 14px;
+
+        }
+
+
+
+        /* =====================================================
+           FOLDERS
+        ===================================================== */
+
+        .folder-item,
+        .file-item {
+
+            width: 100%;
+
+            min-height: 54px;
+
+            border: none;
+
+            background: transparent;
+
+            border-radius: 8px;
 
             display: flex;
 
             align-items: center;
 
-            gap: 13px;
+            text-align: left;
 
-            min-width: 0;
+            padding:
+                7px 10px;
 
-        }
+            cursor: pointer;
 
-
-        .file-icon {
-
-            width: 38px;
-
-            height: 38px;
-
-            border-radius: 10px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 19px;
-
-            flex-shrink: 0;
+            margin-bottom: 2px;
 
         }
 
 
-        .icon-flowchart {
 
-            background: #dcfce7;
+        .folder-item:hover,
+        .file-item:hover {
 
-        }
-
-
-        .icon-quiz {
-
-            background: #fef3c7;
+            background: #f1f5f9;
 
         }
 
 
-        .icon-flashcards {
 
-            background: #fce7f3;
-
-        }
-
-
-        .icon-presentation {
+        .folder-item.selected,
+        .file-item.selected {
 
             background: #dbeafe;
 
         }
 
 
-        .file-title {
 
-            font-size: 14px;
+        .file-icon,
+        .folder-icon {
 
-            font-weight: 650;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-
-            white-space: nowrap;
-
-        }
-
-
-        .file-type {
-
-            font-size: 12px;
-
-            color: var(--muted);
-
-        }
-
-
-        .file-date {
-
-            font-size: 12px;
-
-            color: var(--muted);
-
-        }
-
-
-        /* =========================================================
-   GRID VIEW
-========================================================= */
-
-        .grid-view {
-
-            display: none;
-
-            grid-template-columns:
-                repeat(auto-fill,
-                    minmax(180px, 1fr));
-
-            gap: 15px;
-
-            padding: 17px;
-
-        }
-
-
-        .grid-view.active {
-
-            display: grid;
-
-        }
-
-
-        .finder.column-mode .finder-list {
-
-            display: none;
-
-        }
-
-
-        .file-card {
-
-            background: var(--card);
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 14px;
-
-            padding: 18px;
-
-            cursor: pointer;
-
-            min-height: 150px;
-
-            transition: .15s;
-
-        }
-
-
-        .file-card:hover {
-
-            transform:
-                translateY(-2px);
-
-            box-shadow:
-                0 8px 22px rgba(0, 0, 0, .08);
-
-        }
-
-
-        .file-card-icon {
-
-            width: 50px;
-
-            height: 50px;
-
-            border-radius: 13px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
+            width: 40px;
 
             font-size: 25px;
 
-            margin-bottom: 20px;
+            text-align: center;
+
+            flex-shrink: 0;
 
         }
 
 
-        .file-card-title {
+
+        .item-info {
+
+            min-width: 0;
+
+            flex: 1;
+
+        }
+
+
+
+        .item-name {
 
             font-size: 14px;
 
-            font-weight: 700;
+            font-weight: 600;
 
-            margin-bottom: 5px;
+            color: #1e293b;
 
             overflow: hidden;
 
@@ -1035,127 +626,276 @@
         }
 
 
-        .file-card-date {
 
-            color: var(--muted);
+        .item-meta {
+
+            margin-top: 3px;
 
             font-size: 11px;
 
-        }
-
-
-        /* =========================================================
-   EMPTY STORAGE
-========================================================= */
-
-        .empty {
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-            justify-content: center;
-
-            min-height: 300px;
-
-            color: var(--muted);
+            color: #94a3b8;
 
         }
 
 
-        .empty-icon {
 
-            font-size: 50px;
+        .folder-arrow {
+
+            color: #94a3b8;
+
+            font-size: 18px;
+
+        }
+
+
+
+        /* =====================================================
+           FILE DETAILS
+        ===================================================== */
+
+        .file-details {
+
+            padding: 35px;
+
+            max-width: 600px;
+
+        }
+
+
+
+        .details-icon {
+
+            font-size: 70px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        .details-name {
+
+            font-size: 25px;
+
+            font-weight: 700;
 
             margin-bottom: 12px;
 
-        }
-
-
-        .empty h3 {
-
-            color: var(--text);
-
-            margin:
-                0 0 5px;
+            word-break: break-word;
 
         }
 
 
-        .empty p {
 
-            margin: 0;
+        .details-row {
 
-            font-size: 13px;
+            display: flex;
+
+            justify-content: space-between;
+
+            border-bottom:
+                1px solid #e2e8f0;
+
+            padding:
+                11px 0;
+
+            font-size: 14px;
 
         }
 
 
-        /* =========================================================
-   SCANNER
-========================================================= */
 
-        .scanner-panel {
+        .details-label {
 
-            margin-top: 28px;
+            color: #64748b;
 
-            background: var(--card);
+        }
+
+
+
+        .details-value {
+
+            font-weight: 600;
+
+            text-align: right;
+
+            max-width: 65%;
+
+            word-break: break-word;
+
+        }
+
+
+
+        .open-file-button {
+
+            margin-top: 25px;
+
+            padding:
+                12px 22px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #2563eb;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+        }
+
+
+
+        .open-file-button:hover {
+
+            background: #1d4ed8;
+
+        }
+
+
+
+        /* =====================================================
+           RENAME
+        ===================================================== */
+
+        .rename-input {
+
+            width: 100%;
+
+            padding:
+                5px 7px;
 
             border:
-                1px solid var(--border);
+                2px solid #2563eb;
 
-            border-radius: var(--radius);
+            border-radius: 5px;
 
-            box-shadow: var(--shadow);
+            font-size: 14px;
 
-            padding: 25px;
-
-        }
-
-
-        .scanner-title {
-
-            margin-bottom: 18px;
+            outline: none;
 
         }
 
 
-        .scanner-title h2 {
 
-            margin: 0;
+        /* =====================================================
+           CONTEXT MENU
+        ===================================================== */
 
-            font-size: 19px;
+        #contextMenu {
+
+            display: none;
+
+            position: fixed;
+
+            z-index: 500;
+
+            background: white;
+
+            border:
+                1px solid #cbd5e1;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, .18);
+
+            border-radius: 8px;
+
+            min-width: 160px;
+
+            padding: 5px;
 
         }
 
 
-        .scanner-title p {
 
-            margin:
-                5px 0 0;
+        .context-option {
 
-            color: var(--muted);
+            width: 100%;
+
+            padding:
+                9px 12px;
+
+            border: none;
+
+            background: transparent;
+
+            text-align: left;
+
+            border-radius: 6px;
+
+            cursor: pointer;
 
             font-size: 13px;
 
         }
+
+
+
+        .context-option:hover {
+
+            background: #f1f5f9;
+
+        }
+
+
+
+        /* =====================================================
+           SCANNER
+        ===================================================== */
+
+        #scanner {
+
+            min-height: 100vh;
+
+        }
+
+
+
+        .container {
+
+            width: 100%;
+
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            text-align: center;
+
+            padding: 30px;
+
+        }
+
+
+
+        h1 {
+
+            font-size: 36px;
+
+            color: #1e293b;
+
+        }
+
 
 
         video {
 
             width: 100%;
 
-            max-height: 470px;
-
-            object-fit: cover;
-
-            border-radius: 15px;
+            border-radius: 18px;
 
             background: black;
 
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, .2);
+
         }
+
 
 
         canvas {
@@ -1165,144 +905,157 @@
         }
 
 
+
         .mode-container {
 
-            margin-top: 18px;
+            margin-top: 20px;
 
             display: flex;
 
-            gap: 9px;
+            justify-content: center;
+
+            gap: 15px;
 
             flex-wrap: wrap;
 
         }
 
 
+
         .mode-btn {
 
             padding:
-                10px 15px;
+                14px 25px;
 
-            border:
-                1px solid var(--border);
+            border: none;
 
-            border-radius: 10px;
+            border-radius: 12px;
 
-            font-size: 13px;
+            font-size: 16px;
 
             cursor: pointer;
 
-            background: var(--card);
+            background: #2563eb;
 
-            color: var(--text);
+            color: white;
 
-            font-weight: 650;
+            transition: .2s;
 
         }
+
 
 
         .mode-btn:hover {
 
-            background: var(--hover);
+            transform: translateY(-2px);
+
+            background: #1d4ed8;
 
         }
 
 
-        .mode-btn.active {
-
-            background: var(--primary);
-
-            color: white;
-
-            border-color:
-                var(--primary);
-
-        }
-
-
-        /* =========================================================
-   OUTPUT
-========================================================= */
 
         #result {
 
-            margin-top: 20px;
+            margin-top: 30px;
+
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, .12);
 
         }
 
 
+
+        #flowchart-render {
+
+            margin-top: 25px;
+
+        }
+
+
+
+        /* =====================================================
+           STUDY CARDS
+        ===================================================== */
+
         .study-card {
 
-            background: var(--card);
+            background: white;
 
             padding: 25px;
 
-            border:
-                1px solid var(--border);
+            border-radius: 18px;
 
-            border-radius: 17px;
-
-            box-shadow: var(--shadow);
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, .15);
 
             text-align: left;
 
         }
+
 
 
         .choice {
 
             width: 100%;
 
-            padding: 14px;
+            padding: 15px;
 
-            margin: 8px 0;
+            margin: 10px 0;
 
-            border-radius: 10px;
+            border-radius: 12px;
 
-            border:
-                1px solid var(--border);
+            border: none;
 
-            font-size: 15px;
+            font-size: 16px;
 
             cursor: pointer;
 
-            background: var(--input);
-
-            color: var(--text);
+            background: #e2e8f0;
 
             text-align: left;
 
         }
 
 
+
         .choice:hover {
 
-            background: var(--hover);
+            background: #cbd5e1;
 
         }
+
 
 
         .choice.correct {
 
             background: #86efac;
 
-            color: #14532d;
-
         }
+
 
 
         .choice.wrong {
 
             background: #fca5a5;
 
-            color: #7f1d1d;
-
         }
 
 
+
+        /* =====================================================
+           FLASHCARDS
+        ===================================================== */
+
         .flashcard {
 
-            width: min(400px, 90%);
+            width: 400px;
 
             height: 250px;
 
@@ -1311,6 +1064,7 @@
             perspective: 1000px;
 
         }
+
 
 
         .flash-inner {
@@ -1330,12 +1084,13 @@
         }
 
 
+
         .flashcard.flip .flash-inner {
 
-            transform:
-                rotateY(180deg);
+            transform: rotateY(180deg);
 
         }
+
 
 
         .flash-front,
@@ -1355,70 +1110,70 @@
 
             padding: 25px;
 
-            border-radius: 18px;
+            box-sizing: border-box;
+
+            border-radius: 20px;
 
             backface-visibility: hidden;
 
-            font-size: 21px;
+            font-size: 22px;
 
             box-shadow:
-                0 8px 25px rgba(0, 0, 0, .15);
+                0 8px 25px rgba(0, 0, 0, .2);
 
-            background: var(--card);
-
-            border:
-                1px solid var(--border);
-
-            text-align: center;
+            background: white;
 
         }
+
 
 
         .flash-back {
 
-            transform:
-                rotateY(180deg);
+            transform: rotateY(180deg);
 
-            background:
-                var(--secondary);
+            background: #eff6ff;
 
         }
+
 
 
         .action-btn {
 
             padding:
-                10px 17px;
+                12px 25px;
 
-            margin: 7px;
+            margin: 10px;
 
             border: none;
 
-            border-radius: 9px;
+            border-radius: 10px;
 
-            background: var(--primary);
+            background: #2563eb;
 
             color: white;
 
             cursor: pointer;
 
-            font-size: 14px;
-
-            font-weight: 600;
+            font-size: 16px;
 
         }
 
+
+
+        /* =====================================================
+           PRESENTATION
+        ===================================================== */
 
         .presentation-link {
 
             display: inline-block;
 
-            margin-top: 20px;
+            margin-top: 25px;
 
             padding:
-                13px 20px;
+                15px 30px;
 
-            border-radius: 10px;
+            border-radius: 12px;
 
             background: #16a34a;
 
@@ -1426,264 +1181,47 @@
 
             text-decoration: none;
 
-            font-size: 15px;
+            font-size: 18px;
 
             font-weight: bold;
 
         }
 
 
-        /* =========================================================
-   RESPONSIVE
-========================================================= */
 
-        @media(max-width: 850px) {
+        .presentation-link:hover {
 
-            .sidebar {
+            background: #15803d;
 
-                width: 70px;
+        }
 
-                padding:
-                    15px 8px;
 
-            }
 
-            .logo-text,
-            .logo-sub,
-            .sidebar-label,
-            .nav-item span:not(.nav-icon),
-            .theme-row>span {
+        /* =====================================================
+           MOBILE
+        ===================================================== */
 
-                display: none;
+        @media (max-width: 800px) {
+
+            .finder-sidebar {
+
+                width: 190px;
 
             }
 
-            .logo {
+            .finder-column {
 
-                justify-content: center;
-
-                padding-bottom: 18px;
-
-            }
-
-            .nav-item {
-
-                justify-content: center;
-
-            }
-
-            .theme-row {
-
-                justify-content: center;
-
-            }
-
-            .main {
-
-                margin-left: 70px;
-
-                width:
-                    calc(100% - 70px);
-
-            }
-
-            .search {
+                min-width: 240px;
 
                 width: 240px;
 
             }
 
-        }
+            .finder-search {
 
-
-        @media(max-width: 600px) {
-
-            .content {
-
-                padding: 18px;
+                width: 150px;
 
             }
-
-            .topbar {
-
-                padding:
-                    0 18px;
-
-            }
-
-            .student-badge {
-
-                display: none;
-
-            }
-
-            .search {
-
-                width: 100%;
-
-            }
-
-            .welcome {
-
-                flex-direction: column;
-
-            }
-
-            .finder-header,
-            .file-row {
-
-                grid-template-columns:
-                    1fr 90px;
-
-            }
-
-            .finder-header div:nth-child(3),
-            .file-row .file-date {
-
-                display: none;
-
-            }
-
-        }
-
-
-        /* =========================================================
-   CONTEXT MENU
-========================================================= */
-
-        .context-menu {
-
-            display: none;
-
-            position: fixed;
-
-            z-index: 1000;
-
-            background: var(--card);
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 10px;
-
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, .2);
-
-            padding: 5px;
-
-            min-width: 150px;
-
-        }
-
-
-        .context-menu button {
-
-            display: block;
-
-            width: 100%;
-
-            border: none;
-
-            background: transparent;
-
-            color: var(--text);
-
-            padding: 9px 11px;
-
-            text-align: left;
-
-            border-radius: 7px;
-
-            cursor: pointer;
-
-            font-size: 13px;
-
-        }
-
-
-        .context-menu button:hover {
-
-            background: var(--hover);
-
-        }
-
-
-        /* =========================================================
-   RENAME DIALOG
-========================================================= */
-
-        .rename-modal {
-
-            display: none;
-
-            position: fixed;
-
-            inset: 0;
-
-            z-index: 2000;
-
-            background:
-                rgba(15, 23, 42, .45);
-
-            align-items: center;
-
-            justify-content: center;
-
-        }
-
-
-        .rename-box {
-
-            width: min(400px, 90%);
-
-            background: var(--card);
-
-            border-radius: 16px;
-
-            padding: 25px;
-
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, .25);
-
-        }
-
-
-        .rename-box h3 {
-
-            margin-top: 0;
-
-        }
-
-
-        .rename-input {
-
-            width: 100%;
-
-            padding: 11px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 9px;
-
-            background: var(--input);
-
-            color: var(--text);
-
-            outline: none;
-
-        }
-
-
-        .rename-actions {
-
-            display: flex;
-
-            justify-content: flex-end;
-
-            gap: 8px;
-
-            margin-top: 15px;
 
         }
     </style>
@@ -1698,409 +1236,329 @@
 
 
         <!-- =====================================================
-     SIDEBAR
-===================================================== -->
+         TOP BAR
+    ===================================================== -->
 
-        <aside class="sidebar">
+        <div class="topbar">
 
-
-            <div class="logo">
-
-                <div class="logo-icon">
-                    ✦
-                </div>
-
-                <div>
-
-                    <div class="logo-text">
-                        StudySpace
-                    </div>
-
-                    <div class="logo-sub">
-                        AI-powered studying
-                    </div>
-
-                </div>
-
+            <div class="app-title">
+                AI Study Scanner
             </div>
 
 
-            <div class="sidebar-section">
+            <div class="topbar-spacer"></div>
 
-                <div class="sidebar-label">
-                    Workspace
+
+            <button class="storage-toggle" onclick="toggleFinder()">
+
+                📁 My Files
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =====================================================
+         FINDER
+    ===================================================== -->
+
+        <div id="finder">
+
+
+            <!-- SIDEBAR -->
+
+            <aside class="finder-sidebar">
+
+
+                <div class="sidebar-section-title">
+                    Favorites
                 </div>
 
 
-                <button class="nav-item active" onclick="showStorage('all')">
+                <button class="sidebar-item active" data-folder="all" onclick="openFolder('all')">
 
-                    <span class="nav-icon">⌂</span>
+                    <span class="sidebar-icon">
+                        📁
+                    </span>
 
                     <span>
-                        My Study Space
+                        All Files
+                    </span>
+
+                    <span class="sidebar-count" id="count-all">
+                        0
                     </span>
 
                 </button>
 
 
-                <button class="nav-item" onclick="showStorage('flowchart')">
+                <button class="sidebar-item" data-folder="recent" onclick="openFolder('recent')">
 
-                    <span class="nav-icon">📊</span>
+                    <span class="sidebar-icon">
+                        🕘
+                    </span>
+
+                    <span>
+                        Recents
+                    </span>
+
+                </button>
+
+
+
+                <div class="sidebar-section-title">
+                    Study Files
+                </div>
+
+
+                <button class="sidebar-item" data-folder="flowchart" onclick="openFolder('flowchart')">
+
+                    <span class="sidebar-icon">
+                        📊
+                    </span>
 
                     <span>
                         Flowcharts
                     </span>
 
+                    <span class="sidebar-count" id="count-flowchart">
+                        0
+                    </span>
+
                 </button>
 
 
-                <button class="nav-item" onclick="showStorage('quiz')">
+                <button class="sidebar-item" data-folder="quiz" onclick="openFolder('quiz')">
 
-                    <span class="nav-icon">📝</span>
+                    <span class="sidebar-icon">
+                        📝
+                    </span>
 
                     <span>
                         Quizzes
                     </span>
 
+                    <span class="sidebar-count" id="count-quiz">
+                        0
+                    </span>
+
                 </button>
 
 
-                <button class="nav-item" onclick="showStorage('flashcards')">
+                <button class="sidebar-item" data-folder="flashcards" onclick="openFolder('flashcards')">
 
-                    <span class="nav-icon">🃏</span>
+                    <span class="sidebar-icon">
+                        🃏
+                    </span>
 
                     <span>
                         Flashcards
                     </span>
 
+                    <span class="sidebar-count" id="count-flashcards">
+                        0
+                    </span>
+
                 </button>
 
 
-                <button class="nav-item" onclick="showStorage('presentation')">
+                <button class="sidebar-item" data-folder="presentation" onclick="openFolder('presentation')">
 
-                    <span class="nav-icon">📽</span>
+                    <span class="sidebar-icon">
+                        📽
+                    </span>
 
                     <span>
                         Presentations
                     </span>
 
-                </button>
-
-            </div>
-
-
-            <div class="sidebar-section">
-
-                <div class="sidebar-label">
-                    Create
-                </div>
-
-
-                <button class="nav-item" onclick="scrollToScanner()">
-
-                    <span class="nav-icon">＋</span>
-
-                    <span>
-                        New Study Material
+                    <span class="sidebar-count" id="count-presentation">
+                        0
                     </span>
 
                 </button>
 
-            </div>
+
+            </aside>
 
 
-            <div class="sidebar-bottom">
+
+            <!-- FINDER MAIN -->
+
+            <main class="finder-main">
 
 
-                <div class="theme-row">
-
-                    <span>
-                        Appearance
-                    </span>
+                <div class="finder-toolbar">
 
 
-                    <label class="theme-switch">
+                    <div class="finder-title" id="finder-title">
 
-                        <input type="checkbox" id="themeToggle">
+                        All Files
 
-                        <span class="slider"></span>
+                    </div>
 
-                    </label>
+
+                    <input type="text" id="finder-search" class="finder-search" placeholder="Search files..."
+                        oninput="renderFinder()">
+
+
+                    <select id="sort-select" class="sort-select" onchange="renderFinder()">
+
+                        <option value="updated">
+                            Date Modified
+                        </option>
+
+                        <option value="name">
+                            Name
+                        </option>
+
+                        <option value="type">
+                            Type
+                        </option>
+
+                    </select>
+
 
                 </div>
 
 
-            </div>
+
+                <div class="finder-breadcrumb" id="finder-breadcrumb">
+
+                    <button class="breadcrumb-button" onclick="openFolder('all')">
+
+                        📁 All Files
+
+                    </button>
+
+                </div>
 
 
-        </aside>
+
+                <div class="finder-content" id="finder-content">
+
+
+                    <div class="finder-column" id="folder-column">
+
+                    </div>
+
+
+                    <div class="finder-column" id="file-column">
+
+                        <div class="column-empty">
+
+                            Select a folder
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="finder-column" id="details-column">
+
+                        <div class="column-empty">
+
+                            Select a file
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+            </main>
+
+        </div>
 
 
 
         <!-- =====================================================
-     MAIN
-===================================================== -->
+         SCANNER
+    ===================================================== -->
 
-        <main class="main">
-
-
-            <header class="topbar">
+        <div id="scanner">
 
 
-                <div class="search">
-
-                    <span class="search-icon">
-                        🔎
-                    </span>
-
-                    <input type="text" id="searchInput" placeholder="Search your study materials...">
-
-                </div>
+            <div class="container">
 
 
-                <div class="top-actions">
-
-                    <div class="student-badge">
-                        🎓 StudySpace
-                    </div>
-
-                </div>
+                <h1>
+                    AI Study Scanner
+                </h1>
 
 
-            </header>
+                <video id="webcam" autoplay playsinline>
+                </video>
+
+
+                <canvas id="canvas"></canvas>
 
 
 
-            <div class="content">
+                <div class="mode-container">
 
 
-                <!-- =====================================================
-     WELCOME
-===================================================== -->
+                    <button class="mode-btn" data-mode="flowchart">
 
-                <section class="welcome">
-
-
-                    <div>
-
-                        <h1>
-                            Your study space
-                        </h1>
-
-                        <p>
-                            Scan notes, make study materials, and keep everything organized.
-                        </p>
-
-                    </div>
-
-
-                    <button class="scan-button" onclick="scrollToScanner()">
-
-                        ✦ Create something
+                        📊 Flowchart
 
                     </button>
 
 
-                </section>
+                    <button class="mode-btn" data-mode="quiz">
+
+                        📝 Quiz
+
+                    </button>
 
 
+                    <button class="mode-btn" data-mode="flashcards">
 
-                <!-- =====================================================
-     STORAGE TOOLBAR
-===================================================== -->
+                        🃏 Flashcards
 
-                <div class="storage-toolbar">
-
-
-                    <div class="breadcrumb">
-
-                        <span>
-                            StudySpace
-                        </span>
-
-                        <span>
-                            /
-                        </span>
-
-                        <strong id="currentFolder">
-                            All Items
-                        </strong>
-
-                    </div>
+                    </button>
 
 
-                    <div class="toolbar-actions">
+                    <button class="mode-btn" data-mode="presentation">
 
-                        <button class="tool-btn" onclick="sortItems()">
+                        📽 Presentation
 
-                            ↕ Sort
-
-                        </button>
-
-
-                        <button class="tool-btn" onclick="setView('list')">
-
-                            ☷
-
-                        </button>
-
-
-                        <button class="tool-btn" onclick="setView('grid')">
-
-                            ▦
-
-                        </button>
-
-                    </div>
+                    </button>
 
 
                 </div>
 
 
 
-                <!-- =====================================================
-     FINDER
-===================================================== -->
+                <div id="result">
 
-                <section class="finder" id="finder">
 
+                    <h3>
+                        Output
+                    </h3>
 
-                    <div class="finder-header">
 
-                        <div>
-                            Name
-                        </div>
+                    <p id="ai-status">
 
-                        <div>
-                            Type
-                        </div>
+                        Select a mode and scan an image.
 
-                        <div>
-                            Modified
-                        </div>
+                    </p>
 
-                    </div>
 
+                    <div id="flowchart-render"></div>
 
 
-                    <div class="finder-list" id="finderList">
-
-                        <div class="empty">
-
-                            <div class="empty-icon">
-                                📁
-                            </div>
-
-                            <h3>
-                                Loading your study space...
-                            </h3>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="grid-view" id="gridView">
-
-                    </div>
-
-
-                </section>
-
-
-
-                <!-- =====================================================
-     SCANNER
-===================================================== -->
-
-                <section class="scanner-panel" id="scannerPanel">
-
-
-                    <div class="scanner-title">
-
-                        <h2>
-                            Create study material
-                        </h2>
-
-                        <p>
-                            Point your camera at notes, worksheets, textbooks, or study guides.
-                        </p>
-
-                    </div>
-
-
-                    <video id="webcam" autoplay playsinline>
-                    </video>
-
-
-                    <canvas id="canvas"></canvas>
-
-
-                    <div class="mode-container">
-
-
-                        <button class="mode-btn active" data-mode="flowchart">
-
-                            📊 Flowchart
-
-                        </button>
-
-
-                        <button class="mode-btn" data-mode="quiz">
-
-                            📝 Quiz
-
-                        </button>
-
-
-                        <button class="mode-btn" data-mode="flashcards">
-
-                            🃏 Flashcards
-
-                        </button>
-
-
-                        <button class="mode-btn" data-mode="presentation">
-
-                            📽 Presentation
-
-                        </button>
-
-
-                    </div>
-
-
-                    <div id="result">
-
-
-                        <div class="study-card">
-
-                            <h3>
-                                Output
-                            </h3>
-
-                            <p id="ai-status">
-
-                                Select a mode and scan an image.
-
-                            </p>
-
-
-                            <div id="flowchart-render"></div>
-
-                        </div>
-
-
-                    </div>
-
-
-                </section>
+                </div>
 
 
             </div>
 
-        </main>
+
+        </div>
+
 
     </div>
 
@@ -2110,59 +1568,21 @@
      CONTEXT MENU
 ===================================================== -->
 
-    <div class="context-menu" id="contextMenu">
+    <div id="contextMenu">
 
-        <button onclick="openSelected()">
-            Open
+
+        <button class="context-option" onclick="renameSelected()">
+
+            ✏️ Rename
+
         </button>
 
-        <button onclick="renameSelected()">
-            Rename
+
+        <button class="context-option" onclick="openSelected()">
+
+            📂 Open
+
         </button>
-
-    </div>
-
-
-
-    <!-- =====================================================
-     RENAME MODAL
-===================================================== -->
-
-    <div class="rename-modal" id="renameModal">
-
-
-        <div class="rename-box">
-
-
-            <h3>
-                Rename study material
-            </h3>
-
-
-            <input class="rename-input" id="renameInput" type="text">
-
-
-            <div class="rename-actions">
-
-
-                <button class="tool-btn" onclick="closeRename()">
-
-                    Cancel
-
-                </button>
-
-
-                <button class="action-btn" onclick="saveRename()">
-
-                    Rename
-
-                </button>
-
-
-            </div>
-
-
-        </div>
 
     </div>
 
@@ -2172,90 +1592,1096 @@
 
 
         /* =========================================================
-           GLOBAL STATE
+           FINDER STATE
         ========================================================= */
 
-        const video =
-            document.getElementById("webcam");
-
-        const canvas =
-            document.getElementById("canvas");
-
-        const status =
-            document.getElementById("ai-status");
-
-        const output =
-            document.getElementById("flowchart-render");
-
-        const finder =
-            document.getElementById("finder");
-
-        const finderList =
-            document.getElementById("finderList");
-
-        const gridView =
-            document.getElementById("gridView");
-
-        const searchInput =
-            document.getElementById("searchInput");
-
-        let selectedMode = "flowchart";
-
-        let selectedItem = null;
 
         let allItems = [];
 
-        let currentFilter = "all";
+        let currentFolder = "all";
 
-        let currentView = "list";
+        let selectedItem = null;
 
-        let sortAscending = false;
+        let selectedFolder = null;
+
 
 
         /* =========================================================
-           DARK MODE
+           FOLDER DEFINITIONS
         ========================================================= */
 
-        const themeToggle =
-            document.getElementById("themeToggle");
+
+        const folderDefinitions = [
+
+            {
+                id: "flowchart",
+                name: "Flowcharts",
+                icon: "📊"
+            },
+
+            {
+                id: "quiz",
+                name: "Quizzes",
+                icon: "📝"
+            },
+
+            {
+                id: "flashcards",
+                name: "Flashcards",
+                icon: "🃏"
+            },
+
+            {
+                id: "presentation",
+                name: "Presentations",
+                icon: "📽"
+            }
+
+        ];
 
 
-        const savedTheme =
-            localStorage.getItem("studyspace-theme");
+
+        /* =========================================================
+           GET ITEMS
+        ========================================================= */
 
 
-        if (savedTheme === "dark") {
-
-            document.body.classList.add("dark");
-
-            themeToggle.checked = true;
-
-        }
+        async function loadItems() {
 
 
-        themeToggle.addEventListener(
-            "change",
-            function () {
+            try {
 
-                if (this.checked) {
 
-                    document.body.classList.add("dark");
+                const response =
+                    await fetch("get_items.php");
 
-                    localStorage.setItem(
-                        "studyspace-theme",
-                        "dark"
-                    );
+
+                const data =
+                    await response.json();
+
+
+                if (Array.isArray(data)) {
+
+                    allItems = data;
+
+                }
+
+                else if (
+                    Array.isArray(data.items)
+                ) {
+
+                    allItems = data.items;
 
                 }
 
                 else {
 
-                    document.body.classList.remove("dark");
+                    allItems = [];
 
-                    localStorage.setItem(
-                        "studyspace-theme",
-                        "light"
+                }
+
+
+                updateCounts();
+
+
+                renderFinder();
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Could not load generated items:",
+                    error
+                );
+
+            }
+
+        }
+
+
+
+        /* =========================================================
+           COUNTS
+        ========================================================= */
+
+
+        function updateCounts() {
+
+
+            document
+                .getElementById("count-all")
+                .innerText =
+                allItems.length;
+
+
+            folderDefinitions.forEach(folder => {
+
+
+                const count =
+                    allItems.filter(
+                        item =>
+                            item.type === folder.id
+                    ).length;
+
+
+                const element =
+                    document.getElementById(
+                        "count-" + folder.id
                     );
+
+
+                if (element) {
+
+                    element.innerText = count;
+
+                }
+
+            });
+
+        }
+
+
+
+        /* =========================================================
+           FOLDER NAVIGATION
+        ========================================================= */
+
+
+        function openFolder(folder) {
+
+
+            currentFolder = folder;
+
+            selectedItem = null;
+
+
+            document
+                .querySelectorAll(".sidebar-item")
+                .forEach(item => {
+
+                    item.classList.remove("active");
+
+                });
+
+
+            const active =
+                document.querySelector(
+                    `.sidebar-item[data-folder="${folder}"]`
+                );
+
+
+            if (active) {
+
+                active.classList.add("active");
+
+            }
+
+
+            const titles = {
+
+                all: "All Files",
+
+                recent: "Recents",
+
+                flowchart: "Flowcharts",
+
+                quiz: "Quizzes",
+
+                flashcards: "Flashcards",
+
+                presentation: "Presentations"
+
+            };
+
+
+            document
+                .getElementById("finder-title")
+                .innerText =
+                titles[folder] || "Files";
+
+
+            renderFinder();
+
+        }
+
+
+
+        /* =========================================================
+           FILTER ITEMS
+        ========================================================= */
+
+
+        function getVisibleItems() {
+
+
+            let items = [...allItems];
+
+
+            if (currentFolder !== "all") {
+
+
+                if (currentFolder === "recent") {
+
+
+                    items.sort(
+                        (a, b) =>
+                            new Date(b.updated_at || b.created_at)
+                            -
+                            new Date(a.updated_at || a.created_at)
+                    );
+
+
+                    items =
+                        items.slice(0, 20);
+
+                }
+
+                else {
+
+                    items =
+                        items.filter(
+                            item =>
+                                item.type === currentFolder
+                        );
+
+                }
+
+            }
+
+
+            const search =
+                document
+                    .getElementById("finder-search")
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (search) {
+
+                items =
+                    items.filter(item =>
+
+                        String(item.name || "")
+                            .toLowerCase()
+                            .includes(search)
+
+                    );
+
+            }
+
+
+            const sort =
+                document
+                    .getElementById("sort-select")
+                    .value;
+
+
+            if (sort === "name") {
+
+                items.sort(
+                    (a, b) =>
+                        String(a.name || "")
+                            .localeCompare(
+                                String(b.name || "")
+                            )
+                );
+
+            }
+
+
+            else if (sort === "type") {
+
+                items.sort(
+                    (a, b) =>
+                        String(a.type || "")
+                            .localeCompare(
+                                String(b.type || "")
+                            )
+                );
+
+            }
+
+
+            else {
+
+                items.sort(
+                    (a, b) =>
+                        new Date(
+                            b.updated_at ||
+                            b.created_at
+                        )
+                        -
+                        new Date(
+                            a.updated_at ||
+                            a.created_at
+                        )
+                );
+
+            }
+
+
+            return items;
+
+        }
+
+
+
+        /* =========================================================
+           RENDER FINDER
+        ========================================================= */
+
+
+        function renderFinder() {
+
+
+            const folderColumn =
+                document.getElementById(
+                    "folder-column"
+                );
+
+
+            const fileColumn =
+                document.getElementById(
+                    "file-column"
+                );
+
+
+            const detailsColumn =
+                document.getElementById(
+                    "details-column"
+                );
+
+
+            folderColumn.innerHTML = "";
+
+            fileColumn.innerHTML = "";
+
+            detailsColumn.innerHTML = `
+
+        <div class="column-empty">
+
+            Select a file
+
+        </div>
+
+    `;
+
+
+
+            /* -----------------------------------------
+               FOLDER COLUMN
+            ----------------------------------------- */
+
+
+            if (
+                currentFolder === "all" ||
+                currentFolder === "recent"
+            ) {
+
+
+                folderDefinitions.forEach(folder => {
+
+
+                    const count =
+                        allItems.filter(
+                            item =>
+                                item.type === folder.id
+                        ).length;
+
+
+                    const button =
+                        document.createElement("button");
+
+
+                    button.className =
+                        "folder-item";
+
+
+                    button.innerHTML = `
+
+                <span class="folder-icon">
+                    ${folder.icon}
+                </span>
+
+                <span class="item-info">
+
+                    <span class="item-name">
+                        ${escapeHtml(folder.name)}
+                    </span>
+
+                    <span class="item-meta">
+                        ${count} item${count === 1 ? "" : "s"}
+                    </span>
+
+                </span>
+
+                <span class="folder-arrow">
+                    ›
+                </span>
+
+            `;
+
+
+                    button.onclick = () => {
+
+
+                        selectedFolder =
+                            folder.id;
+
+
+                        document
+                            .querySelectorAll(".folder-item")
+                            .forEach(el =>
+                                el.classList.remove(
+                                    "selected"
+                                )
+                            );
+
+
+                        button.classList.add(
+                            "selected"
+                        );
+
+
+                        renderFolderFiles(
+                            folder.id
+                        );
+
+                    };
+
+
+                    folderColumn.appendChild(
+                        button
+                    );
+
+                });
+
+
+            }
+
+
+            else {
+
+
+                folderColumn.innerHTML = `
+
+            <div class="column-empty">
+
+                📁
+
+                <br><br>
+
+                ${escapeHtml(
+                    getFolderName(currentFolder)
+                )}
+
+            </div>
+
+        `;
+
+
+                renderFolderFiles(
+                    currentFolder
+                );
+
+            }
+
+
+        }
+
+
+
+        /* =========================================================
+           RENDER FILE COLUMN
+        ========================================================= */
+
+
+        function renderFolderFiles(folder) {
+
+
+            const fileColumn =
+                document.getElementById(
+                    "file-column"
+                );
+
+
+            fileColumn.innerHTML = "";
+
+
+            let items =
+                getVisibleItems();
+
+
+            if (folder !== "all" &&
+                folder !== "recent") {
+
+                items =
+                    items.filter(
+                        item =>
+                            item.type === folder
+                    );
+
+            }
+
+
+            if (!items.length) {
+
+
+                fileColumn.innerHTML = `
+
+            <div class="column-empty">
+
+                This folder is empty.
+
+            </div>
+
+        `;
+
+
+                return;
+
+            }
+
+
+            items.forEach(item => {
+
+
+                const button =
+                    document.createElement("button");
+
+
+                button.className =
+                    "file-item";
+
+
+                button.dataset.id =
+                    item.id;
+
+
+                button.innerHTML = `
+
+            <span class="file-icon">
+
+                ${getTypeIcon(item.type)}
+
+            </span>
+
+            <span class="item-info">
+
+                <span
+                    class="item-name"
+                    title="${escapeHtml(item.name || "Untitled")}">
+
+                    ${escapeHtml(
+                    item.name || "Untitled"
+                )}
+
+                </span>
+
+                <span class="item-meta">
+
+                    ${getTypeName(item.type)}
+                    •
+                    ${formatDate(
+                    item.updated_at ||
+                    item.created_at
+                )}
+
+                </span>
+
+            </span>
+
+        `;
+
+
+                button.onclick = () => {
+
+
+                    document
+                        .querySelectorAll(".file-item")
+                        .forEach(el =>
+                            el.classList.remove(
+                                "selected"
+                            )
+                        );
+
+
+                    button.classList.add(
+                        "selected"
+                    );
+
+
+                    selectedItem = item;
+
+
+                    renderDetails(item);
+
+                };
+
+
+                button.ondblclick = () => {
+
+                    openItem(item);
+
+                };
+
+
+                button.oncontextmenu = event => {
+
+
+                    event.preventDefault();
+
+
+                    selectedItem = item;
+
+
+                    showContextMenu(
+                        event.clientX,
+                        event.clientY
+                    );
+
+                };
+
+
+                fileColumn.appendChild(
+                    button
+                );
+
+            });
+
+        }
+
+
+
+        /* =========================================================
+           DETAILS COLUMN
+        ========================================================= */
+
+
+        function renderDetails(item) {
+
+
+            const details =
+                document.getElementById(
+                    "details-column"
+                );
+
+
+            details.innerHTML = `
+
+        <div class="file-details">
+
+            <div class="details-icon">
+
+                ${getTypeIcon(item.type)}
+
+            </div>
+
+
+            <div class="details-name">
+
+                ${escapeHtml(
+                item.name || "Untitled"
+            )}
+
+            </div>
+
+
+            <div class="details-row">
+
+                <span class="details-label">
+                    Kind
+                </span>
+
+                <span class="details-value">
+                    ${getTypeName(item.type)}
+                </span>
+
+            </div>
+
+
+            <div class="details-row">
+
+                <span class="details-label">
+                    Created
+                </span>
+
+                <span class="details-value">
+                    ${formatDate(
+                item.created_at
+            )}
+                </span>
+
+            </div>
+
+
+            <div class="details-row">
+
+                <span class="details-label">
+                    Modified
+                </span>
+
+                <span class="details-value">
+                    ${formatDate(
+                item.updated_at ||
+                item.created_at
+            )}
+                </span>
+
+            </div>
+
+
+            <div class="details-row">
+
+                <span class="details-label">
+                    ID
+                </span>
+
+                <span class="details-value">
+                    ${item.id}
+                </span>
+
+            </div>
+
+
+            <button
+                class="open-file-button"
+                onclick="openSelected()">
+
+                Open
+
+            </button>
+
+
+        </div>
+
+    `;
+
+        }
+
+
+
+        /* =========================================================
+           OPEN ITEM
+        ========================================================= */
+
+
+        function openItem(item) {
+
+
+            if (!item || !item.id) {
+
+                return;
+
+            }
+
+
+            window.open(
+                "opened_item.php?id=" +
+                encodeURIComponent(item.id),
+
+                "_blank"
+            );
+
+        }
+
+
+
+        /* =========================================================
+           OPEN SELECTED
+        ========================================================= */
+
+
+        function openSelected() {
+
+
+            if (!selectedItem) {
+
+                return;
+
+            }
+
+
+            openItem(
+                selectedItem
+            );
+
+        }
+
+
+
+        /* =========================================================
+           RENAME
+        ========================================================= */
+
+
+        async function renameSelected() {
+
+
+            if (!selectedItem) {
+
+                hideContextMenu();
+
+                return;
+
+            }
+
+
+            hideContextMenu();
+
+
+            const fileElement =
+                document.querySelector(
+                    `.file-item[data-id="${selectedItem.id}"]`
+                );
+
+
+            if (!fileElement) {
+
+                return;
+
+            }
+
+
+            const nameElement =
+                fileElement.querySelector(
+                    ".item-name"
+                );
+
+
+            const oldName =
+                selectedItem.name ||
+                "Untitled";
+
+
+            const input =
+                document.createElement("input");
+
+
+            input.className =
+                "rename-input";
+
+
+            input.value =
+                oldName;
+
+
+            nameElement.replaceWith(
+                input
+            );
+
+
+            input.focus();
+
+            input.select();
+
+
+
+            let finished = false;
+
+
+
+            async function finishRename(
+                save
+            ) {
+
+
+                if (finished) {
+
+                    return;
+
+                }
+
+
+                finished = true;
+
+
+                const newName =
+                    input.value.trim();
+
+
+                if (
+                    !save ||
+                    !newName ||
+                    newName === oldName
+                ) {
+
+                    renderFinder();
+
+                    return;
+
+                }
+
+
+                try {
+
+
+                    const response =
+                        await fetch(
+                            "rename_item.php",
+                            {
+
+                                method: "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        id:
+                                            selectedItem.id,
+
+                                        name:
+                                            newName
+
+                                    })
+
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    if (
+                        !result.success
+                    ) {
+
+                        alert(
+                            result.error ||
+                            "Could not rename item."
+                        );
+
+                        return;
+
+                    }
+
+
+                    selectedItem.name =
+                        newName;
+
+
+                    const index =
+                        allItems.findIndex(
+                            item =>
+                                String(item.id) ===
+                                String(selectedItem.id)
+                        );
+
+
+                    if (index !== -1) {
+
+                        allItems[index].name =
+                            newName;
+
+                    }
+
+
+                    renderFinder();
+
+                    renderFolderFiles(
+                        currentFolder
+                    );
+
+
+                }
+
+                catch (error) {
+
+
+                    console.error(
+                        error
+                    );
+
+
+                    alert(
+                        "Could not rename item."
+                    );
+
+                }
+
+            }
+
+
+
+            input.onkeydown =
+                event => {
+
+
+                    if (
+                        event.key === "Enter"
+                    ) {
+
+                        finishRename(true);
+
+                    }
+
+
+                    if (
+                        event.key === "Escape"
+                    ) {
+
+                        finishRename(false);
+
+                    }
+
+                };
+
+
+            input.onblur =
+                () => {
+
+                    finishRename(true);
+
+                };
+
+        }
+
+
+
+        /* =========================================================
+           F2 RENAME
+        ========================================================= */
+
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+
+                if (
+                    event.key === "F2" &&
+                    selectedItem &&
+                    document.getElementById(
+                        "finder"
+                    ).classList.contains("visible")
+                ) {
+
+                    event.preventDefault();
+
+                    renameSelected();
+
+                }
+
+
+                if (
+                    event.key === "Enter" &&
+                    selectedItem &&
+                    document.getElementById(
+                        "finder"
+                    ).classList.contains("visible")
+                ) {
+
+                    openSelected();
 
                 }
 
@@ -2263,62 +2689,358 @@
         );
 
 
+
         /* =========================================================
-           CAMERA
+           CONTEXT MENU
         ========================================================= */
 
-        async function initCamera() {
 
-            try {
+        function showContextMenu(
+            x,
+            y
+        ) {
 
-                const stream =
-                    await navigator.mediaDevices.getUserMedia({
 
-                        video: {
-                            facingMode: "environment"
-                        }
+            const menu =
+                document.getElementById(
+                    "contextMenu"
+                );
 
-                    });
 
-                video.srcObject = stream;
+            menu.style.display =
+                "block";
+
+
+            menu.style.left =
+                x + "px";
+
+
+            menu.style.top =
+                y + "px";
+
+        }
+
+
+
+        function hideContextMenu() {
+
+
+            document
+                .getElementById(
+                    "contextMenu"
+                )
+                .style.display =
+                "none";
+
+        }
+
+
+
+        document.addEventListener(
+            "click",
+            hideContextMenu
+        );
+
+
+
+        /* =========================================================
+           FINDER TOGGLE
+        ========================================================= */
+
+
+        function toggleFinder() {
+
+
+            const finder =
+                document.getElementById(
+                    "finder"
+                );
+
+
+            const scanner =
+                document.getElementById(
+                    "scanner"
+                );
+
+
+            if (
+                finder.classList.contains(
+                    "visible"
+                )
+            ) {
+
+
+                finder.classList.remove(
+                    "visible"
+                );
+
+
+                scanner.style.display =
+                    "block";
+
 
             }
 
-            catch (err) {
+            else {
 
-                status.innerText =
-                    "Camera error: " + err.message;
+
+                finder.classList.add(
+                    "visible"
+                );
+
+
+                scanner.style.display =
+                    "none";
+
+
+                loadItems();
+
 
             }
 
         }
 
 
-        initCamera();
+
+        /* =========================================================
+           HELPERS
+        ========================================================= */
+
+
+        function getFolderName(
+            type
+        ) {
+
+
+            const folder =
+                folderDefinitions.find(
+                    item =>
+                        item.id === type
+                );
+
+
+            return folder
+                ? folder.name
+                : "Files";
+
+        }
+
+
+
+        function getTypeName(
+            type
+        ) {
+
+
+            const names = {
+
+                flowchart: "Flowchart",
+
+                quiz: "Quiz",
+
+                flashcards: "Flashcards",
+
+                presentation: "Presentation"
+
+            };
+
+
+            return names[type] ||
+                "Study File";
+
+        }
+
+
+
+        function getTypeIcon(
+            type
+        ) {
+
+
+            const icons = {
+
+                flowchart: "📊",
+
+                quiz: "📝",
+
+                flashcards: "🃏",
+
+                presentation: "📽"
+
+            };
+
+
+            return icons[type] ||
+                "📄";
+
+        }
+
+
+
+        function formatDate(
+            date
+        ) {
+
+
+            if (!date) {
+
+                return "Unknown";
+
+            }
+
+
+            const parsed =
+                new Date(
+                    date
+                );
+
+
+            if (
+                Number.isNaN(
+                    parsed.getTime()
+                )
+            ) {
+
+                return date;
+
+            }
+
+
+            return parsed.toLocaleDateString(
+                undefined,
+                {
+
+                    month: "short",
+
+                    day: "numeric",
+
+                    year: "numeric"
+
+                }
+            );
+
+        }
+
+
+
+        function escapeHtml(
+            value
+        ) {
+
+
+            return String(value ?? "")
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+
+        /* =========================================================
+           CAMERA
+        ========================================================= */
+
+
+        const video =
+            document.getElementById(
+                "webcam"
+            );
+
+
+        const canvas =
+            document.getElementById(
+                "canvas"
+            );
+
+
+        const status =
+            document.getElementById(
+                "ai-status"
+            );
+
+
+        const output =
+            document.getElementById(
+                "flowchart-render"
+            );
+
+
+        let selectedMode =
+            "flowchart";
+
+
+
+        async function initCamera() {
+
+
+            try {
+
+
+                const stream =
+                    await navigator.mediaDevices
+                        .getUserMedia({
+
+                            video: {
+                                facingMode:
+                                    "environment"
+                            }
+
+                        });
+
+
+                video.srcObject =
+                    stream;
+
+
+            }
+
+            catch (err) {
+
+
+                status.innerText =
+                    "Camera error: " +
+                    err.message;
+
+            }
+
+        }
+
 
 
         /* =========================================================
            MODE BUTTONS
         ========================================================= */
 
+
         document
             .querySelectorAll(".mode-btn")
             .forEach(button => {
 
+
                 button.onclick = () => {
 
-                    document
-                        .querySelectorAll(".mode-btn")
-                        .forEach(btn => {
-
-                            btn.classList.remove("active");
-
-                        });
-
-                    button.classList.add("active");
 
                     selectedMode =
                         button.dataset.mode;
+
 
                     scanImage();
 
@@ -2327,43 +3049,61 @@
             });
 
 
+
         /* =========================================================
-           SCAN
+           IMAGE CAPTURE
         ========================================================= */
+
 
         async function scanImage() {
 
-            status.innerText =
-                "Analyzing your notes...";
 
-            output.innerHTML = "";
+            status.innerText =
+                "Analyzing...";
+
+
+            output.innerHTML =
+                "";
 
 
             canvas.width =
                 video.videoWidth;
+
 
             canvas.height =
                 video.videoHeight;
 
 
             const ctx =
-                canvas.getContext("2d");
+                canvas.getContext(
+                    "2d"
+                );
 
 
             ctx.drawImage(
+
                 video,
+
                 0,
+
                 0,
+
                 canvas.width,
+
                 canvas.height
+
             );
 
 
             const image =
-                canvas.toDataURL("image/jpeg");
+                canvas.toDataURL(
+                    "image/jpeg"
+                );
+
 
 
             try {
+
 
                 const response =
                     await fetch(
@@ -2384,9 +3124,11 @@
                             body:
                                 JSON.stringify({
 
-                                    image: image,
+                                    image:
+                                        image,
 
-                                    mode: selectedMode
+                                    mode:
+                                        selectedMode
 
                                 })
 
@@ -2395,40 +3137,56 @@
                     );
 
 
+
                 const text =
                     await response.text();
 
 
                 console.log(
-                    "SERVER RESPONSE:",
+                    "SERVER RESPONSE:"
+                );
+
+
+                console.log(
                     text
                 );
 
 
                 const data =
-                    JSON.parse(text);
+                    JSON.parse(
+                        text
+                    );
+
 
 
                 if (!data.success) {
 
+
                     status.innerText =
                         data.error;
+
 
                     return;
 
                 }
 
 
+
                 status.innerText =
                     "Generated successfully!";
 
 
-                /* FLOWCHART */
+
+                /* =========================================
+                   FLOWCHART
+                ========================================= */
+
 
                 if (
                     selectedMode ===
                     "flowchart"
                 ) {
+
 
                     let code =
                         data.ai_response;
@@ -2436,14 +3194,17 @@
 
                     code =
                         code
+
                             .replace(
                                 /```mermaid/gi,
                                 ""
                             )
+
                             .replace(
                                 /```/g,
                                 ""
                             )
+
                             .trim();
 
 
@@ -2461,7 +3222,9 @@
                         code;
 
 
-                    output.appendChild(div);
+                    output.appendChild(
+                        div
+                    );
 
 
                     await mermaid.run({
@@ -2470,54 +3233,77 @@
 
                     });
 
+
                 }
 
 
-                /* QUIZ */
+
+                /* =========================================
+                   QUIZ
+                ========================================= */
+
 
                 else if (
                     selectedMode ===
                     "quiz"
                 ) {
 
+
                     const quiz =
                         JSON.parse(
                             data.ai_response
                         );
 
-                    createQuiz(quiz);
+
+                    createQuiz(
+                        quiz
+                    );
 
                 }
 
 
-                /* FLASHCARDS */
+
+                /* =========================================
+                   FLASHCARDS
+                ========================================= */
+
 
                 else if (
                     selectedMode ===
                     "flashcards"
                 ) {
 
+
                     const cards =
                         JSON.parse(
                             data.ai_response
                         );
 
-                    createFlashcards(cards);
+
+                    createFlashcards(
+                        cards
+                    );
 
                 }
 
 
-                /* PRESENTATION */
+
+                /* =========================================
+                   PRESENTATION
+                ========================================= */
+
 
                 else if (
                     selectedMode ===
                     "presentation"
                 ) {
 
+
                     const presentation =
                         JSON.parse(
                             data.ai_response
                         );
+
 
                     createPresentation(
                         presentation
@@ -2526,30 +3312,33 @@
                 }
 
 
-                /* Refresh Finder */
-
-                setTimeout(
-                    loadItems,
-                    700
-                );
 
             }
 
             catch (err) {
 
+
                 status.innerText =
-                    "Error: " + err.message;
+                    "Error: " +
+                    err.message;
 
             }
+
+
 
         }
 
 
+
         /* =========================================================
-           GOOGLE SLIDES
+           GOOGLE SLIDES CREATION
         ========================================================= */
 
-        async function createPresentation(data) {
+
+        async function createPresentation(
+            data
+        ) {
+
 
             output.innerHTML = `
 
@@ -2560,7 +3349,8 @@
             </h2>
 
             <p>
-                Your presentation is being designed.
+                Please wait while your
+                presentation is generated.
             </p>
 
         </div>
@@ -2568,7 +3358,9 @@
     `;
 
 
+
             try {
+
 
                 const response =
                     await fetch(
@@ -2587,7 +3379,9 @@
                             },
 
                             body:
-                                JSON.stringify(data)
+                                JSON.stringify(
+                                    data
+                                )
 
                         }
 
@@ -2598,7 +3392,11 @@
                     await response.json();
 
 
-                if (result.success) {
+
+                if (
+                    result.success
+                ) {
+
 
                     output.innerHTML = `
 
@@ -2609,7 +3407,8 @@
                     </h2>
 
                     <p>
-                        Your editable Google Slides file is ready.
+                        Your editable Google Slides
+                        file is ready.
                     </p>
 
                     <a
@@ -2625,14 +3424,20 @@
 
             `;
 
-                    setTimeout(
-                        loadItems,
-                        500
-                    );
+
+                    /*
+                     * Refresh Finder so the newly
+                     * generated presentation appears.
+                     */
+
+                    await loadItems();
+
 
                 }
 
+
                 else {
+
 
                     output.innerHTML = `
 
@@ -2643,7 +3448,10 @@
                     </h2>
 
                     <p>
-                        ${result.error}
+                        ${escapeHtml(
+                        result.error ||
+                        "Unknown error"
+                    )}
                     </p>
 
                 </div>
@@ -2652,16 +3460,20 @@
 
                 }
 
+
             }
 
             catch (err) {
+
 
                 output.innerHTML = `
 
             <div class="study-card">
 
                 Error:
-                ${err.message}
+                ${escapeHtml(
+                    err.message
+                )}
 
             </div>
 
@@ -2672,21 +3484,30 @@
         }
 
 
+
         /* =========================================================
-           QUIZ
+           INTERACTIVE QUIZ
         ========================================================= */
 
-        function createQuiz(data) {
+
+        function createQuiz(
+            data
+        ) {
+
 
             let current = 0;
 
             let score = 0;
 
 
+
             function showQuestion() {
 
+
                 const q =
-                    data.questions[current];
+                    data.questions[
+                    current
+                    ];
 
 
                 output.innerHTML = `
@@ -2695,11 +3516,14 @@
 
                 <h2>
                     Question
-                    ${current + 1}/${data.questions.length}
+                    ${current + 1}/
+                    ${data.questions.length}
                 </h2>
 
                 <h3>
-                    ${q.question}
+                    ${escapeHtml(
+                    q.question
+                )}
                 </h3>
 
                 <div id="choices"></div>
@@ -2711,14 +3535,17 @@
         `;
 
 
+
                 const choices =
                     document.getElementById(
                         "choices"
                     );
 
 
+
                 q.choices.forEach(
                     (choice, index) => {
+
 
                         const button =
                             document.createElement(
@@ -2734,46 +3561,60 @@
                             choice;
 
 
+
                         button.onclick = () => {
+
 
                             document
                                 .querySelectorAll(
                                     ".choice"
                                 )
-                                .forEach(btn => {
+                                .forEach(
+                                    btn => {
 
-                                    btn.disabled = true;
+                                        btn.disabled =
+                                            true;
 
-                                });
+                                    }
+                                );
+
 
 
                             if (
-                                index === q.answer
+                                index ===
+                                q.answer
                             ) {
+
 
                                 button.classList.add(
                                     "correct"
                                 );
 
+
                                 score++;
+
 
                             }
 
                             else {
 
+
                                 button.classList.add(
                                     "wrong"
                                 );
 
+
                                 document
                                     .querySelectorAll(
                                         ".choice"
-                                    )[q.answer]
+                                    )
+                                [q.answer]
                                     .classList.add(
                                         "correct"
                                     );
 
                             }
+
 
 
                             document
@@ -2784,7 +3625,9 @@
 
                             <br>
 
-                            ${q.explanation}
+                            ${escapeHtml(
+                                    q.explanation
+                                )}
 
                             <br><br>
 
@@ -2811,8 +3654,10 @@
             }
 
 
+
             window.nextQuestion =
                 function () {
+
 
                     current++;
 
@@ -2821,6 +3666,7 @@
                         current >=
                         data.questions.length
                     ) {
+
 
                         output.innerHTML = `
 
@@ -2831,12 +3677,14 @@
                         </h2>
 
                         <h1>
-                            ${score}/${data.questions.length}
+                            ${score}/
+                            ${data.questions.length}
                         </h1>
 
                     </div>
 
                 `;
+
 
                         return;
 
@@ -2848,24 +3696,34 @@
                 };
 
 
+
             showQuestion();
 
         }
 
 
+
         /* =========================================================
-           FLASHCARDS
+           QUIZLET FLASHCARDS
         ========================================================= */
 
-        function createFlashcards(data) {
+
+        function createFlashcards(
+            data
+        ) {
+
 
             let current = 0;
 
 
+
             function showCard() {
 
+
                 const card =
-                    data.cards[current];
+                    data.cards[
+                    current
+                    ];
 
 
                 output.innerHTML = `
@@ -2882,13 +3740,17 @@
 
                         <div class="flash-front">
 
-                            ${card.front}
+                            ${escapeHtml(
+                    card.front
+                )}
 
                         </div>
 
                         <div class="flash-back">
 
-                            ${card.back}
+                            ${escapeHtml(
+                    card.back
+                )}
 
                         </div>
 
@@ -2899,7 +3761,8 @@
 
                 <h3>
                     Card
-                    ${current + 1}/${data.cards.length}
+                    ${current + 1}/
+                    ${data.cards.length}
                 </h3>
 
 
@@ -2927,8 +3790,10 @@
             }
 
 
+
             window.nextCard =
                 function () {
+
 
                     if (
                         current <
@@ -2939,23 +3804,30 @@
 
                     }
 
+
                     showCard();
 
                 };
+
 
 
             window.previousCard =
                 function () {
 
-                    if (current > 0) {
+
+                    if (
+                        current > 0
+                    ) {
 
                         current--;
 
                     }
 
+
                     showCard();
 
                 };
+
 
 
             showCard();
@@ -2963,987 +3835,13 @@
         }
 
 
-        /* =========================================================
-           STORAGE
-        ========================================================= */
-
-        /*
-         * Loads the records created by analyze.php /
-         * create_slides.php from the generated_items
-         * storage system.
-         */
-
-        async function loadItems() {
-
-            try {
-
-                /*
-                 * This endpoint should be the storage
-                 * listing file you already created.
-                 */
-
-                const response =
-                    await fetch(
-                        "get_generated_items.php"
-                    );
-
-
-                const result =
-                    await response.json();
-
-
-                if (
-                    result.success &&
-                    Array.isArray(result.items)
-                ) {
-
-                    allItems =
-                        result.items;
-
-                }
-
-                else if (
-                    Array.isArray(result)
-                ) {
-
-                    allItems =
-                        result;
-
-                }
-
-                else {
-
-                    allItems = [];
-
-                }
-
-
-                renderItems();
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Could not load generated items:",
-                    error
-                );
-
-
-                renderEmpty(
-                    "Your study materials will appear here."
-                );
-
-            }
-
-        }
-
 
         /* =========================================================
-           FILTER
+           START
         ========================================================= */
 
-        function showStorage(type) {
 
-            currentFilter =
-                type;
-
-
-            const labels = {
-
-                all:
-                    "All Items",
-
-                flowchart:
-                    "Flowcharts",
-
-                quiz:
-                    "Quizzes",
-
-                flashcards:
-                    "Flashcards",
-
-                presentation:
-                    "Presentations"
-
-            };
-
-
-            document.getElementById(
-                "currentFolder"
-            ).innerText =
-                labels[type] ||
-                "All Items";
-
-
-            document
-                .querySelectorAll(
-                    ".nav-item"
-                )
-                .forEach(
-                    item =>
-                        item.classList.remove(
-                            "active"
-                        )
-                );
-
-
-            renderItems();
-
-        }
-
-
-        /* =========================================================
-           RENDER ITEMS
-        ========================================================= */
-
-        function renderItems() {
-
-            const search =
-                searchInput.value
-                    .toLowerCase()
-                    .trim();
-
-
-            let items =
-                [...allItems];
-
-
-            if (
-                currentFilter !==
-                "all"
-            ) {
-
-                items =
-                    items.filter(
-                        item =>
-                            item.type ===
-                            currentFilter
-                    );
-
-            }
-
-
-            if (search) {
-
-                items =
-                    items.filter(
-                        item =>
-                            String(
-                                item.name || ""
-                            )
-                                .toLowerCase()
-                                .includes(search)
-                    );
-
-            }
-
-
-            items.sort(
-                (a, b) => {
-
-                    const da =
-                        new Date(
-                            a.updated_at ||
-                            a.created_at
-                        );
-
-                    const db =
-                        new Date(
-                            b.updated_at ||
-                            b.created_at
-                        );
-
-
-                    return sortAscending
-                        ? da - db
-                        : db - da;
-
-                }
-            );
-
-
-            if (!items.length) {
-
-                renderEmpty(
-                    search
-                        ? "No study materials match your search."
-                        : "Nothing here yet. Scan some notes to get started."
-                );
-
-                return;
-
-            }
-
-
-            finderList.innerHTML = "";
-
-            gridView.innerHTML = "";
-
-
-            items.forEach(
-                item => {
-
-                    renderListItem(item);
-
-                    renderGridItem(item);
-
-                }
-            );
-
-        }
-
-
-        /* =========================================================
-           LIST ITEM
-        ========================================================= */
-
-        function renderListItem(item) {
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "file-row";
-
-
-            row.dataset.id =
-                item.id;
-
-
-            const icon =
-                getItemIcon(item.type);
-
-
-            const iconClass =
-                "icon-" +
-                item.type;
-
-
-            row.innerHTML = `
-
-        <div class="file-name">
-
-            <div
-                class="file-icon ${iconClass}">
-
-                ${icon}
-
-            </div>
-
-            <div>
-
-                <div class="file-title">
-
-                    ${escapeHtml(
-                item.name
-            )}
-
-                </div>
-
-                <div class="file-type">
-
-                    ${getItemTypeName(
-                item.type
-            )}
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="file-type">
-
-            ${getItemTypeName(
-                item.type
-            )}
-
-        </div>
-
-
-        <div class="file-date">
-
-            ${formatDate(
-                item.updated_at ||
-                item.created_at
-            )}
-
-        </div>
-
-    `;
-
-
-            attachFileEvents(
-                row,
-                item
-            );
-
-
-            finderList.appendChild(
-                row
-            );
-
-        }
-
-
-        /* =========================================================
-           GRID ITEM
-        ========================================================= */
-
-        function renderGridItem(item) {
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "file-card";
-
-
-            card.dataset.id =
-                item.id;
-
-
-            const icon =
-                getItemIcon(item.type);
-
-
-            const iconClass =
-                "icon-" +
-                item.type;
-
-
-            card.innerHTML = `
-
-        <div
-            class="
-                file-card-icon
-                ${iconClass}
-            ">
-
-            ${icon}
-
-        </div>
-
-
-        <div class="file-card-title">
-
-            ${escapeHtml(
-                item.name
-            )}
-
-        </div>
-
-
-        <div class="file-card-date">
-
-            ${getItemTypeName(
-                item.type
-            )}
-
-            ·
-
-            ${formatDate(
-                item.updated_at ||
-                item.created_at
-            )}
-
-        </div>
-
-    `;
-
-
-            attachFileEvents(
-                card,
-                item
-            );
-
-
-            gridView.appendChild(
-                card
-            );
-
-        }
-
-
-        /* =========================================================
-           FILE EVENTS
-        ========================================================= */
-
-        function attachFileEvents(
-            element,
-            item
-        ) {
-
-            let clickTimer = null;
-
-
-            element.addEventListener(
-                "click",
-                event => {
-
-                    document
-                        .querySelectorAll(
-                            ".file-row.selected"
-                        )
-                        .forEach(
-                            el =>
-                                el.classList.remove(
-                                    "selected"
-                                )
-                        );
-
-
-                    if (
-                        element.classList.contains(
-                            "file-row"
-                        )
-                    ) {
-
-                        element.classList.add(
-                            "selected"
-                        );
-
-                    }
-
-
-                    selectedItem =
-                        item;
-
-                }
-            );
-
-
-            /*
-             * Double-click opens:
-             *
-             * opened_item.php?id=ITEM_ID
-             */
-
-            element.addEventListener(
-                "dblclick",
-                event => {
-
-                    event.preventDefault();
-
-                    window.open(
-                        "opened_item.php?id=" +
-                        encodeURIComponent(
-                            item.id
-                        ),
-                        "_blank"
-                    );
-
-                }
-            );
-
-
-            element.addEventListener(
-                "contextmenu",
-                event => {
-
-                    event.preventDefault();
-
-                    selectedItem =
-                        item;
-
-                    showContextMenu(
-                        event.clientX,
-                        event.clientY
-                    );
-
-                }
-            );
-
-        }
-
-
-        /* =========================================================
-           ICONS
-        ========================================================= */
-
-        function getItemIcon(type) {
-
-            if (
-                type === "flowchart"
-            ) return "📊";
-
-            if (
-                type === "quiz"
-            ) return "📝";
-
-            if (
-                type === "flashcards"
-            ) return "🃏";
-
-            if (
-                type === "presentation"
-            ) return "📽";
-
-            return "📄";
-
-        }
-
-
-        function getItemTypeName(type) {
-
-            if (
-                type === "flowchart"
-            ) return "Flowchart";
-
-            if (
-                type === "quiz"
-            ) return "Quiz";
-
-            if (
-                type === "flashcards"
-            ) return "Flashcards";
-
-            if (
-                type === "presentation"
-            ) return "Presentation";
-
-            return "Study Material";
-
-        }
-
-
-        /* =========================================================
-           DATE
-        ========================================================= */
-
-        function formatDate(dateString) {
-
-            if (!dateString)
-                return "Recently";
-
-
-            const date =
-                new Date(
-                    dateString
-                );
-
-
-            if (
-                isNaN(
-                    date.getTime()
-                )
-            ) {
-
-                return "Recently";
-
-            }
-
-
-            return date.toLocaleDateString(
-                undefined,
-                {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric"
-                }
-            );
-
-        }
-
-
-        /* =========================================================
-           EMPTY
-        ========================================================= */
-
-        function renderEmpty(message) {
-
-            finderList.innerHTML = `
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                📁
-            </div>
-
-            <h3>
-                No study materials
-            </h3>
-
-            <p>
-                ${message}
-            </p>
-
-        </div>
-
-    `;
-
-
-            gridView.innerHTML = "";
-
-        }
-
-
-        /* =========================================================
-           VIEW SWITCH
-        ========================================================= */
-
-        function setView(view) {
-
-            currentView =
-                view;
-
-
-            if (
-                view === "grid"
-            ) {
-
-                finder.classList.add(
-                    "column-mode"
-                );
-
-                gridView.classList.add(
-                    "active"
-                );
-
-            }
-
-            else {
-
-                finder.classList.remove(
-                    "column-mode"
-                );
-
-                gridView.classList.remove(
-                    "active"
-                );
-
-            }
-
-        }
-
-
-        /* =========================================================
-           SORT
-        ========================================================= */
-
-        function sortItems() {
-
-            sortAscending =
-                !sortAscending;
-
-            renderItems();
-
-        }
-
-
-        /* =========================================================
-           SEARCH
-        ========================================================= */
-
-        searchInput.addEventListener(
-            "input",
-            renderItems
-        );
-
-
-        /* =========================================================
-           CONTEXT MENU
-        ========================================================= */
-
-        const contextMenu =
-            document.getElementById(
-                "contextMenu"
-            );
-
-
-        function showContextMenu(
-            x,
-            y
-        ) {
-
-            contextMenu.style.display =
-                "block";
-
-            contextMenu.style.left =
-                x + "px";
-
-            contextMenu.style.top =
-                y + "px";
-
-        }
-
-
-        document.addEventListener(
-            "click",
-            () => {
-
-                contextMenu.style.display =
-                    "none";
-
-            }
-        );
-
-
-        /* =========================================================
-           OPEN SELECTED
-        ========================================================= */
-
-        function openSelected() {
-
-            if (!selectedItem)
-                return;
-
-
-            window.open(
-                "opened_item.php?id=" +
-                encodeURIComponent(
-                    selectedItem.id
-                ),
-                "_blank"
-            );
-
-        }
-
-
-        /* =========================================================
-           RENAME
-        ========================================================= */
-
-        const renameModal =
-            document.getElementById(
-                "renameModal"
-            );
-
-
-        const renameInput =
-            document.getElementById(
-                "renameInput"
-            );
-
-
-        function renameSelected() {
-
-            if (!selectedItem)
-                return;
-
-
-            renameInput.value =
-                selectedItem.name || "";
-
-
-            renameModal.style.display =
-                "flex";
-
-
-            renameInput.focus();
-
-        }
-
-
-        function closeRename() {
-
-            renameModal.style.display =
-                "none";
-
-        }
-
-
-        async function saveRename() {
-
-            if (!selectedItem)
-                return;
-
-
-            const newName =
-                renameInput.value.trim();
-
-
-            if (!newName) {
-
-                return;
-
-            }
-
-
-            try {
-
-                /*
-                 * Rename endpoint from the storage system.
-                 */
-
-                const response =
-                    await fetch(
-                        "rename_item.php",
-                        {
-
-                            method: "POST",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    id:
-                                        selectedItem.id,
-
-                                    name:
-                                        newName
-
-                                })
-
-                        }
-                    );
-
-
-                const result =
-                    await response.json();
-
-
-                if (
-                    !result.success
-                ) {
-
-                    alert(
-                        result.error ||
-                        "Could not rename item."
-                    );
-
-                    return;
-
-                }
-
-
-                selectedItem.name =
-                    newName;
-
-
-                const existing =
-                    allItems.find(
-                        item =>
-                            String(item.id) ===
-                            String(selectedItem.id)
-                    );
-
-
-                if (existing) {
-
-                    existing.name =
-                        newName;
-
-                }
-
-
-                closeRename();
-
-                renderItems();
-
-            }
-
-            catch (error) {
-
-                alert(
-                    "Rename error: " +
-                    error.message
-                );
-
-            }
-
-        }
-
-
-        /* =========================================================
-           KEYBOARD SHORTCUT
-        ========================================================= */
-
-        renameInput.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
-
-                    saveRename();
-
-                }
-
-                if (
-                    event.key ===
-                    "Escape"
-                ) {
-
-                    closeRename();
-
-                }
-
-            }
-        );
-
-
-        /* =========================================================
-           ESCAPE HTML
-        ========================================================= */
-
-        function escapeHtml(value) {
-
-            return String(value)
-                .replace(
-                    /&/g,
-                    "&amp;"
-                )
-                .replace(
-                    /</g,
-                    "&lt;"
-                )
-                .replace(
-                    />/g,
-                    "&gt;"
-                )
-                .replace(
-                    /"/g,
-                    "&quot;"
-                )
-                .replace(
-                    /'/g,
-                    "&#039;"
-                );
-
-        }
-
-
-        /* =========================================================
-           SCROLL TO SCANNER
-        ========================================================= */
-
-        function scrollToScanner() {
-
-            document
-                .getElementById(
-                    "scannerPanel"
-                )
-                .scrollIntoView({
-
-                    behavior: "smooth",
-
-                    block: "start"
-
-                });
-
-        }
-
-
-        /* =========================================================
-           INITIAL LOAD
-        ========================================================= */
+        initCamera();
 
         loadItems();
 
