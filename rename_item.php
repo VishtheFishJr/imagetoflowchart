@@ -4,24 +4,49 @@ require_once 'db.php';
 
 header("Content-Type: application/json");
 
-try {
+$data = json_decode(
+    file_get_contents("php://input"),
+    true
+);
 
-    $stmt = $pdo->query("
-        SELECT
-            id,
-            name,
-            type,
-            created_at,
-            updated_at
-        FROM generated_items
-        ORDER BY updated_at DESC
-    ");
+$id = intval($data["id"] ?? 0);
+$name = trim($data["name"] ?? "");
 
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($id <= 0 || $name === "") {
 
     echo json_encode([
-        "success" => true,
-        "items" => $items
+        "success" => false,
+        "error" => "Invalid item or name."
+    ]);
+
+    exit;
+}
+
+if (strlen($name) > 255) {
+
+    echo json_encode([
+        "success" => false,
+        "error" => "Name is too long."
+    ]);
+
+    exit;
+}
+
+try {
+
+    $stmt = $pdo->prepare("
+        UPDATE generated_items
+        SET name = ?
+        WHERE id = ?
+    ");
+
+    $stmt->execute([
+        $name,
+        $id
+    ]);
+
+    echo json_encode([
+        "success" => true
     ]);
 
 } catch (PDOException $e) {
