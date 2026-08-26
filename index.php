@@ -1,3 +1,6 @@
+<?php
+require_once 'db.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -83,7 +86,10 @@
         }
 
         .storage-toggle,
-        .dark-mode-toggle {
+        .dark-mode-toggle,
+        .login-button,
+        .signup-button,
+        .logout-button {
             border: 1px solid #bbb;
             background: #fff;
             color: #111;
@@ -92,10 +98,14 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
+            text-decoration: none;
         }
 
         .storage-toggle:hover,
-        .dark-mode-toggle:hover {
+        .dark-mode-toggle:hover,
+        .login-button:hover,
+        .signup-button:hover,
+        .logout-button:hover {
             background: #f0f0f0;
         }
 
@@ -655,7 +665,10 @@
         body.dark-mode .choice,
         body.dark-mode .action-btn,
         body.dark-mode .open-file-button,
-        body.dark-mode .presentation-link {
+        body.dark-mode .presentation-link,
+        body.dark-mode .login-button,
+        body.dark-mode .signup-button,
+        body.dark-mode .logout-button {
             background: #181818;
             color: #eee;
             border-color: #555;
@@ -696,7 +709,6 @@
 
 </head>
 
-
 <body>
 
 
@@ -717,8 +729,36 @@
             <div class="topbar-spacer"></div>
 
 
+            <?php if (isset($_SESSION['user_id'])): ?>
+
+                <a href="login.php?logout=1" class="logout-button">
+
+                    Logout
+
+                </a>
+
+            <?php else: ?>
+
+                <a href="login.php" class="login-button">
+
+                    Login
+
+                </a>
+
+
+                <a href="signup.php" class="signup-button">
+
+                    Sign Up
+
+                </a>
+
+            <?php endif; ?>
+
+
             <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode">
+
                 🌙 Dark
+
             </button>
 
 
@@ -760,7 +800,9 @@
                     </span>
 
                     <span class="sidebar-count" id="count-all">
+
                         0
+
                     </span>
 
                 </button>
@@ -796,7 +838,9 @@
                     </span>
 
                     <span class="sidebar-count" id="count-flowchart">
+
                         0
+
                     </span>
 
                 </button>
@@ -813,7 +857,9 @@
                     </span>
 
                     <span class="sidebar-count" id="count-quiz">
+
                         0
+
                     </span>
 
                 </button>
@@ -830,7 +876,9 @@
                     </span>
 
                     <span class="sidebar-count" id="count-flashcards">
+
                         0
+
                     </span>
 
                 </button>
@@ -847,7 +895,9 @@
                     </span>
 
                     <span class="sidebar-count" id="count-presentation">
+
                         0
+
                     </span>
 
                 </button>
@@ -1058,10 +1108,16 @@
         </button>
 
     </div>
-
-
-
     <script>
+
+
+        /* =========================================================
+           LOGIN STATE
+        ========================================================= */
+
+        const isLoggedIn =
+            <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+
 
 
         /* =========================================================
@@ -2224,6 +2280,16 @@
         function toggleFinder() {
 
 
+            if (!isLoggedIn) {
+
+                window.location.href =
+                    "login.php";
+
+                return;
+
+            }
+
+
             const finder =
                 document.getElementById(
                     "finder"
@@ -2424,12 +2490,9 @@
                 );
 
         }
-
-
-
         /* =========================================================
-           CAMERA
-        ========================================================= */
+   CAMERA
+========================================================= */
 
 
         const video =
@@ -2637,6 +2700,45 @@
 
                     status.innerText =
                         data.error;
+
+
+                    if (
+                        data.error &&
+                        data.error
+                            .toLowerCase()
+                            .includes("google account not connected")
+                    ) {
+
+                        output.innerHTML = `
+
+                            <div class="study-card">
+
+                                <h3>
+                                    Error
+                                </h3>
+
+                                <p>
+                                    ${escapeHtml(
+                            data.error
+                        )}
+                                </p>
+
+                                <p>
+
+                                    <a
+                                        href="https://vishthefishjr.me/google_login.php">
+
+                                        Connect your Google Account
+
+                                    </a>
+
+                                </p>
+
+                            </div>
+
+                        `;
+
+                    }
 
 
                     return;
@@ -2897,11 +2999,6 @@
 
             `;
 
-
-                    /*
-                     * Refresh Finder so the newly
-                     * generated presentation appears.
-                     */
 
                     await loadItems();
 
