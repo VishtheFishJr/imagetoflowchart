@@ -1532,7 +1532,7 @@ $isAdmin =
                 <?php endif; ?>
 
 
-                <a href="logout.php" class="auth-button">
+                <a href="login.php" class="auth-button">
                     Log Out
                 </a>
 
@@ -3019,8 +3019,8 @@ $isAdmin =
 
             <?php if (empty($_SESSION["logged_in"])): ?>
 
-                    window.location.href =
-                "login.php";
+                window.location.href =
+                    "login.php";
 
                 return;
 
@@ -4132,7 +4132,7 @@ $isAdmin =
 
         <?php if (!empty($_SESSION["logged_in"])): ?>
 
-                    loadItems();
+            loadItems();
 
         <?php endif; ?>
 
