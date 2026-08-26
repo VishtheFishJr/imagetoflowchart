@@ -2,40 +2,94 @@
 
 require_once 'db.php';
 
-session_start();
+
+/*
+ * LOGOUT
+ */
+
+if (
+    isset($_GET["logout"]) &&
+    $_GET["logout"] === "1"
+) {
+
+    $_SESSION = [];
+
+    if (
+        ini_get("session.use_cookies")
+    ) {
+
+        $params =
+            session_get_cookie_params();
+
+        setcookie(
+            session_name(),
+            "",
+            time() - 42000,
+            $params["path"],
+            $params["domain"],
+            $params["secure"],
+            $params["httponly"]
+        );
+
+    }
+
+    session_destroy();
+
+    header("Location: login.php");
+    exit;
+}
+
 
 $error = "";
 
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $login = trim($_POST["login"] ?? "");
-    $password = $_POST["password"] ?? "";
+    $login =
+        trim(
+            $_POST["login"] ?? ""
+        );
 
-    if ($login === "" || $password === "") {
+    $password =
+        $_POST["password"] ?? "";
 
-        $error = "Please enter your username/email and password.";
+
+    if (
+        $login === "" ||
+        $password === ""
+    ) {
+
+        $error =
+            "Please enter your username/email and password.";
 
     } else {
 
         try {
 
-            $stmt = $pdo->prepare("
-                SELECT
-                    id,
-                    username,
-                    email,
-                    password_hash
-                FROM users
-                WHERE username = ? OR email = ?
-                LIMIT 1
-            ");
+            $stmt =
+                $pdo->prepare("
+                    SELECT
+                        id,
+                        username,
+                        email,
+                        password_hash
+                    FROM users
+                    WHERE username = ? OR email = ?
+                    LIMIT 1
+                ");
+
 
             $stmt->execute([
                 $login,
                 $login
             ]);
 
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $user =
+                $stmt->fetch(
+                    PDO::FETCH_ASSOC
+                );
+
 
             if (
                 !$user ||
@@ -45,23 +99,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 )
             ) {
 
-                $error = "Invalid username/email or password.";
+                $error =
+                    "Invalid username/email or password.";
 
             } else {
 
-                session_regenerate_id(true);
+                session_regenerate_id(
+                    true
+                );
+
 
                 $_SESSION["user_id"] =
                     $user["id"];
 
+
                 $_SESSION["username"] =
                     $user["username"];
+
 
                 $_SESSION["logged_in"] =
                     true;
 
-                header("Location: index.php");
+
+                header(
+                    "Location: index.php"
+                );
+
                 exit;
+
             }
 
         } catch (PDOException $e) {
@@ -70,10 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "Something went wrong. Please try again.";
 
         }
+
     }
+
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -84,12 +152,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Log In</title>
+    <title>
+        Log In
+    </title>
+
 
     <style>
         * {
+
             box-sizing: border-box;
+
         }
+
 
         body {
 
@@ -112,6 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+
         .container {
 
             width: 100%;
@@ -129,6 +204,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+
         h1 {
 
             margin-top: 0;
@@ -137,6 +213,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+
         .subtitle {
 
             color: #666;
@@ -144,6 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-bottom: 25px;
 
         }
+
 
         label {
 
@@ -154,6 +232,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             font-weight: bold;
 
         }
+
 
         input {
 
@@ -171,6 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+
         input:focus {
 
             outline: none;
@@ -178,6 +258,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border-color: #2563eb;
 
         }
+
 
         button {
 
@@ -199,11 +280,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+
         button:hover {
 
             background: #1d4ed8;
 
         }
+
 
         .error {
 
@@ -219,6 +302,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+
         .bottom {
 
             text-align: center;
@@ -228,6 +312,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: #666;
 
         }
+
 
         .bottom a {
 
@@ -240,66 +325,101 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </head>
 
+
 <body>
+
 
     <div class="container">
 
-        <h1>Welcome Back</h1>
+
+        <h1>
+            Welcome Back
+        </h1>
+
 
         <div class="subtitle">
+
             Log in to access your study materials.
+
         </div>
+
 
         <?php if ($error): ?>
 
             <div class="error">
 
-                <?php echo htmlspecialchars(
+                <?php
+
+                echo htmlspecialchars(
                     $error,
                     ENT_QUOTES,
                     "UTF-8"
-                ); ?>
+                );
+
+                ?>
 
             </div>
 
         <?php endif; ?>
 
+
         <form method="POST">
 
+
             <label for="login">
+
                 Username or Email
+
             </label>
 
-            <input type="text" id="login" name="login" required autocomplete="username" value="<?php echo htmlspecialchars(
+
+            <input type="text" id="login" name="login" required autocomplete="username" value="<?php
+
+            echo htmlspecialchars(
                 $_POST["login"] ?? "",
                 ENT_QUOTES,
                 "UTF-8"
-            ); ?>"
-            >
+            );
+
+            ?>">
+
 
             <label for="password">
+
                 Password
+
             </label>
+
 
             <input type="password" id="password" name="password" required autocomplete="current-password">
 
+
             <button type="submit">
+
                 Log In
+
             </button>
 
+
         </form>
+
 
         <div class="bottom">
 
             Don't have an account?
 
+
             <a href="signup.php">
+
                 Sign up
+
             </a>
 
         </div>
 
+
     </div>
+
 
 </body>
 
