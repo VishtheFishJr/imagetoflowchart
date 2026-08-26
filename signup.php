@@ -2,8 +2,6 @@
 
 require_once 'db.php';
 
-session_start();
-
 $error = "";
 $success = "";
 
@@ -13,8 +11,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"] ?? "");
     $password = $_POST["password"] ?? "";
     $confirmPassword = $_POST["confirm_password"] ?? "";
+    $role = $_POST["role"] ?? "user";
 
-    if ($username === "" || $email === "" || $password === "") {
+    if (
+        $username === "" ||
+        $email === "" ||
+        $password === ""
+    ) {
 
         $error = "Please fill in all fields.";
 
@@ -33,6 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($password !== $confirmPassword) {
 
         $error = "Passwords do not match.";
+
+    } elseif (
+        $role !== "user" &&
+        $role !== "admin"
+    ) {
+
+        $error = "Invalid account role.";
 
     } else {
 
@@ -66,10 +76,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     (
                         username,
                         email,
-                        password_hash
+                        password_hash,
+                        role
                     )
                     VALUES
                     (
+                        ?,
                         ?,
                         ?,
                         ?
@@ -79,7 +91,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $stmt->execute([
                     $username,
                     $email,
-                    $passwordHash
+                    $passwordHash,
+                    $role
                 ]);
 
                 $userId = $pdo->lastInsertId();
@@ -89,6 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION["user_id"] = $userId;
                 $_SESSION["username"] = $username;
                 $_SESSION["logged_in"] = true;
+                $_SESSION["role"] = $role;
 
                 header("Location: index.php");
                 exit;
@@ -184,7 +198,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
-        input {
+        input,
+        select {
 
             width: 100%;
 
@@ -198,9 +213,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             font-size: 15px;
 
+            background: white;
+
         }
 
-        input:focus {
+        input:focus,
+        select:focus {
 
             outline: none;
 
@@ -282,11 +300,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <?php if ($error): ?>
 
             <div class="error">
+
                 <?php echo htmlspecialchars(
                     $error,
                     ENT_QUOTES,
                     "UTF-8"
                 ); ?>
+
             </div>
 
         <?php endif; ?>
@@ -325,6 +345,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <input type="password" id="confirm_password" name="confirm_password" required minlength="8"
                 autocomplete="new-password">
+
+            <label for="role">
+                Account Type
+            </label>
+
+            <select id="role" name="role" required>
+
+                <option value="user" <?php echo (
+                    ($_POST["role"] ?? "user") === "user"
+                ) ? "selected" : ""; ?>> Regular
+                    User </option>
+
+                <option value="admin" <?php echo (
+                    ($_POST["role"] ?? "") === "admin"
+                ) ? "selected" : ""; ?>> Admin
+                </option>
+
+            </select>
 
             <button type="submit">
                 Create Account
