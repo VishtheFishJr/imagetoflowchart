@@ -1,6 +1,31 @@
 <?php
+
 require_once 'db.php';
+
+
+$isLoggedIn =
+    !empty($_SESSION["logged_in"]) &&
+    !empty($_SESSION["user_id"]);
+
+
+$currentUserId =
+    $_SESSION["user_id"] ?? null;
+
+
+$currentUsername =
+    $_SESSION["username"] ?? null;
+
+
+$currentRole =
+    $_SESSION["role"] ?? "user";
+
+
+$isAdmin =
+    $isLoggedIn &&
+    $currentRole === "admin";
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,11 +72,668 @@ require_once 'db.php';
             box-sizing: border-box;
         }
 
+
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
             background: #fff;
             color: #111;
+        }
+
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* TOP BAR — retained */
+
+        .topbar {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 22px;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 700;
+            white-space: nowrap;
+            color: #111;
+        }
+
+
+        .topbar-spacer {
+            flex: 1;
+        }
+
+
+        .storage-toggle,
+        .auth-button,
+        .users-button {
+            border: 1px solid #bbb;
+            background: #fff;
+            color: #111;
+            padding: 9px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        .storage-toggle:hover,
+        .auth-button:hover,
+        .users-button:hover {
+            background: #f0f0f0;
+        }
+
+
+        .auth-button {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* DARK/LIGHT MODE SLIDER */
+
+        .theme-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+
+        .theme-switch input {
+            display: none;
+        }
+
+
+        .theme-slider {
+            width: 46px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 24px;
+            position: relative;
+            transition: background .2s;
+            border: 1px solid #aaa;
+        }
+
+
+        .theme-slider::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 2px;
+            top: 2px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform .2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+        }
+
+
+        .theme-switch input:checked+.theme-slider::before {
+            transform: translateX(22px);
+        }
+
+
+        .theme-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111;
+            white-space: nowrap;
+        }
+
+
+        /* FINDER — retained */
+
+        #finder {
+            display: none;
+            position: fixed;
+            inset: 64px 0 0 0;
+            background: #fff;
+            z-index: 90;
+        }
+
+
+        #finder.visible {
+            display: flex;
+        }
+
+
+        /* FINDER SIDEBAR — retained */
+
+        .finder-sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            background: #f5f5f5;
+            border-right: 1px solid #ddd;
+            padding: 20px 12px;
+            overflow-y: auto;
+        }
+
+
+        .sidebar-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            padding: 8px 12px;
+            margin-top: 5px;
+        }
+
+
+        .sidebar-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2px;
+        }
+
+
+        .sidebar-item:hover {
+            background: #e5e5e5;
+        }
+
+
+        .sidebar-item.active {
+            background: #ddd;
+            color: #111;
+            font-weight: 600;
+        }
+
+
+        .sidebar-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+
+        .sidebar-count {
+            margin-left: auto;
+            color: #777;
+            font-size: 12px;
+        }
+
+
+        .finder-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .finder-toolbar {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 18px;
+            gap: 12px;
+        }
+
+
+        .finder-title {
+            font-size: 18px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+
+        .finder-search {
+            margin-left: auto;
+            width: 250px;
+            padding: 9px 13px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            outline: none;
+            font-size: 14px;
+            background: #fff;
+            color: #111;
+        }
+
+
+        .sort-select {
+            padding: 9px 10px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 13px;
+            color: #111;
+        }
+
+
+        .finder-breadcrumb {
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 20px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            font-size: 13px;
+            color: #666;
+        }
+
+
+        .breadcrumb-button {
+            border: none;
+            background: transparent;
+            color: #333;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 3px;
+        }
+
+
+        .finder-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+        }
+
+
+        .finder-column {
+            width: 300px;
+            min-width: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 8px;
+        }
+
+
+        .finder-column:last-child {
+            flex: 1;
+            border-right: none;
+        }
+
+
+        .column-empty {
+            text-align: center;
+            color: #888;
+            padding: 45px 20px;
+            font-size: 14px;
+        }
+
+
+        .folder-item,
+        .file-item {
+            width: 100%;
+            min-height: 54px;
+            border: none;
+            background: transparent;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            padding: 7px 10px;
+            cursor: pointer;
+            margin-bottom: 2px;
+            color: #111;
+        }
+
+
+        .folder-item:hover,
+        .file-item:hover {
+            background: #f0f0f0;
+        }
+
+
+        .folder-item.selected,
+        .file-item.selected {
+            background: #ddd;
+        }
+
+
+        .file-icon,
+        .folder-icon {
+            width: 40px;
+            font-size: 25px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+
+        .item-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+
+        .item-meta {
+            margin-top: 3px;
+            font-size: 11px;
+            color: #777;
+        }
+
+
+        .folder-arrow {
+            color: #777;
+            font-size: 18px;
+        }
+
+
+        .file-details {
+            padding: 35px;
+            max-width: 600px;
+        }
+
+
+        .details-icon {
+            font-size: 70px;
+            margin-bottom: 15px;
+        }
+
+
+        .details-name {
+            font-size: 25px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 11px 0;
+            font-size: 14px;
+        }
+
+
+        .details-label {
+            color: #666;
+        }
+
+
+        .details-value {
+            font-weight: 600;
+            text-align: right;
+            max-width: 65%;
+            word-break: break-word;
+        }
+
+
+        .open-file-button {
+            margin-top: 25px;
+            padding: 10px 18px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        .rename-input {
+            width: 100%;
+            padding: 5px 7px;
+            border: 1px solid #777;
+            border-radius: 3px;
+            font-size: 14px;
+            outline: none;
+        }
+
+
+        #contextMenu {
+            display: none;
+            position: fixed;
+            z-index: 500;
+            background: #fff;
+            border: 1px solid #bbb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            border-radius: 5px;
+            min-width: 160px;
+            padding: 5px;
+        }
+
+
+        .context-option {
+            width: 100%;
+            padding: 9px 12px;
+            border: none;
+            background: transparent;
+            text-align: left;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #111;
+        }
+
+
+        .context-option:hover {
+            background: #eee;
+        }
+
+
+        /* SCANNER — functionality retained */
+
+        #scanner {
+            min-height: 100vh;
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 30px;
+        }
+
+
+        h1 {
+            font-size: 32px;
+            color: #111;
+        }
+
+
+        video {
+            width: 100%;
+            border-radius: 0;
+            background: #000;
+            box-shadow: none;
+        }
+
+
+        canvas {
+            display: none;
+        }
+
+
+        .mode-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+
+        .mode-btn {
+            padding: 10px 18px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            background: #fff;
+            color: #111;
+        }
+
+
+        .mode-btn:hover {
+            background: #eee;
+        }
+
+
+        #result {
+            margin-top: 30px;
+            background: #fff;
+            border-radius: 0;
+            padding: 20px 0;
+            box-shadow: none;
+        }
+
+
+        #flowchart-render {
+            margin-top: 25px;
+        }
+
+
+        .study-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 0;
+            box-shadow: none;
+            border-top: 1px solid #ddd;
+            text-align: left;
+        }
+
+
+        .choice {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border: 1px solid #bbb;
+            font-size: 16px;
+            cursor: pointer;
+            background: #fff;
+            color: #111;
+            text-align: left;
+        }
+
+
+        .choice:hover {
+            background: #eee;
+        }
+
+
+        .choice.correct {
+            background: #d9f2d9;
+        }
+
+
+        .choice.wrong {
+            background: #f5d6d6;
+        }
+
+
+        .flashcard {
+            width: 400px;
+            height: 250px;
+            margin: 30px auto;
+            perspective: 1000px;
+        }
+
+
+        .flash-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: .5s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+
+        .flashcard.flip .flash-inner {
+            transform: rotateY(180deg);
+        }
+
+
+        .flash-front,
+        .flash-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            box-sizing: border-box;
+            border: 1px solid #bbb;
+            border-radius: 0;
+            backface-visibility: hidden;
+            font-size: 22px;
+            box-shadow: none;
+            background: #fff;
+            color: #111;
+        }
+
+
+        .flash-back {
+            transform: rotateY(180deg);
+            background: #f5f5f5;
+        }
+
+
+        .action-btn {
+            padding: 10px 18px;
+            margin: 8px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+
+        .presentation-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 22px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .app {
@@ -60,7 +742,7 @@ require_once 'db.php';
             flex-direction: column;
         }
 
-        /* TOP BAR — retained */
+        /* TOP BAR */
         .topbar {
             height: 64px;
             background: #fff;
@@ -68,7 +750,7 @@ require_once 'db.php';
             display: flex;
             align-items: center;
             padding: 0 22px;
-            gap: 20px;
+            gap: 12px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -86,10 +768,8 @@ require_once 'db.php';
         }
 
         .storage-toggle,
-        .dark-mode-toggle,
-        .login-button,
-        .signup-button,
-        .logout-button {
+        .auth-button,
+        .admin-button {
             border: 1px solid #bbb;
             background: #fff;
             color: #111;
@@ -99,17 +779,82 @@ require_once 'db.php';
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .storage-toggle:hover,
-        .dark-mode-toggle:hover,
-        .login-button:hover,
-        .signup-button:hover,
-        .logout-button:hover {
+        .auth-button:hover,
+        .admin-button:hover {
             background: #f0f0f0;
         }
 
-        /* FINDER — retained */
+        .auth-button {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        .auth-button:hover {
+            background: #333;
+        }
+
+        /* CLICKABLE DARK MODE SLIDER */
+
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .theme-slider {
+            width: 52px;
+            height: 28px;
+            background: #ddd;
+            border: 1px solid #bbb;
+            border-radius: 30px;
+            position: relative;
+            transition: .2s;
+            display: block;
+        }
+
+        .theme-slider::after {
+            content: "";
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            left: 2px;
+            top: 2px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+            transition: .2s;
+        }
+
+        .theme-switch input:checked+.theme-slider {
+            background: #333;
+            border-color: #555;
+        }
+
+        .theme-switch input:checked+.theme-slider::after {
+            transform: translateX(24px);
+        }
+
+        .theme-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* FINDER */
+
         #finder {
             display: none;
             position: fixed;
@@ -122,7 +867,6 @@ require_once 'db.php';
             display: flex;
         }
 
-        /* FINDER SIDEBAR — retained */
         .finder-sidebar {
             width: 245px;
             flex-shrink: 0;
@@ -417,7 +1161,8 @@ require_once 'db.php';
             background: #eee;
         }
 
-        /* SCANNER — functionality retained, added visual styling removed */
+        /* SCANNER */
+
         #scanner {
             min-height: 100vh;
         }
@@ -582,7 +1327,8 @@ require_once 'db.php';
             font-weight: 600;
         }
 
-        /* DARK MODE — retained */
+        /* DARK MODE */
+
         body.dark-mode {
             background: #111;
             color: #eee;
@@ -637,7 +1383,9 @@ require_once 'db.php';
         body.dark-mode .file-item:hover,
         body.dark-mode .context-option:hover,
         body.dark-mode .mode-btn:hover,
-        body.dark-mode .choice:hover {
+        body.dark-mode .choice:hover,
+        body.dark-mode .storage-toggle:hover,
+        body.dark-mode .admin-button:hover {
             background: #292929;
         }
 
@@ -660,17 +1408,33 @@ require_once 'db.php';
         body.dark-mode .finder-search,
         body.dark-mode .sort-select,
         body.dark-mode .storage-toggle,
-        body.dark-mode .dark-mode-toggle,
+        body.dark-mode .admin-button,
         body.dark-mode .mode-btn,
         body.dark-mode .choice,
         body.dark-mode .action-btn,
         body.dark-mode .open-file-button,
-        body.dark-mode .presentation-link,
-        body.dark-mode .login-button,
-        body.dark-mode .signup-button,
-        body.dark-mode .logout-button {
+        body.dark-mode .presentation-link {
             background: #181818;
             color: #eee;
+            border-color: #555;
+        }
+
+        body.dark-mode .auth-button {
+            background: #eee;
+            color: #111;
+            border-color: #eee;
+        }
+
+        body.dark-mode .auth-button:hover {
+            background: #ddd;
+        }
+
+        body.dark-mode .theme-label {
+            color: #ddd;
+        }
+
+        body.dark-mode .theme-slider {
+            background: #333;
             border-color: #555;
         }
 
@@ -688,6 +1452,7 @@ require_once 'db.php';
         }
 
         @media (max-width: 800px) {
+
             .finder-sidebar {
                 width: 190px;
             }
@@ -701,13 +1466,22 @@ require_once 'db.php';
                 width: 150px;
             }
 
-            .dark-mode-toggle {
-                padding: 8px 10px;
+            .theme-label {
+                display: none;
+            }
+
+            .theme-slider {
+                width: 46px;
+            }
+
+            .theme-switch input:checked+.theme-slider::after {
+                transform: translateX(18px);
             }
         }
     </style>
 
 </head>
+
 
 <body>
 
@@ -716,8 +1490,8 @@ require_once 'db.php';
 
 
         <!-- =====================================================
-         TOP BAR
-    ===================================================== -->
+             TOP BAR
+        ===================================================== -->
 
         <div class="topbar">
 
@@ -729,37 +1503,50 @@ require_once 'db.php';
             <div class="topbar-spacer"></div>
 
 
-            <?php if (isset($_SESSION['user_id'])): ?>
+            <!-- DARK MODE SLIDER -->
 
-                <a href="login.php?logout=1" class="logout-button">
+            <label class="theme-switch" title="Toggle dark mode">
 
-                    Logout
+                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
 
+                <span class="theme-slider"></span>
+
+                <span class="theme-label" id="themeLabel">
+                    Light
+                </span>
+
+            </label>
+
+
+            <?php if (!empty($_SESSION["logged_in"])): ?>
+
+                <?php if (
+                    isset($_SESSION["role"]) &&
+                    $_SESSION["role"] === "admin"
+                ): ?>
+
+                    <a href="users.php" class="admin-button">
+                        👥 Users
+                    </a>
+
+                <?php endif; ?>
+
+
+                <a href="logout.php" class="auth-button">
+                    Log Out
                 </a>
 
             <?php else: ?>
 
-                <a href="login.php" class="login-button">
-
-                    Login
-
+                <a href="login.php" class="auth-button">
+                    Log In
                 </a>
 
-
-                <a href="signup.php" class="signup-button">
-
+                <a href="signup.php" class="admin-button">
                     Sign Up
-
                 </a>
 
             <?php endif; ?>
-
-
-            <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode">
-
-                🌙 Dark
-
-            </button>
 
 
             <button class="storage-toggle" onclick="toggleFinder()">
@@ -773,8 +1560,8 @@ require_once 'db.php';
 
 
         <!-- =====================================================
-         FINDER
-    ===================================================== -->
+             FINDER
+        ===================================================== -->
 
         <div id="finder">
 
@@ -800,9 +1587,7 @@ require_once 'db.php';
                     </span>
 
                     <span class="sidebar-count" id="count-all">
-
                         0
-
                     </span>
 
                 </button>
@@ -838,9 +1623,7 @@ require_once 'db.php';
                     </span>
 
                     <span class="sidebar-count" id="count-flowchart">
-
                         0
-
                     </span>
 
                 </button>
@@ -857,9 +1640,7 @@ require_once 'db.php';
                     </span>
 
                     <span class="sidebar-count" id="count-quiz">
-
                         0
-
                     </span>
 
                 </button>
@@ -876,9 +1657,7 @@ require_once 'db.php';
                     </span>
 
                     <span class="sidebar-count" id="count-flashcards">
-
                         0
-
                     </span>
 
                 </button>
@@ -895,9 +1674,7 @@ require_once 'db.php';
                     </span>
 
                     <span class="sidebar-count" id="count-presentation">
-
                         0
-
                     </span>
 
                 </button>
@@ -999,8 +1776,8 @@ require_once 'db.php';
 
 
         <!-- =====================================================
-         SCANNER
-    ===================================================== -->
+             SCANNER
+        ===================================================== -->
 
         <div id="scanner">
 
@@ -1088,8 +1865,8 @@ require_once 'db.php';
 
 
     <!-- =====================================================
-     CONTEXT MENU
-===================================================== -->
+         CONTEXT MENU
+    ===================================================== -->
 
     <div id="contextMenu">
 
@@ -1107,17 +1884,9 @@ require_once 'db.php';
 
         </button>
 
+
     </div>
     <script>
-
-
-        /* =========================================================
-           LOGIN STATE
-        ========================================================= */
-
-        const isLoggedIn =
-            <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-
 
 
         /* =========================================================
@@ -1177,17 +1946,13 @@ require_once 'db.php';
 
         async function loadItems() {
 
-
             try {
-
 
                 const response =
                     await fetch("get_items.php");
 
-
                 const data =
                     await response.json();
-
 
                 if (Array.isArray(data)) {
 
@@ -1209,12 +1974,9 @@ require_once 'db.php';
 
                 }
 
-
                 updateCounts();
 
-
                 renderFinder();
-
 
             }
 
@@ -1238,7 +2000,6 @@ require_once 'db.php';
 
         function updateCounts() {
 
-
             document
                 .getElementById("count-all")
                 .innerText =
@@ -1246,7 +2007,6 @@ require_once 'db.php';
 
 
             folderDefinitions.forEach(folder => {
-
 
                 const count =
                     allItems.filter(
@@ -1279,7 +2039,6 @@ require_once 'db.php';
 
 
         function openFolder(folder) {
-
 
             currentFolder = folder;
 
@@ -1344,21 +2103,24 @@ require_once 'db.php';
 
         function getVisibleItems() {
 
-
             let items = [...allItems];
 
 
             if (currentFolder !== "all") {
 
-
                 if (currentFolder === "recent") {
-
 
                     items.sort(
                         (a, b) =>
-                            new Date(b.updated_at || b.created_at)
+                            new Date(
+                                b.updated_at ||
+                                b.created_at
+                            )
                             -
-                            new Date(a.updated_at || a.created_at)
+                            new Date(
+                                a.updated_at ||
+                                a.created_at
+                            )
                     );
 
 
@@ -1465,7 +2227,6 @@ require_once 'db.php';
 
         function renderFinder() {
 
-
             const folderColumn =
                 document.getElementById(
                     "folder-column"
@@ -1490,13 +2251,13 @@ require_once 'db.php';
 
             detailsColumn.innerHTML = `
 
-        <div class="column-empty">
+                <div class="column-empty">
 
-            Select a file
+                    Select a file
 
-        </div>
+                </div>
 
-    `;
+            `;
 
 
 
@@ -1510,9 +2271,7 @@ require_once 'db.php';
                 currentFolder === "recent"
             ) {
 
-
                 folderDefinitions.forEach(folder => {
-
 
                     const count =
                         allItems.filter(
@@ -1531,31 +2290,30 @@ require_once 'db.php';
 
                     button.innerHTML = `
 
-                <span class="folder-icon">
-                    ${folder.icon}
-                </span>
+                        <span class="folder-icon">
+                            ${folder.icon}
+                        </span>
 
-                <span class="item-info">
+                        <span class="item-info">
 
-                    <span class="item-name">
-                        ${escapeHtml(folder.name)}
-                    </span>
+                            <span class="item-name">
+                                ${escapeHtml(folder.name)}
+                            </span>
 
-                    <span class="item-meta">
-                        ${count} item${count === 1 ? "" : "s"}
-                    </span>
+                            <span class="item-meta">
+                                ${count} item${count === 1 ? "" : "s"}
+                            </span>
 
-                </span>
+                        </span>
 
-                <span class="folder-arrow">
-                    ›
-                </span>
+                        <span class="folder-arrow">
+                            ›
+                        </span>
 
-            `;
+                    `;
 
 
                     button.onclick = () => {
-
 
                         selectedFolder =
                             folder.id;
@@ -1588,28 +2346,25 @@ require_once 'db.php';
 
                 });
 
-
             }
-
 
             else {
 
-
                 folderColumn.innerHTML = `
 
-            <div class="column-empty">
+                    <div class="column-empty">
 
-                📁
+                        📁
 
-                <br><br>
+                        <br><br>
 
-                ${escapeHtml(
+                        ${escapeHtml(
                     getFolderName(currentFolder)
                 )}
 
-            </div>
+                    </div>
 
-        `;
+                `;
 
 
                 renderFolderFiles(
@@ -1617,7 +2372,6 @@ require_once 'db.php';
                 );
 
             }
-
 
         }
 
@@ -1629,7 +2383,6 @@ require_once 'db.php';
 
 
         function renderFolderFiles(folder) {
-
 
             const fileColumn =
                 document.getElementById(
@@ -1644,8 +2397,10 @@ require_once 'db.php';
                 getVisibleItems();
 
 
-            if (folder !== "all" &&
-                folder !== "recent") {
+            if (
+                folder !== "all" &&
+                folder !== "recent"
+            ) {
 
                 items =
                     items.filter(
@@ -1658,16 +2413,15 @@ require_once 'db.php';
 
             if (!items.length) {
 
-
                 fileColumn.innerHTML = `
 
-            <div class="column-empty">
+                    <div class="column-empty">
 
-                This folder is empty.
+                        This folder is empty.
 
-            </div>
+                    </div>
 
-        `;
+                `;
 
 
                 return;
@@ -1676,7 +2430,6 @@ require_once 'db.php';
 
 
             items.forEach(item => {
-
 
                 const button =
                     document.createElement("button");
@@ -1692,42 +2445,41 @@ require_once 'db.php';
 
                 button.innerHTML = `
 
-            <span class="file-icon">
+                    <span class="file-icon">
 
-                ${getTypeIcon(item.type)}
+                        ${getTypeIcon(item.type)}
 
-            </span>
+                    </span>
 
-            <span class="item-info">
+                    <span class="item-info">
 
-                <span
-                    class="item-name"
-                    title="${escapeHtml(item.name || "Untitled")}">
+                        <span
+                            class="item-name"
+                            title="${escapeHtml(item.name || "Untitled")}">
 
-                    ${escapeHtml(
+                            ${escapeHtml(
                     item.name || "Untitled"
                 )}
 
-                </span>
+                        </span>
 
-                <span class="item-meta">
+                        <span class="item-meta">
 
-                    ${getTypeName(item.type)}
-                    •
-                    ${formatDate(
+                            ${getTypeName(item.type)}
+                            •
+                            ${formatDate(
                     item.updated_at ||
                     item.created_at
                 )}
 
-                </span>
+                        </span>
 
-            </span>
+                    </span>
 
-        `;
+                `;
 
 
                 button.onclick = () => {
-
 
                     document
                         .querySelectorAll(".file-item")
@@ -1760,7 +2512,6 @@ require_once 'db.php';
 
                 button.oncontextmenu = event => {
 
-
                     event.preventDefault();
 
 
@@ -1792,7 +2543,6 @@ require_once 'db.php';
 
         function renderDetails(item) {
 
-
             const details =
                 document.getElementById(
                     "details-column"
@@ -1801,93 +2551,94 @@ require_once 'db.php';
 
             details.innerHTML = `
 
-        <div class="file-details">
+                <div class="file-details">
 
-            <div class="details-icon">
+                    <div class="details-icon">
 
-                ${getTypeIcon(item.type)}
+                        ${getTypeIcon(item.type)}
 
-            </div>
+                    </div>
 
 
-            <div class="details-name">
+                    <div class="details-name">
 
-                ${escapeHtml(
+                        ${escapeHtml(
                 item.name || "Untitled"
             )}
 
-            </div>
+                    </div>
 
 
-            <div class="details-row">
+                    <div class="details-row">
 
-                <span class="details-label">
-                    Kind
-                </span>
+                        <span class="details-label">
+                            Kind
+                        </span>
 
-                <span class="details-value">
-                    ${getTypeName(item.type)}
-                </span>
+                        <span class="details-value">
+                            ${getTypeName(item.type)}
+                        </span>
 
-            </div>
+                    </div>
 
 
-            <div class="details-row">
+                    <div class="details-row">
 
-                <span class="details-label">
-                    Created
-                </span>
+                        <span class="details-label">
+                            Created
+                        </span>
 
-                <span class="details-value">
-                    ${formatDate(
+                        <span class="details-value">
+                            ${formatDate(
                 item.created_at
             )}
-                </span>
+                        </span>
 
-            </div>
+                    </div>
 
 
-            <div class="details-row">
+                    <div class="details-row">
 
-                <span class="details-label">
-                    Modified
-                </span>
+                        <span class="details-label">
+                            Modified
+                        </span>
 
-                <span class="details-value">
-                    ${formatDate(
+                        <span class="details-value">
+                            ${formatDate(
                 item.updated_at ||
                 item.created_at
             )}
-                </span>
+                        </span>
 
-            </div>
-
-
-            <div class="details-row">
-
-                <span class="details-label">
-                    ID
-                </span>
-
-                <span class="details-value">
-                    ${item.id}
-                </span>
-
-            </div>
+                    </div>
 
 
-            <button
-                class="open-file-button"
-                onclick="openSelected()">
+                    <div class="details-row">
 
-                Open
+                        <span class="details-label">
+                            ID
+                        </span>
 
-            </button>
+                        <span class="details-value">
+                            ${item.id}
+                        </span>
+
+                    </div>
 
 
-        </div>
+                    <button
+                        class="open-file-button"
+                        onclick="openSelected()"
+                    >
 
-    `;
+                        Open
+
+                    </button>
+
+
+                </div>
+
+            `;
 
         }
 
@@ -1899,7 +2650,6 @@ require_once 'db.php';
 
 
         function openItem(item) {
-
 
             if (!item || !item.id) {
 
@@ -1926,7 +2676,6 @@ require_once 'db.php';
 
         function openSelected() {
 
-
             if (!selectedItem) {
 
                 return;
@@ -1948,7 +2697,6 @@ require_once 'db.php';
 
 
         async function renameSelected() {
-
 
             if (!selectedItem) {
 
@@ -2008,15 +2756,12 @@ require_once 'db.php';
             input.select();
 
 
-
             let finished = false;
-
 
 
             async function finishRename(
                 save
             ) {
-
 
                 if (finished) {
 
@@ -2046,7 +2791,6 @@ require_once 'db.php';
 
 
                 try {
-
 
                     const response =
                         await fetch(
@@ -2126,7 +2870,6 @@ require_once 'db.php';
 
                 catch (error) {
 
-
                     console.error(
                         error
                     );
@@ -2141,10 +2884,8 @@ require_once 'db.php';
             }
 
 
-
             input.onkeydown =
                 event => {
-
 
                     if (
                         event.key === "Enter"
@@ -2185,7 +2926,6 @@ require_once 'db.php';
         document.addEventListener(
             "keydown",
             event => {
-
 
                 if (
                     event.key === "F2" &&
@@ -2229,7 +2969,6 @@ require_once 'db.php';
             y
         ) {
 
-
             const menu =
                 document.getElementById(
                     "contextMenu"
@@ -2252,7 +2991,6 @@ require_once 'db.php';
 
 
         function hideContextMenu() {
-
 
             document
                 .getElementById(
@@ -2279,15 +3017,14 @@ require_once 'db.php';
 
         function toggleFinder() {
 
+            <?php if (empty($_SESSION["logged_in"])): ?>
 
-            if (!isLoggedIn) {
-
-                window.location.href =
-                    "login.php";
+                    window.location.href =
+                "login.php";
 
                 return;
 
-            }
+            <?php endif; ?>
 
 
             const finder =
@@ -2308,7 +3045,6 @@ require_once 'db.php';
                 )
             ) {
 
-
                 finder.classList.remove(
                     "visible"
                 );
@@ -2317,11 +3053,9 @@ require_once 'db.php';
                 scanner.style.display =
                     "block";
 
-
             }
 
             else {
-
 
                 finder.classList.add(
                     "visible"
@@ -2333,7 +3067,6 @@ require_once 'db.php';
 
 
                 loadItems();
-
 
             }
 
@@ -2349,7 +3082,6 @@ require_once 'db.php';
         function getFolderName(
             type
         ) {
-
 
             const folder =
                 folderDefinitions.find(
@@ -2369,7 +3101,6 @@ require_once 'db.php';
         function getTypeName(
             type
         ) {
-
 
             const names = {
 
@@ -2395,7 +3126,6 @@ require_once 'db.php';
             type
         ) {
 
-
             const icons = {
 
                 flowchart: "📊",
@@ -2419,7 +3149,6 @@ require_once 'db.php';
         function formatDate(
             date
         ) {
-
 
             if (!date) {
 
@@ -2466,7 +3195,6 @@ require_once 'db.php';
             value
         ) {
 
-
             return String(value ?? "")
                 .replace(
                     /&/g,
@@ -2490,9 +3218,12 @@ require_once 'db.php';
                 );
 
         }
+
+
+
         /* =========================================================
-   CAMERA
-========================================================= */
+           CAMERA
+        ========================================================= */
 
 
         const video =
@@ -2526,9 +3257,7 @@ require_once 'db.php';
 
         async function initCamera() {
 
-
             try {
-
 
                 const stream =
                     await navigator.mediaDevices
@@ -2545,11 +3274,9 @@ require_once 'db.php';
                 video.srcObject =
                     stream;
 
-
             }
 
             catch (err) {
-
 
                 status.innerText =
                     "Camera error: " +
@@ -2570,13 +3297,10 @@ require_once 'db.php';
             .querySelectorAll(".mode-btn")
             .forEach(button => {
 
-
                 button.onclick = () => {
-
 
                     selectedMode =
                         button.dataset.mode;
-
 
                     scanImage();
 
@@ -2592,7 +3316,6 @@ require_once 'db.php';
 
 
         async function scanImage() {
-
 
             status.innerText =
                 "Analyzing...";
@@ -2617,17 +3340,11 @@ require_once 'db.php';
 
 
             ctx.drawImage(
-
                 video,
-
                 0,
-
                 0,
-
                 canvas.width,
-
                 canvas.height
-
             );
 
 
@@ -2637,15 +3354,11 @@ require_once 'db.php';
                 );
 
 
-
             try {
-
 
                 const response =
                     await fetch(
-
                         "analyze.php",
-
                         {
 
                             method: "POST",
@@ -2669,9 +3382,7 @@ require_once 'db.php';
                                 })
 
                         }
-
                     );
-
 
 
                 const text =
@@ -2694,62 +3405,18 @@ require_once 'db.php';
                     );
 
 
-
                 if (!data.success) {
-
 
                     status.innerText =
                         data.error;
-
-
-                    if (
-                        data.error &&
-                        data.error
-                            .toLowerCase()
-                            .includes("google account not connected")
-                    ) {
-
-                        output.innerHTML = `
-
-                            <div class="study-card">
-
-                                <h3>
-                                    Error
-                                </h3>
-
-                                <p>
-                                    ${escapeHtml(
-                            data.error
-                        )}
-                                </p>
-
-                                <p>
-
-                                    <a
-                                        href="https://vishthefishjr.me/google_login.php">
-
-                                        Connect your Google Account
-
-                                    </a>
-
-                                </p>
-
-                            </div>
-
-                        `;
-
-                    }
-
 
                     return;
 
                 }
 
 
-
                 status.innerText =
                     "Generated successfully!";
-
 
 
                 /* =========================================
@@ -2762,24 +3429,20 @@ require_once 'db.php';
                     "flowchart"
                 ) {
 
-
                     let code =
                         data.ai_response;
 
 
                     code =
                         code
-
                             .replace(
                                 /```mermaid/gi,
                                 ""
                             )
-
                             .replace(
                                 /```/g,
                                 ""
                             )
-
                             .trim();
 
 
@@ -2808,7 +3471,6 @@ require_once 'db.php';
 
                     });
 
-
                 }
 
 
@@ -2822,7 +3484,6 @@ require_once 'db.php';
                     selectedMode ===
                     "quiz"
                 ) {
-
 
                     const quiz =
                         JSON.parse(
@@ -2848,7 +3509,6 @@ require_once 'db.php';
                     "flashcards"
                 ) {
 
-
                     const cards =
                         JSON.parse(
                             data.ai_response
@@ -2873,7 +3533,6 @@ require_once 'db.php';
                     "presentation"
                 ) {
 
-
                     const presentation =
                         JSON.parse(
                             data.ai_response
@@ -2886,20 +3545,15 @@ require_once 'db.php';
 
                 }
 
-
-
             }
 
             catch (err) {
-
 
                 status.innerText =
                     "Error: " +
                     err.message;
 
             }
-
-
 
         }
 
@@ -2914,34 +3568,29 @@ require_once 'db.php';
             data
         ) {
 
-
             output.innerHTML = `
 
-        <div class="study-card">
+                <div class="study-card">
 
-            <h2>
-                Creating Google Slides...
-            </h2>
+                    <h2>
+                        Creating Google Slides...
+                    </h2>
 
-            <p>
-                Please wait while your
-                presentation is generated.
-            </p>
+                    <p>
+                        Please wait while your
+                        presentation is generated.
+                    </p>
 
-        </div>
+                </div>
 
-    `;
-
+            `;
 
 
             try {
 
-
                 const response =
                     await fetch(
-
                         "create_slides.php",
-
                         {
 
                             method: "POST",
@@ -2959,7 +3608,6 @@ require_once 'db.php';
                                 )
 
                         }
-
                     );
 
 
@@ -2967,87 +3615,81 @@ require_once 'db.php';
                     await response.json();
 
 
-
                 if (
                     result.success
                 ) {
 
-
                     output.innerHTML = `
 
-                <div class="study-card">
+                        <div class="study-card">
 
-                    <h2>
-                        Presentation Created 🎉
-                    </h2>
+                            <h2>
+                                Presentation Created 🎉
+                            </h2>
 
-                    <p>
-                        Your editable Google Slides
-                        file is ready.
-                    </p>
+                            <p>
+                                Your editable Google Slides
+                                file is ready.
+                            </p>
 
-                    <a
-                        class="presentation-link"
-                        target="_blank"
-                        href="${result.url}">
+                            <a
+                                class="presentation-link"
+                                target="_blank"
+                                href="${result.url}"
+                            >
 
-                        Open Google Slides
+                                Open Google Slides
 
-                    </a>
+                            </a>
 
-                </div>
+                        </div>
 
-            `;
+                    `;
 
 
                     await loadItems();
 
-
                 }
-
 
                 else {
 
-
                     output.innerHTML = `
 
-                <div class="study-card">
+                        <div class="study-card">
 
-                    <h2>
-                        Error
-                    </h2>
+                            <h2>
+                                Error
+                            </h2>
 
-                    <p>
-                        ${escapeHtml(
+                            <p>
+                                ${escapeHtml(
                         result.error ||
                         "Unknown error"
                     )}
-                    </p>
+                            </p>
 
-                </div>
+                        </div>
 
-            `;
+                    `;
 
                 }
-
 
             }
 
             catch (err) {
 
-
                 output.innerHTML = `
 
-            <div class="study-card">
+                    <div class="study-card">
 
-                Error:
-                ${escapeHtml(
+                        Error:
+                        ${escapeHtml(
                     err.message
                 )}
 
-            </div>
+                    </div>
 
-        `;
+                `;
 
             }
 
@@ -3064,15 +3706,12 @@ require_once 'db.php';
             data
         ) {
 
-
             let current = 0;
 
             let score = 0;
 
 
-
             function showQuestion() {
-
 
                 const q =
                     data.questions[
@@ -3082,28 +3721,27 @@ require_once 'db.php';
 
                 output.innerHTML = `
 
-            <div class="study-card">
+                    <div class="study-card">
 
-                <h2>
-                    Question
-                    ${current + 1}/
-                    ${data.questions.length}
-                </h2>
+                        <h2>
+                            Question
+                            ${current + 1}/
+                            ${data.questions.length}
+                        </h2>
 
-                <h3>
-                    ${escapeHtml(
+                        <h3>
+                            ${escapeHtml(
                     q.question
                 )}
-                </h3>
+                        </h3>
 
-                <div id="choices"></div>
+                        <div id="choices"></div>
 
-                <p id="feedback"></p>
+                        <p id="feedback"></p>
 
-            </div>
+                    </div>
 
-        `;
-
+                `;
 
 
                 const choices =
@@ -3112,10 +3750,8 @@ require_once 'db.php';
                     );
 
 
-
                 q.choices.forEach(
                     (choice, index) => {
-
 
                         const button =
                             document.createElement(
@@ -3131,9 +3767,7 @@ require_once 'db.php';
                             choice;
 
 
-
                         button.onclick = () => {
-
 
                             document
                                 .querySelectorAll(
@@ -3149,12 +3783,10 @@ require_once 'db.php';
                                 );
 
 
-
                             if (
                                 index ===
                                 q.answer
                             ) {
-
 
                                 button.classList.add(
                                     "correct"
@@ -3163,11 +3795,9 @@ require_once 'db.php';
 
                                 score++;
 
-
                             }
 
                             else {
-
 
                                 button.classList.add(
                                     "wrong"
@@ -3186,30 +3816,30 @@ require_once 'db.php';
                             }
 
 
-
                             document
                                 .getElementById(
                                     "feedback"
                                 )
                                 .innerHTML = `
 
-                            <br>
+                                    <br>
 
-                            ${escapeHtml(
+                                    ${escapeHtml(
                                     q.explanation
                                 )}
 
-                            <br><br>
+                                    <br><br>
 
-                            <button
-                                class="action-btn"
-                                onclick="nextQuestion()">
+                                    <button
+                                        class="action-btn"
+                                        onclick="nextQuestion()"
+                                    >
 
-                                Next Question
+                                        Next Question
 
-                            </button>
+                                    </button>
 
-                        `;
+                                `;
 
                         };
 
@@ -3224,10 +3854,8 @@ require_once 'db.php';
             }
 
 
-
             window.nextQuestion =
                 function () {
-
 
                     current++;
 
@@ -3237,23 +3865,22 @@ require_once 'db.php';
                         data.questions.length
                     ) {
 
-
                         output.innerHTML = `
 
-                    <div class="study-card">
+                            <div class="study-card">
 
-                        <h2>
-                            Quiz Complete 🎉
-                        </h2>
+                                <h2>
+                                    Quiz Complete 🎉
+                                </h2>
 
-                        <h1>
-                            ${score}/
-                            ${data.questions.length}
-                        </h1>
+                                <h1>
+                                    ${score}/
+                                    ${data.questions.length}
+                                </h1>
 
-                    </div>
+                            </div>
 
-                `;
+                        `;
 
 
                         return;
@@ -3264,7 +3891,6 @@ require_once 'db.php';
                     showQuestion();
 
                 };
-
 
 
             showQuestion();
@@ -3282,13 +3908,10 @@ require_once 'db.php';
             data
         ) {
 
-
             let current = 0;
 
 
-
             function showCard() {
-
 
                 const card =
                     data.cards[
@@ -3298,72 +3921,73 @@ require_once 'db.php';
 
                 output.innerHTML = `
 
-            <div>
+                    <div>
 
-                <div
-                    class="flashcard"
-                    onclick="
-                        this.classList.toggle('flip')
-                    ">
+                        <div
+                            class="flashcard"
+                            onclick="
+                                this.classList.toggle('flip')
+                            "
+                        >
 
-                    <div class="flash-inner">
+                            <div class="flash-inner">
 
-                        <div class="flash-front">
+                                <div class="flash-front">
 
-                            ${escapeHtml(
+                                    ${escapeHtml(
                     card.front
                 )}
 
-                        </div>
+                                </div>
 
-                        <div class="flash-back">
+                                <div class="flash-back">
 
-                            ${escapeHtml(
+                                    ${escapeHtml(
                     card.back
                 )}
 
+                                </div>
+
+                            </div>
+
                         </div>
+
+
+                        <h3>
+                            Card
+                            ${current + 1}/
+                            ${data.cards.length}
+                        </h3>
+
+
+                        <button
+                            class="action-btn"
+                            onclick="previousCard()"
+                        >
+
+                            ← Previous
+
+                        </button>
+
+
+                        <button
+                            class="action-btn"
+                            onclick="nextCard()"
+                        >
+
+                            Next →
+
+                        </button>
 
                     </div>
 
-                </div>
-
-
-                <h3>
-                    Card
-                    ${current + 1}/
-                    ${data.cards.length}
-                </h3>
-
-
-                <button
-                    class="action-btn"
-                    onclick="previousCard()">
-
-                    ← Previous
-
-                </button>
-
-
-                <button
-                    class="action-btn"
-                    onclick="nextCard()">
-
-                    Next →
-
-                </button>
-
-            </div>
-
-        `;
+                `;
 
             }
 
 
-
             window.nextCard =
                 function () {
-
 
                     if (
                         current <
@@ -3380,10 +4004,8 @@ require_once 'db.php';
                 };
 
 
-
             window.previousCard =
                 function () {
-
 
                     if (
                         current > 0
@@ -3399,7 +4021,6 @@ require_once 'db.php';
                 };
 
 
-
             showCard();
 
         }
@@ -3410,42 +4031,94 @@ require_once 'db.php';
            DARK MODE
         ========================================================= */
 
+
         function toggleDarkMode() {
-            document.body.classList.toggle("dark-mode");
+
+            const checkbox =
+                document.getElementById(
+                    "darkModeToggle"
+                );
+
 
             const enabled =
-                document.body.classList.contains("dark-mode");
+                checkbox.checked;
+
+
+            document.body.classList.toggle(
+                "dark-mode",
+                enabled
+            );
+
 
             localStorage.setItem(
                 "aiStudyScannerDarkMode",
                 enabled ? "1" : "0"
             );
 
-            const button =
-                document.getElementById("darkModeToggle");
 
-            if (button) {
-                button.innerText =
-                    enabled ? "☀️ Light" : "🌙 Dark";
+            const label =
+                document.getElementById(
+                    "themeLabel"
+                );
+
+
+            if (label) {
+
+                label.innerText =
+                    enabled
+                        ? "Dark"
+                        : "Light";
+
             }
+
         }
+
 
         function loadDarkMode() {
+
             const enabled =
-                localStorage.getItem("aiStudyScannerDarkMode") === "1";
+                localStorage.getItem(
+                    "aiStudyScannerDarkMode"
+                ) === "1";
 
-            if (enabled) {
-                document.body.classList.add("dark-mode");
+
+            const checkbox =
+                document.getElementById(
+                    "darkModeToggle"
+                );
+
+
+            if (checkbox) {
+
+                checkbox.checked =
+                    enabled;
+
             }
 
-            const button =
-                document.getElementById("darkModeToggle");
 
-            if (button) {
-                button.innerText =
-                    enabled ? "☀️ Light" : "🌙 Dark";
+            document.body.classList.toggle(
+                "dark-mode",
+                enabled
+            );
+
+
+            const label =
+                document.getElementById(
+                    "themeLabel"
+                );
+
+
+            if (label) {
+
+                label.innerText =
+                    enabled
+                        ? "Dark"
+                        : "Light";
+
             }
+
         }
+
 
 
         /* =========================================================
@@ -3454,9 +4127,14 @@ require_once 'db.php';
 
 
         loadDarkMode();
+
         initCamera();
 
-        loadItems();
+        <?php if (!empty($_SESSION["logged_in"])): ?>
+
+                    loadItems();
+
+        <?php endif; ?>
 
 
     </script>
