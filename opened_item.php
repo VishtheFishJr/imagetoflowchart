@@ -46,6 +46,17 @@ $content = $item["content"];
 $presentationUrl =
     $item["presentation_url"];
 
+// ---------------------------------------------------------
+// PRESENTATIONS: OPEN THE GOOGLE SLIDES PRESENTATION
+// DIRECTLY INSTEAD OF SHOWING AN INTERMEDIATE PAGE.
+// ---------------------------------------------------------
+
+if ($type === "presentation" && !empty($presentationUrl)) {
+
+    header("Location: " . $presentationUrl);
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 
@@ -61,7 +72,7 @@ $presentationUrl =
         <?php echo $name; ?>
     </title>
 
-
+    <!-- Mermaid for flowcharts -->
     <script type="module">
 
         import mermaid from
@@ -87,8 +98,33 @@ $presentationUrl =
 
         window.mermaid = mermaid;
 
+        window.dispatchEvent(
+            new Event("mermaidReady")
+        );
+
     </script>
 
+    <!-- MathJax for readable mathematical notation -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [
+                    ["\\(", "\\)"],
+                    ["$", "$"]
+                ],
+                displayMath: [
+                    ["\\[", "\\]"],
+                    ["$$", "$$"]
+                ]
+            },
+            svg: {
+                fontCache: "global"
+            }
+        };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
 
     <style>
         * {
@@ -345,17 +381,36 @@ $presentationUrl =
 
             overflow-x: auto;
 
+            display: flex;
+
+            justify-content: center;
+
+            width: 100%;
+
+            min-height: 200px;
+
+        }
+
+        #flowchart svg {
+
+            max-width: 100%;
+
+            height: auto;
+
+        }
+
+        .math-content {
+
+            line-height: 1.7;
+
         }
     </style>
 
 </head>
 
-
 <body>
 
-
     <div class="container">
-
 
         <div class="header">
 
@@ -391,14 +446,11 @@ $presentationUrl =
 
         </div>
 
-
         <div class="content">
 
             <?php if ($type === "flowchart"): ?>
 
-
                 <div id="flowchart"></div>
-
 
                 <script>
 
@@ -414,32 +466,76 @@ $presentationUrl =
                     flowchartDiv.textContent =
                         flowchartCode;
 
-                    mermaid.run({
+                    async function renderFlowchart() {
 
-                        nodes: [flowchartDiv]
+                        if (!window.mermaid) {
+                            return;
+                        }
 
-                    });
+                        try {
+
+                            await window.mermaid.run({
+                                nodes: [flowchartDiv]
+                            });
+
+                        } catch (error) {
+
+                            flowchartDiv.className = "";
+
+                            flowchartDiv.textContent =
+                                "Unable to render this flowchart: "
+                                + error.message;
+
+                        }
+
+                    }
+
+                    if (window.mermaid) {
+
+                        renderFlowchart();
+
+                    } else {
+
+                        window.addEventListener(
+                            "mermaidReady",
+                            renderFlowchart,
+                            { once: true }
+                        );
+
+                    }
 
                 </script>
 
-
             <?php elseif ($type === "quiz"): ?>
 
-
-                <div id="quiz"></div>
-
+                <div id="quiz" class="math-content"></div>
 
                 <script>
 
                     const quizData =
                         <?php echo json_encode(
-                            json_decode($content, true)
+                            json_decode($content, true),
+                            JSON_UNESCAPED_UNICODE
                         ); ?>;
 
                     let currentQuestion = 0;
 
                     let score = 0;
 
+                    function typesetMath(element) {
+
+                        if (
+                            window.MathJax &&
+                            window.MathJax.typesetPromise
+                        ) {
+
+                            window.MathJax.typesetPromise(
+                                [element]
+                            ).catch(() => { });
+
+                        }
+
+                    }
 
                     function showQuestion() {
 
@@ -472,10 +568,8 @@ $presentationUrl =
 
     `;
 
-
                         const choices =
                             document.getElementById("choices");
-
 
                         q.choices.forEach(
                             (choice, index) => {
@@ -486,7 +580,7 @@ $presentationUrl =
                                 button.className =
                                     "choice";
 
-                                button.innerText =
+                                button.innerHTML =
                                     choice;
 
                                 button.onclick = () => {
@@ -498,7 +592,6 @@ $presentationUrl =
                                                 btn.disabled = true
                                         );
 
-
                                     if (index === q.answer) {
 
                                         button.classList.add(
@@ -507,9 +600,7 @@ $presentationUrl =
 
                                         score++;
 
-                                    }
-
-                                    else {
+                                    } else {
 
                                         button.classList.add(
                                             "wrong"
@@ -523,7 +614,6 @@ $presentationUrl =
                                             );
 
                                     }
-
 
                                     document
                                         .getElementById("feedback")
@@ -544,16 +634,22 @@ $presentationUrl =
 
                 `;
 
-                                };
+                                    typesetMath(
+                                        document.getElementById(
+                                            "quiz"
+                                        )
+                                    );
 
+                                };
 
                                 choices.appendChild(button);
 
                             }
                         );
 
-                    }
+                        typesetMath(quiz);
 
+                    }
 
                     window.nextQuestion = function () {
 
@@ -581,6 +677,10 @@ $presentationUrl =
 
         `;
 
+                            typesetMath(
+                                document.getElementById("quiz")
+                            );
+
                             return;
 
                         }
@@ -589,27 +689,43 @@ $presentationUrl =
 
                     };
 
-
                     showQuestion();
 
                 </script>
 
-
             <?php elseif ($type === "flashcards"): ?>
 
-
-                <div id="flashcards"></div>
-
+                <div id="flashcards" class="math-content"></div>
 
                 <script>
 
                     const flashcardData =
                         <?php echo json_encode(
-                            json_decode($content, true)
+                            json_decode($content, true),
+                            JSON_UNESCAPED_UNICODE
                         ); ?>;
 
                     let currentCard = 0;
 
+                    function typesetFlashcards() {
+
+                        const element =
+                            document.getElementById(
+                                "flashcards"
+                            );
+
+                        if (
+                            window.MathJax &&
+                            window.MathJax.typesetPromise
+                        ) {
+
+                            window.MathJax.typesetPromise(
+                                [element]
+                            ).catch(() => { });
+
+                        }
+
+                    }
 
                     function showCard() {
 
@@ -645,7 +761,6 @@ $presentationUrl =
 
         </div>
 
-
         <h3 style="text-align:center">
 
             Card
@@ -654,7 +769,6 @@ $presentationUrl =
             ${flashcardData.cards.length}
 
         </h3>
-
 
         <div style="text-align:center">
 
@@ -666,7 +780,6 @@ $presentationUrl =
                 ← Previous
 
             </button>
-
 
             <button
                 class="action-btn"
@@ -681,8 +794,9 @@ $presentationUrl =
 
     `;
 
-                    }
+                        typesetFlashcards();
 
+                    }
 
                     window.nextCard = function () {
 
@@ -699,7 +813,6 @@ $presentationUrl =
 
                     };
 
-
                     window.previousCard = function () {
 
                         if (currentCard > 0) {
@@ -712,14 +825,11 @@ $presentationUrl =
 
                     };
 
-
                     showCard();
 
                 </script>
 
-
             <?php elseif ($type === "presentation"): ?>
-
 
                 <div class="study-card">
 
@@ -731,7 +841,6 @@ $presentationUrl =
                         This presentation was generated as
                         an editable Google Slides presentation.
                     </p>
-
 
                     <?php if ($presentationUrl): ?>
 
@@ -755,11 +864,9 @@ $presentationUrl =
 
                 </div>
 
-
             <?php else: ?>
 
-
-                <div class="study-card">
+                <div class="study-card math-content">
 
                     <pre><?php
 
@@ -773,14 +880,11 @@ $presentationUrl =
 
                 </div>
 
-
             <?php endif; ?>
 
         </div>
 
-
     </div>
-
 
 </body>
 
