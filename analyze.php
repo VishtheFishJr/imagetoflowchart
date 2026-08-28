@@ -788,14 +788,16 @@ try {
                 name,
                 type,
                 content,
-                presentation_url
+                presentation_url,
+                user_id
             )
             VALUES
             (
                 ?,
                 ?,
                 ?,
-                NULL
+                NULL,
+                ?
             )
             "
         );
@@ -807,7 +809,9 @@ try {
 
         $mode,
 
-        $aiAnswer
+        $aiAnswer,
+
+        $_SESSION["user_id"] ?? null
 
     ]);
 

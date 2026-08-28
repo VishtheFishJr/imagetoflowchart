@@ -738,10 +738,12 @@ try {
                 name,
                 type,
                 content,
-                presentation_url
+                presentation_url,
+                user_id
             )
             VALUES
             (
+                ?,
                 ?,
                 ?,
                 ?,
@@ -754,7 +756,8 @@ try {
         $presentationName,
         "presentation",
         $presentationContent,
-        $presentationUrl
+        $presentationUrl,
+        $_SESSION["user_id"] ?? null
     ]);
 
     $generatedItemId =
