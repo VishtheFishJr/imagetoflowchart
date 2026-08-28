@@ -20,6 +20,32 @@ $currentRole =
     $_SESSION["role"] ?? "user";
 
 
+/* Keep the role in sync with the database. */
+if ($isLoggedIn) {
+    try {
+        $roleStmt = $pdo->prepare("
+            SELECT role
+            FROM users
+            WHERE id = ?
+            LIMIT 1
+        ");
+
+        $roleStmt->execute([
+            $currentUserId
+        ]);
+
+        $dbRole = $roleStmt->fetchColumn();
+
+        if ($dbRole) {
+            $currentRole = $dbRole;
+            $_SESSION["role"] = $dbRole;
+        }
+    } catch (PDOException $e) {
+        // Keep the existing session role if the role lookup fails.
+    }
+}
+
+
 $isAdmin =
     $isLoggedIn &&
     $currentRole === "admin";
@@ -3407,8 +3433,44 @@ $isAdmin =
 
                 if (!data.success) {
 
+                    const errorMessage =
+                        data.error ||
+                        "Something went wrong.";
+
                     status.innerText =
-                        data.error;
+                        errorMessage;
+
+                    if (
+                        errorMessage.toLowerCase().includes(
+                            "google account not connected"
+                        )
+                    ) {
+                        const googleLink =
+                            document.createElement("a");
+
+                        googleLink.href =
+                            "https://vishthefishjr.me/google_login.php";
+
+                        googleLink.target = "_self";
+                        googleLink.innerText =
+                            "Connect your Google account";
+
+                        googleLink.style.display =
+                            "block";
+
+                        googleLink.style.marginTop =
+                            "10px";
+
+                        googleLink.style.color =
+                            "#2563eb";
+
+                        googleLink.style.textDecoration =
+                            "none";
+
+                        status.parentNode.appendChild(
+                            googleLink
+                        );
+                    }
 
                     return;
 
