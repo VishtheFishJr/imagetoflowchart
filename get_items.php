@@ -4,36 +4,36 @@ require_once 'db.php';
 
 header("Content-Type: application/json; charset=utf-8");
 
+$isLoggedIn =
+    !empty($_SESSION["logged_in"]) &&
+    !empty($_SESSION["user_id"]);
+
+if (!$isLoggedIn) {
+
+    echo json_encode([
+        "success" => true,
+        "items" => []
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    exit;
+}
+
 try {
 
-    /*
-     * Make sure the user is logged in.
-     */
-    if (
-        !isset($_SESSION["logged_in"]) ||
-        $_SESSION["logged_in"] !== true ||
-        !isset($_SESSION["user_id"])
-    ) {
-        http_response_code(401);
+    $roleStmt = $pdo->prepare("
+        SELECT role
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+    ");
 
-        echo json_encode([
-            "success" => false,
-            "error" => "Not logged in."
-        ], JSON_UNESCAPED_UNICODE);
+    $roleStmt->execute([
+        $_SESSION["user_id"]
+    ]);
 
-        exit;
-    }
+    $role = $roleStmt->fetchColumn() ?: "user";
 
-    $userId = $_SESSION["user_id"];
-
-    /*
-     * Admins can see every generated item.
-     * Regular users can only see items they created.
-     */
-    if (
-        isset($_SESSION["role"]) &&
-        $_SESSION["role"] === "admin"
-    ) {
+    if ($role === "admin") {
 
         $stmt = $pdo->query("
             SELECT
@@ -65,7 +65,7 @@ try {
         ");
 
         $stmt->execute([
-            $userId
+            $_SESSION["user_id"]
         ]);
     }
 

@@ -1,6 +1,8 @@
+```php
 <?php
 
 require_once 'db.php';
+
 
 /*
  * LOGOUT
@@ -29,6 +31,7 @@ if (
             $params["secure"],
             $params["httponly"]
         );
+
     }
 
     session_destroy();
@@ -38,7 +41,9 @@ if (
     exit;
 }
 
+
 $error = "";
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -49,6 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $password =
         $_POST["password"] ?? "";
+
 
     if (
         $login === "" ||
@@ -75,15 +81,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     LIMIT 1
                 ");
 
+
             $stmt->execute([
                 $login,
                 $login
             ]);
 
+
             $user =
                 $stmt->fetch(
                     PDO::FETCH_ASSOC
                 );
+
 
             if (
                 !$user ||
@@ -102,31 +111,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     true
                 );
 
+
                 $_SESSION["user_id"] =
                     $user["id"];
+
 
                 $_SESSION["username"] =
                     $user["username"];
 
-                $_SESSION["logged_in"] =
-                    true;
 
                 $_SESSION["role"] =
                     $user["role"];
+
+
+                $_SESSION["logged_in"] =
+                    true;
+
 
                 header(
                     "Location: index.php"
                 );
 
                 exit;
+
             }
 
         } catch (PDOException $e) {
 
             $error =
                 "Something went wrong. Please try again.";
+
         }
+
     }
+
 }
 
 ?>
@@ -140,9 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Log In
-    </title>
+    <title>Log In</title>
 
     <style>
         * {
@@ -167,6 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 sans-serif;
 
             background: #f5f5f5;
+
         }
 
         .container {
@@ -183,6 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             box-shadow:
                 0 4px 20px rgba(0, 0, 0, .1);
+
         }
 
         h1 {
@@ -190,6 +208,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-top: 0;
 
             margin-bottom: 8px;
+
         }
 
         .subtitle {
@@ -197,6 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: #666;
 
             margin-bottom: 25px;
+
         }
 
         label {
@@ -206,6 +226,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-bottom: 6px;
 
             font-weight: bold;
+
         }
 
         input {
@@ -221,6 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border-radius: 7px;
 
             font-size: 15px;
+
         }
 
         input:focus {
@@ -228,6 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             outline: none;
 
             border-color: #2563eb;
+
         }
 
         button {
@@ -247,11 +270,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             font-size: 16px;
 
             cursor: pointer;
+
         }
 
         button:hover {
 
             background: #1d4ed8;
+
         }
 
         .error {
@@ -265,6 +290,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border-radius: 7px;
 
             margin-bottom: 18px;
+
         }
 
         .bottom {
@@ -274,6 +300,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-top: 20px;
 
             color: #666;
+
         }
 
         .bottom a {
@@ -281,6 +308,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: #2563eb;
 
             text-decoration: none;
+
         }
     </style>
 
@@ -303,53 +331,78 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="error">
 
                 <?php
+
                 echo htmlspecialchars(
                     $error,
                     ENT_QUOTES,
                     "UTF-8"
                 );
+
                 ?>
 
             </div>
 
         <?php endif; ?>
 
+
         <form method="POST">
 
+
             <label for="login">
+
                 Username or Email
+
             </label>
 
-            <input type="text" id="login" name="login" required autocomplete="username" value="<?php echo htmlspecialchars(
+
+            <input type="text" id="login" name="login" required autocomplete="username" value="<?php
+
+            echo htmlspecialchars(
                 $_POST["login"] ?? "",
                 ENT_QUOTES,
                 "UTF-8"
-            ); ?>">
+            );
+
+            ?>">
+
 
             <label for="password">
+
                 Password
+
             </label>
+
 
             <input type="password" id="password" name="password" required autocomplete="current-password">
 
+
             <button type="submit">
+
                 Log In
+
             </button>
 
+
         </form>
+
 
         <div class="bottom">
 
             Don't have an account?
 
+
             <a href="signup.php">
+
                 Sign up
+
             </a>
 
         </div>
+
 
     </div>
 
 </body>
 
 </html>
+```
