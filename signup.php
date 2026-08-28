@@ -1,3 +1,4 @@
+```php
 <?php
 
 require_once 'db.php';
@@ -111,7 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } catch (PDOException $e) {
 
             $error = "Something went wrong. Please try again.";
-
         }
     }
 }
@@ -152,7 +152,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 sans-serif;
 
             background: #f5f5f5;
-
         }
 
         .container {
@@ -169,7 +168,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             box-shadow:
                 0 4px 20px rgba(0, 0, 0, .1);
-
         }
 
         h1 {
@@ -177,7 +175,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-top: 0;
 
             margin-bottom: 8px;
-
         }
 
         .subtitle {
@@ -185,7 +182,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: #666;
 
             margin-bottom: 25px;
-
         }
 
         label {
@@ -195,7 +191,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-bottom: 6px;
 
             font-weight: bold;
-
         }
 
         input,
@@ -214,7 +209,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             font-size: 15px;
 
             background: white;
-
         }
 
         input:focus,
@@ -223,7 +217,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             outline: none;
 
             border-color: #2563eb;
-
         }
 
         button {
@@ -243,13 +236,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             font-size: 16px;
 
             cursor: pointer;
-
         }
 
         button:hover {
 
             background: #1d4ed8;
-
         }
 
         .error {
@@ -263,7 +254,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border-radius: 7px;
 
             margin-bottom: 18px;
-
         }
 
         .bottom {
@@ -273,7 +263,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-top: 20px;
 
             color: #666;
-
         }
 
         .bottom a {
@@ -281,7 +270,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: #2563eb;
 
             text-decoration: none;
-
         }
     </style>
 
@@ -301,11 +289,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="error">
 
-                <?php echo htmlspecialchars(
+                <?php
+                echo htmlspecialchars(
                     $error,
                     ENT_QUOTES,
                     "UTF-8"
-                ); ?>
+                );
+                ?>
 
             </div>
 
