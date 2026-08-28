@@ -1,4 +1,3 @@
-```php
 <?php
 
 require_once 'db.php';
@@ -87,4 +86,3 @@ try {
     ], JSON_UNESCAPED_UNICODE);
 }
 ?>
-```
