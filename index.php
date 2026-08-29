@@ -1353,6 +1353,27 @@ $isAdmin =
             font-weight: 600;
         }
 
+        /* =========================================================
+           GOOGLE FORMS — ADDED
+        ========================================================= */
+
+        .form-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 22px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background: #fff;
+            color: #111;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .form-link:hover {
+            background: #eee;
+        }
+
         /* DARK MODE */
 
         body.dark-mode {
@@ -1411,7 +1432,8 @@ $isAdmin =
         body.dark-mode .mode-btn:hover,
         body.dark-mode .choice:hover,
         body.dark-mode .storage-toggle:hover,
-        body.dark-mode .admin-button:hover {
+        body.dark-mode .admin-button:hover,
+        body.dark-mode .form-link:hover {
             background: #292929;
         }
 
@@ -1439,7 +1461,8 @@ $isAdmin =
         body.dark-mode .choice,
         body.dark-mode .action-btn,
         body.dark-mode .open-file-button,
-        body.dark-mode .presentation-link {
+        body.dark-mode .presentation-link,
+        body.dark-mode .form-link {
             background: #181818;
             color: #eee;
             border-color: #555;
@@ -1706,6 +1729,27 @@ $isAdmin =
                 </button>
 
 
+                <!-- =================================================
+                     GOOGLE FORMS — ADDED
+                ================================================= -->
+
+                <button class="sidebar-item" data-folder="form" onclick="openFolder('form')">
+
+                    <span class="sidebar-icon">
+                        📋
+                    </span>
+
+                    <span>
+                        Forms
+                    </span>
+
+                    <span class="sidebar-count" id="count-form">
+                        0
+                    </span>
+
+                </button>
+
+
             </aside>
 
 
@@ -1855,6 +1899,17 @@ $isAdmin =
                     </button>
 
 
+                    <!-- =================================================
+                         GOOGLE FORMS — ADDED
+                    ================================================= -->
+
+                    <button class="mode-btn" data-mode="form">
+
+                        📋 Google Form
+
+                    </button>
+
+
                 </div>
 
 
@@ -1912,6 +1967,437 @@ $isAdmin =
 
 
     </div>
+    <div class="sidebar-section-title">
+        Study Files
+    </div>
+
+
+    <button class="sidebar-item" data-folder="flowchart" onclick="openFolder('flowchart')">
+
+        <span class="sidebar-icon">
+            📊
+        </span>
+
+        <span>
+            Flowcharts
+        </span>
+
+        <span class="sidebar-count" id="count-flowchart">
+            0
+        </span>
+
+    </button>
+
+
+    <button class="sidebar-item" data-folder="quiz" onclick="openFolder('quiz')">
+
+        <span class="sidebar-icon">
+            📝
+        </span>
+
+        <span>
+            Quizzes
+        </span>
+
+        <span class="sidebar-count" id="count-quiz">
+            0
+        </span>
+
+    </button>
+
+
+    <button class="sidebar-item" data-folder="flashcards" onclick="openFolder('flashcards')">
+
+        <span class="sidebar-icon">
+            🃏
+        </span>
+
+        <span>
+            Flashcards
+        </span>
+
+        <span class="sidebar-count" id="count-flashcards">
+            0
+        </span>
+
+    </button>
+
+
+    <button class="sidebar-item" data-folder="presentation" onclick="openFolder('presentation')">
+
+        <span class="sidebar-icon">
+            📽
+        </span>
+
+        <span>
+            Presentations
+        </span>
+
+        <span class="sidebar-count" id="count-presentation">
+            0
+        </span>
+
+    </button>
+
+
+    <!-- GOOGLE FORMS — ADDED -->
+
+    <button class="sidebar-item" data-folder="form" onclick="openFolder('form')">
+
+        <span class="sidebar-icon">
+            📋
+        </span>
+
+        <span>
+            Google Forms
+        </span>
+
+        <span class="sidebar-count" id="count-form">
+            0
+        </span>
+
+    </button>
+
+
+    </aside>
+
+
+
+    <!-- FINDER MAIN -->
+
+    <main class="finder-main">
+
+
+        <div class="finder-toolbar">
+
+
+            <div class="finder-title" id="finder-title">
+
+                All Files
+
+            </div>
+
+
+            <input type="text" id="finder-search" class="finder-search" placeholder="Search files..."
+                oninput="renderFinder()">
+
+
+            <select id="sort-select" class="sort-select" onchange="renderFinder()">
+
+                <option value="updated">
+                    Date Modified
+                </option>
+
+                <option value="name">
+                    Name
+                </option>
+
+                <option value="type">
+                    Type
+                </option>
+
+            </select>
+
+
+        </div>
+
+
+
+        <div class="finder-breadcrumb" id="finder-breadcrumb">
+
+            <button class="breadcrumb-button" onclick="openFolder('all')">
+
+                📁 All Files
+
+            </button>
+
+        </div>
+
+
+
+        <div class="finder-content" id="finder-content">
+
+
+            <div class="finder-column" id="folder-column">
+
+            </div>
+
+
+            <div class="finder-column" id="file-column">
+
+                <div class="column-empty">
+
+                    Select a folder
+
+                </div>
+
+            </div>
+
+
+            <div class="finder-column" id="details-column">
+
+                <div class="column-empty">
+
+                    Select a file
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+    </div>
+
+
+
+    <!-- =====================================================
+             SCANNER
+        ===================================================== -->
+
+    <div id="scanner">
+
+
+        <div class="container">
+
+
+            <h1>
+                AI Study Scanner
+            </h1>
+
+
+            <video id="webcam" autoplay playsinline>
+            </video>
+
+
+            <canvas id="canvas"></canvas>
+
+
+
+            <div class="mode-container">
+
+
+                <button class="mode-btn" data-mode="flowchart">
+
+                    📊 Flowchart
+
+                </button>
+
+
+                <button class="mode-btn" data-mode="quiz">
+
+                    📝 Quiz
+
+                </button>
+
+
+                <button class="mode-btn" data-mode="flashcards">
+
+                    🃏 Flashcards
+
+                </button>
+
+
+                <button class="mode-btn" data-mode="presentation">
+
+                    📽 Presentation
+
+                </button>
+
+
+                <!-- GOOGLE FORMS — ADDED -->
+
+                <button class="mode-btn" data-mode="form">
+
+                    📋 Google Form
+
+                </button>
+
+
+            </div>
+
+
+
+            <div id="result">
+
+
+                <h3>
+                    Output
+                </h3>
+
+
+                <p id="ai-status">
+
+                    Select a mode and scan an image.
+
+                </p>
+
+
+                <div id="flowchart-render"></div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CONTEXT MENU
+    ===================================================== -->
+
+    <div id="contextMenu">
+
+
+        <button class="context-option" onclick="renameSelected()">
+
+            ✏️ Rename
+
+        </button>
+
+
+        <button class="context-option" onclick="openSelected()">
+
+            📂 Open
+
+        </button>
+
+
+    </div>
+
+    /* =====================================================
+    SCANNER
+    ===================================================== */
+
+    <div id="scanner">
+
+
+        <div class="container">
+
+
+            <h1>
+                AI Study Scanner
+            </h1>
+
+
+            <video id="webcam" autoplay playsinline>
+            </video>
+
+
+            <canvas id="canvas"></canvas>
+
+
+
+            <div class="mode-container">
+
+
+                <button class="mode-btn" data-mode="flowchart">
+
+                    📊 Flowchart
+
+                </button>
+
+
+                <button class="mode-btn" data-mode="quiz">
+
+                    📝 Quiz
+
+                </button>
+
+
+                <button class="mode-btn" data-mode="flashcards">
+
+                    🃏 Flashcards
+
+                </button>
+
+
+                <button class="mode-btn" data-mode="presentation">
+
+                    📽 Presentation
+
+                </button>
+
+
+                <!-- ADDED: GOOGLE FORMS -->
+
+                <button class="mode-btn" data-mode="form">
+
+                    📋 Google Form
+
+                </button>
+
+
+            </div>
+
+
+
+            <div id="result">
+
+
+                <h3>
+                    Output
+                </h3>
+
+
+                <p id="ai-status">
+
+                    Select a mode and scan an image.
+
+                </p>
+
+
+                <div id="flowchart-render"></div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CONTEXT MENU
+    ===================================================== -->
+
+    <div id="contextMenu">
+
+
+        <button class="context-option" onclick="renameSelected()">
+
+            ✏️ Rename
+
+        </button>
+
+
+        <button class="context-option" onclick="openSelected()">
+
+            📂 Open
+
+        </button>
+
+
+    </div>
+
+
     <script>
 
 
@@ -1959,6 +2445,14 @@ $isAdmin =
                 id: "presentation",
                 name: "Presentations",
                 icon: "📽"
+            },
+
+            /* ADDED: GOOGLE FORMS */
+
+            {
+                id: "form",
+                name: "Google Forms",
+                icon: "📋"
             }
 
         ];
@@ -2105,7 +2599,11 @@ $isAdmin =
 
                 flashcards: "Flashcards",
 
-                presentation: "Presentations"
+                presentation: "Presentations",
+
+                /* ADDED */
+
+                form: "Google Forms"
 
             };
 
@@ -2559,12 +3057,9 @@ $isAdmin =
             });
 
         }
-
-
-
         /* =========================================================
-           DETAILS COLUMN
-        ========================================================= */
+   DETAILS COLUMN
+========================================================= */
 
 
         function renderDetails(item) {
@@ -3045,8 +3540,8 @@ $isAdmin =
 
             <?php if (empty($_SESSION["logged_in"])): ?>
 
-                window.location.href =
-                    "login.php";
+                    window.location.href =
+                "login.php";
 
                 return;
 
@@ -3136,7 +3631,11 @@ $isAdmin =
 
                 flashcards: "Flashcards",
 
-                presentation: "Presentation"
+                presentation: "Presentation",
+
+                /* ADDED */
+
+                form: "Google Form"
 
             };
 
@@ -3160,7 +3659,11 @@ $isAdmin =
 
                 flashcards: "🃏",
 
-                presentation: "📽"
+                presentation: "📽",
+
+                /* ADDED */
+
+                form: "📋"
 
             };
 
@@ -3607,6 +4110,29 @@ $isAdmin =
 
                 }
 
+
+
+                /* =========================================
+                   GOOGLE FORM
+                ========================================= */
+
+                else if (
+                    selectedMode ===
+                    "form"
+                ) {
+
+                    const form =
+                        JSON.parse(
+                            data.ai_response
+                        );
+
+
+                    createForm(
+                        form
+                    );
+
+                }
+
             }
 
             catch (err) {
@@ -3701,6 +4227,143 @@ $isAdmin =
                             >
 
                                 Open Google Slides
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+
+                    await loadItems();
+
+                }
+
+                else {
+
+                    output.innerHTML = `
+
+                        <div class="study-card">
+
+                            <h2>
+                                Error
+                            </h2>
+
+                            <p>
+                                ${escapeHtml(
+                        result.error ||
+                        "Unknown error"
+                    )}
+                            </p>
+
+                        </div>
+
+                    `;
+
+                }
+
+            }
+
+            catch (err) {
+
+                output.innerHTML = `
+
+                    <div class="study-card">
+
+                        Error:
+                        ${escapeHtml(
+                    err.message
+                )}
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+
+        /* =========================================================
+           GOOGLE FORM CREATION
+        ========================================================= */
+
+
+        async function createForm(
+            data
+        ) {
+
+            output.innerHTML = `
+
+                <div class="study-card">
+
+                    <h2>
+                        Creating Google Form...
+                    </h2>
+
+                    <p>
+                        Please wait while your
+                        form is generated.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "create_form.php",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    data
+                                )
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (
+                    result.success
+                ) {
+
+                    output.innerHTML = `
+
+                        <div class="study-card">
+
+                            <h2>
+                                Google Form Created 🎉
+                            </h2>
+
+                            <p>
+                                Your Google Form is ready.
+                            </p>
+
+                            <a
+                                class="presentation-link"
+                                target="_blank"
+                                href="${escapeHtml(result.url)}"
+                            >
+
+                                Open Google Form
 
                             </a>
 
@@ -4194,7 +4857,7 @@ $isAdmin =
 
         <?php if (!empty($_SESSION["logged_in"])): ?>
 
-            loadItems();
+                loadItems();
 
         <?php endif; ?>
 
