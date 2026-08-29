@@ -45,7 +45,7 @@ echo "
 
 <a href='$url'>
 
-Connect Google Account yes
+Connect Google Account
 
 </a>
 
