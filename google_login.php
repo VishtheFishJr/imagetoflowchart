@@ -28,7 +28,13 @@ $client->addScope(
 );
 
 
+$client->addScope(
+    'https://www.googleapis.com/auth/forms.body'
+);
+
+
 // Important: keep login active
+
 $client->setAccessType('offline');
 
 
