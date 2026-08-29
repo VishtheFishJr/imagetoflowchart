@@ -3,9 +3,11 @@
 require_once 'vendor/autoload.php';
 
 session_name("PHPSESSID");
+
 session_start();
 
 header('Content-Type: application/json');
+
 
 
 // ------------------------------------------------------------
@@ -17,25 +19,17 @@ if (!isset($_SESSION['google_token'])) {
     http_response_code(401);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'Google account is not connected.'
+
     ]);
 
     exit;
+
 }
 
-
-// ------------------------------------------------------------
-// Get form title / description
-// ------------------------------------------------------------
-
-$formTitle = trim($_POST['title'] ?? '');
-
-if ($formTitle === '') {
-    $formTitle = 'AI Generated Form';
-}
-
-$formDescription = trim($_POST['description'] ?? '');
 
 
 // ------------------------------------------------------------
@@ -49,15 +43,21 @@ if (empty($questionsJson)) {
     http_response_code(400);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'No questions were provided.'
+
     ]);
 
     exit;
+
 }
 
 
+
 $questions = json_decode($questionsJson, true);
+
 
 
 if (!is_array($questions)) {
@@ -65,12 +65,17 @@ if (!is_array($questions)) {
     http_response_code(400);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'Invalid questions JSON.'
+
     ]);
 
     exit;
+
 }
+
 
 
 if (count($questions) === 0) {
@@ -78,12 +83,45 @@ if (count($questions) === 0) {
     http_response_code(400);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'No questions found.'
+
     ]);
 
     exit;
+
 }
+
+
+
+// ------------------------------------------------------------
+// OPTIONAL FORM INFORMATION
+// ------------------------------------------------------------
+// ADDED:
+// The new AI form generator can send a title and description.
+// If they are not provided, the old quiz title is used.
+// ------------------------------------------------------------
+
+$formTitle = $_POST['title'] ?? 'AI Generated Form';
+
+$formDescription = $_POST['description'] ?? '';
+
+
+
+$formTitle = trim($formTitle);
+
+$formDescription = trim($formDescription);
+
+
+
+if ($formTitle === '') {
+
+    $formTitle = 'AI Generated Form';
+
+}
+
 
 
 // ------------------------------------------------------------
@@ -95,12 +133,15 @@ $client = new Google_Client();
 $client->setAuthConfig('client_secret.json');
 
 $client->setRedirectUri(
+
     'https://vishthefishjr.me/oauth_callback.php'
+
 );
 
 $client->setAccessType('offline');
 
 $client->setAccessToken($_SESSION['google_token']);
+
 
 
 // ------------------------------------------------------------
@@ -114,7 +155,9 @@ if ($client->isAccessTokenExpired()) {
     if ($refreshToken) {
 
         $newToken = $client->fetchAccessTokenWithRefreshToken(
+
             $refreshToken
+
         );
 
         if (isset($newToken['error'])) {
@@ -122,11 +165,15 @@ if ($client->isAccessTokenExpired()) {
             http_response_code(401);
 
             echo json_encode([
+
                 'success' => false,
+
                 'error' => 'Google authorization expired. Please reconnect your Google account.'
+
             ]);
 
             exit;
+
         }
 
         $_SESSION['google_token'] = $client->getAccessToken();
@@ -136,13 +183,19 @@ if ($client->isAccessTokenExpired()) {
         http_response_code(401);
 
         echo json_encode([
+
             'success' => false,
+
             'error' => 'Google authorization expired. Please reconnect your Google account.'
+
         ]);
 
         exit;
+
     }
+
 }
+
 
 
 // ------------------------------------------------------------
@@ -156,14 +209,19 @@ if (!isset($token['access_token'])) {
     http_response_code(401);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'No Google access token available.'
+
     ]);
 
     exit;
+
 }
 
 $accessToken = $token['access_token'];
+
 
 
 // ------------------------------------------------------------
@@ -171,16 +229,26 @@ $accessToken = $token['access_token'];
 // ------------------------------------------------------------
 
 $formData = [
+
     'info' => [
+
         'title' => $formTitle,
+
         'documentTitle' => $formTitle
+
     ]
+
 ];
 
 
+
 $ch = curl_init(
+
     'https://forms.googleapis.com/v1/forms'
+
 );
+
+
 
 curl_setopt_array($ch, [
 
@@ -189,8 +257,11 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
 
     CURLOPT_HTTPHEADER => [
+
         'Authorization: Bearer ' . $accessToken,
+
         'Content-Type: application/json'
+
     ],
 
     CURLOPT_POSTFIELDS => json_encode($formData)
@@ -198,11 +269,15 @@ curl_setopt_array($ch, [
 ]);
 
 
+
 $response = curl_exec($ch);
 
 $httpCode = curl_getinfo(
+
     $ch,
+
     CURLINFO_HTTP_CODE
+
 );
 
 $curlError = curl_error($ch);
@@ -210,24 +285,35 @@ $curlError = curl_error($ch);
 curl_close($ch);
 
 
+
 if ($response === false) {
 
     http_response_code(500);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'Could not connect to Google.',
+
         'details' => $curlError
+
     ]);
 
     exit;
+
 }
 
 
+
 $form = json_decode(
+
     $response,
+
     true
+
 );
+
 
 
 if ($httpCode < 200 || $httpCode >= 300) {
@@ -235,13 +321,19 @@ if ($httpCode < 200 || $httpCode >= 300) {
     http_response_code($httpCode);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'Google Forms API returned an error.',
+
         'details' => $form
+
     ]);
 
     exit;
+
 }
+
 
 
 if (!isset($form['formId'])) {
@@ -249,32 +341,35 @@ if (!isset($form['formId'])) {
     http_response_code(500);
 
     echo json_encode([
+
         'success' => false,
+
         'error' => 'Google did not return a form ID.',
+
         'details' => $form
+
     ]);
 
     exit;
+
 }
+
 
 
 $formId = $form['formId'];
 
 
-// ------------------------------------------------------------
-// Build batch update requests
-// ------------------------------------------------------------
-
-$requests = [];
-
 
 // ------------------------------------------------------------
-// Add form description if provided
+// Add form description
+// ------------------------------------------------------------
+// ADDED:
+// Google Forms supports updating the form description separately.
 // ------------------------------------------------------------
 
 if ($formDescription !== '') {
 
-    $requests[] = [
+    $descriptionRequest = [
 
         'updateFormInfo' => [
 
@@ -289,85 +384,218 @@ if ($formDescription !== '') {
         ]
 
     ];
+
+
+
+    $descriptionUrl =
+
+        'https://forms.googleapis.com/v1/forms/' .
+
+        urlencode($formId) .
+
+        ':batchUpdate';
+
+
+
+    $descriptionData = [
+
+        'requests' => [
+
+            $descriptionRequest
+
+        ]
+
+    ];
+
+
+
+    $ch = curl_init($descriptionUrl);
+
+
+
+    curl_setopt_array($ch, [
+
+        CURLOPT_POST => true,
+
+        CURLOPT_RETURNTRANSFER => true,
+
+        CURLOPT_HTTPHEADER => [
+
+            'Authorization: Bearer ' . $accessToken,
+
+            'Content-Type: application/json'
+
+        ],
+
+        CURLOPT_POSTFIELDS => json_encode($descriptionData)
+
+    ]);
+
+
+
+    $descriptionResponse = curl_exec($ch);
+
+    $descriptionHttpCode = curl_getinfo(
+
+        $ch,
+
+        CURLINFO_HTTP_CODE
+
+    );
+
+    $descriptionCurlError = curl_error($ch);
+
+    curl_close($ch);
+
+
+
+    if ($descriptionResponse === false) {
+
+        http_response_code(500);
+
+        echo json_encode([
+
+            'success' => false,
+
+            'error' => 'Could not connect to Google Forms.',
+
+            'details' => $descriptionCurlError
+
+        ]);
+
+        exit;
+
+    }
+
+
+
+    $descriptionResult = json_decode(
+
+        $descriptionResponse,
+
+        true
+
+    );
+
+
+
+    if (
+
+        $descriptionHttpCode < 200 ||
+
+        $descriptionHttpCode >= 300
+
+    ) {
+
+        http_response_code($descriptionHttpCode);
+
+        echo json_encode([
+
+            'success' => false,
+
+            'error' => 'Google Forms rejected the form description.',
+
+            'details' => $descriptionResult
+
+        ]);
+
+        exit;
+
+    }
+
 }
+
 
 
 // ------------------------------------------------------------
 // Add questions
 // ------------------------------------------------------------
 
+$requests = [];
+
+
+
 foreach ($questions as $question) {
 
-    if (!is_array($question)) {
-        continue;
-    }
-
-
     if (!isset($question['question'])) {
+
         continue;
+
     }
+
 
 
     $questionText = trim(
-        (string) $question['question']
+
+        $question['question']
+
     );
+
 
 
     if ($questionText === '') {
+
         continue;
+
     }
 
 
-    // --------------------------------------------------------
-    // Question type
-    // --------------------------------------------------------
 
     $type = strtolower(
-        trim(
-            (string) ($question['type'] ?? 'multiple_choice')
-        )
+
+        trim($question['type'] ?? 'multiple_choice')
+
     );
 
 
+
     // --------------------------------------------------------
-    // Required
+    // Required setting
+    // --------------------------------------------------------
+    // ADDED:
+    // AI can now decide whether each question is required.
     // --------------------------------------------------------
 
     $required = true;
 
+
+
     if (isset($question['required'])) {
 
-        $required = filter_var(
-            $question['required'],
-            FILTER_VALIDATE_BOOLEAN,
-            FILTER_NULL_ON_FAILURE
-        );
+        $required = (bool) $question['required'];
 
-        if ($required === null) {
-            $required = true;
-        }
     }
 
 
+
     // --------------------------------------------------------
-    // Multiple Choice / Radio
+    // Multiple Choice
     // --------------------------------------------------------
 
     if (
+
         $type === 'multiple_choice' ||
+
         $type === 'multiple choice' ||
-        $type === 'mcq' ||
-        $type === 'radio'
+
+        $type === 'mcq'
+
     ) {
 
         $options = $question['options'] ?? [];
 
+
+
         if (!is_array($options) || count($options) === 0) {
+
             continue;
+
         }
 
 
+
         $choiceOptions = [];
+
 
 
         foreach ($options as $option) {
@@ -379,28 +607,39 @@ foreach ($questions as $question) {
             } else {
 
                 $optionText = $option;
+
             }
 
 
-            $optionText = trim(
-                (string) $optionText
-            );
+
+            $optionText = trim((string) $optionText);
+
 
 
             if ($optionText === '') {
+
                 continue;
+
             }
 
 
+
             $choiceOptions[] = [
+
                 'value' => $optionText
+
             ];
+
         }
+
 
 
         if (count($choiceOptions) === 0) {
+
             continue;
+
         }
+
 
 
         $requests[] = [
@@ -442,27 +681,38 @@ foreach ($questions as $question) {
             ]
 
         ];
+
     }
 
 
+
     // --------------------------------------------------------
-    // Checkboxes / Multiple Select
+    // Checkboxes
     // --------------------------------------------------------
     elseif (
-        $type === 'checkbox' ||
+
         $type === 'checkboxes' ||
-        $type === 'multiple_select' ||
-        $type === 'multiple select'
+
+        $type === 'checkbox' ||
+
+        $type === 'checkboxes'
+
     ) {
 
         $options = $question['options'] ?? [];
 
+
+
         if (!is_array($options) || count($options) === 0) {
+
             continue;
+
         }
 
 
+
         $choiceOptions = [];
+
 
 
         foreach ($options as $option) {
@@ -474,28 +724,39 @@ foreach ($questions as $question) {
             } else {
 
                 $optionText = $option;
+
             }
 
 
-            $optionText = trim(
-                (string) $optionText
-            );
+
+            $optionText = trim((string) $optionText);
+
 
 
             if ($optionText === '') {
+
                 continue;
+
             }
 
 
+
             $choiceOptions[] = [
+
                 'value' => $optionText
+
             ];
+
         }
+
 
 
         if (count($choiceOptions) === 0) {
+
             continue;
+
         }
+
 
 
         $requests[] = [
@@ -537,27 +798,38 @@ foreach ($questions as $question) {
             ]
 
         ];
+
     }
+
 
 
     // --------------------------------------------------------
     // Dropdown
     // --------------------------------------------------------
     elseif (
+
         $type === 'dropdown' ||
+
         $type === 'drop_down' ||
-        $type === 'drop down' ||
-        $type === 'select'
+
+        $type === 'drop down'
+
     ) {
 
         $options = $question['options'] ?? [];
 
+
+
         if (!is_array($options) || count($options) === 0) {
+
             continue;
+
         }
 
 
+
         $choiceOptions = [];
+
 
 
         foreach ($options as $option) {
@@ -569,28 +841,39 @@ foreach ($questions as $question) {
             } else {
 
                 $optionText = $option;
+
             }
 
 
-            $optionText = trim(
-                (string) $optionText
-            );
+
+            $optionText = trim((string) $optionText);
+
 
 
             if ($optionText === '') {
+
                 continue;
+
             }
 
 
+
             $choiceOptions[] = [
+
                 'value' => $optionText
+
             ];
+
         }
+
 
 
         if (count($choiceOptions) === 0) {
+
             continue;
+
         }
+
 
 
         $requests[] = [
@@ -632,17 +915,22 @@ foreach ($questions as $question) {
             ]
 
         ];
+
     }
+
 
 
     // --------------------------------------------------------
     // True / False
     // --------------------------------------------------------
     elseif (
+
         $type === 'true_false' ||
+
         $type === 'true/false' ||
-        $type === 'true false' ||
-        $type === 'boolean'
+
+        $type === 'true false'
+
     ) {
 
         $requests[] = [
@@ -666,11 +954,15 @@ foreach ($questions as $question) {
                                 'options' => [
 
                                     [
+
                                         'value' => 'True'
+
                                     ],
 
                                     [
+
                                         'value' => 'False'
+
                                     ]
 
                                 ],
@@ -694,19 +986,22 @@ foreach ($questions as $question) {
             ]
 
         ];
+
     }
+
 
 
     // --------------------------------------------------------
     // Short Answer
     // --------------------------------------------------------
     elseif (
+
         $type === 'short_answer' ||
+
         $type === 'short answer' ||
-        $type === 'text' ||
-        $type === 'email' ||
-        $type === 'name' ||
-        $type === 'phone'
+
+        $type === 'text'
+
     ) {
 
         $requests[] = [
@@ -744,18 +1039,24 @@ foreach ($questions as $question) {
             ]
 
         ];
+
     }
+
 
 
     // --------------------------------------------------------
     // Paragraph / Long Answer
     // --------------------------------------------------------
     elseif (
+
         $type === 'paragraph' ||
+
         $type === 'long_answer' ||
+
         $type === 'long answer' ||
-        $type === 'essay' ||
-        $type === 'textarea'
+
+        $type === 'essay'
+
     ) {
 
         $requests[] = [
@@ -793,351 +1094,143 @@ foreach ($questions as $question) {
             ]
 
         ];
+
     }
 
-
-    // --------------------------------------------------------
-    // Linear Scale
-    // --------------------------------------------------------
-    elseif (
-        $type === 'linear_scale' ||
-        $type === 'linear scale' ||
-        $type === 'scale' ||
-        $type === 'rating'
-    ) {
-
-        $low = isset($question['low'])
-            ? (int) $question['low']
-            : 1;
-
-        $high = isset($question['high'])
-            ? (int) $question['high']
-            : 5;
-
-
-        // Google Forms supports scale values from 0-10.
-        if ($low < 0) {
-            $low = 0;
-        }
-
-        if ($low > 10) {
-            $low = 10;
-        }
-
-        if ($high < 2) {
-            $high = 2;
-        }
-
-        if ($high > 10) {
-            $high = 10;
-        }
-
-
-        if ($high <= $low) {
-            $high = $low + 1;
-        }
-
-        if ($high > 10) {
-            $high = 10;
-            $low = 9;
-        }
-
-
-        $scaleQuestion = [
-
-            'low' => $low,
-
-            'high' => $high
-
-        ];
-
-
-        if (
-            isset($question['lowLabel']) &&
-            trim((string) $question['lowLabel']) !== ''
-        ) {
-
-            $scaleQuestion['lowLabel'] = trim(
-                (string) $question['lowLabel']
-            );
-        }
-
-
-        if (
-            isset($question['highLabel']) &&
-            trim((string) $question['highLabel']) !== ''
-        ) {
-
-            $scaleQuestion['highLabel'] = trim(
-                (string) $question['highLabel']
-            );
-        }
-
-
-        $requests[] = [
-
-            'createItem' => [
-
-                'item' => [
-
-                    'title' => $questionText,
-
-                    'questionItem' => [
-
-                        'question' => [
-
-                            'requiredQuestion' => $required,
-
-                            'scaleQuestion' => $scaleQuestion
-
-                        ]
-
-                    ]
-
-                ],
-
-                'location' => [
-
-                    'index' => count($requests)
-
-                ]
-
-            ]
-
-        ];
-    }
-
-
-    // --------------------------------------------------------
-    // Date
-    // --------------------------------------------------------
-    elseif (
-        $type === 'date'
-    ) {
-
-        $dateQuestion = [
-
-            'includeYear' => true,
-
-            'includeTime' => false
-
-        ];
-
-
-        if (isset($question['includeYear'])) {
-
-            $dateQuestion['includeYear'] = filter_var(
-                $question['includeYear'],
-                FILTER_VALIDATE_BOOLEAN
-            );
-        }
-
-
-        if (isset($question['includeTime'])) {
-
-            $dateQuestion['includeTime'] = filter_var(
-                $question['includeTime'],
-                FILTER_VALIDATE_BOOLEAN
-            );
-        }
-
-
-        $requests[] = [
-
-            'createItem' => [
-
-                'item' => [
-
-                    'title' => $questionText,
-
-                    'questionItem' => [
-
-                        'question' => [
-
-                            'requiredQuestion' => $required,
-
-                            'dateQuestion' => $dateQuestion
-
-                        ]
-
-                    ]
-
-                ],
-
-                'location' => [
-
-                    'index' => count($requests)
-
-                ]
-
-            ]
-
-        ];
-    }
-
-
-    // --------------------------------------------------------
-    // Time
-    // --------------------------------------------------------
-    elseif (
-        $type === 'time'
-    ) {
-
-        $requests[] = [
-
-            'createItem' => [
-
-                'item' => [
-
-                    'title' => $questionText,
-
-                    'questionItem' => [
-
-                        'question' => [
-
-                            'requiredQuestion' => $required,
-
-                            'timeQuestion' => [
-
-                                'duration' => false
-
-                            ]
-
-                        ]
-
-                    ]
-
-                ],
-
-                'location' => [
-
-                    'index' => count($requests)
-
-                ]
-
-            ]
-
-        ];
-    }
 }
 
 
-// ------------------------------------------------------------
-// Make sure at least one question was created
-// ------------------------------------------------------------
-
-if (count($requests) === 0) {
-
-    http_response_code(400);
-
-    echo json_encode([
-        'success' => false,
-        'error' => 'No valid questions could be created from the generated form.'
-    ]);
-
-    exit;
-}
-
 
 // ------------------------------------------------------------
-// Add questions / form information to the form
+// Add questions to the form
 // ------------------------------------------------------------
 
-$batchUrl =
-    'https://forms.googleapis.com/v1/forms/' .
-    urlencode($formId) .
-    ':batchUpdate';
+if (count($requests) > 0) {
+
+    $batchUrl =
+
+        'https://forms.googleapis.com/v1/forms/' .
+
+        urlencode($formId) .
+
+        ':batchUpdate';
 
 
-$batchData = [
 
-    'requests' => $requests
+    $batchData = [
 
-];
+        'requests' => $requests
 
-
-$ch = curl_init($batchUrl);
+    ];
 
 
-curl_setopt_array($ch, [
 
-    CURLOPT_POST => true,
-
-    CURLOPT_RETURNTRANSFER => true,
-
-    CURLOPT_HTTPHEADER => [
-
-        'Authorization: Bearer ' . $accessToken,
-
-        'Content-Type: application/json'
-
-    ],
-
-    CURLOPT_POSTFIELDS =>
-        json_encode($batchData)
-
-]);
+    $ch = curl_init($batchUrl);
 
 
-$batchResponse = curl_exec($ch);
 
-$batchHttpCode = curl_getinfo(
-    $ch,
-    CURLINFO_HTTP_CODE
-);
+    curl_setopt_array($ch, [
 
-$batchCurlError = curl_error($ch);
+        CURLOPT_POST => true,
 
-curl_close($ch);
+        CURLOPT_RETURNTRANSFER => true,
 
+        CURLOPT_HTTPHEADER => [
 
-if ($batchResponse === false) {
+            'Authorization: Bearer ' . $accessToken,
 
-    http_response_code(500);
+            'Content-Type: application/json'
 
-    echo json_encode([
+        ],
 
-        'success' => false,
+        CURLOPT_POSTFIELDS =>
 
-        'error' =>
-            'Could not connect to Google Forms.',
-
-        'details' =>
-            $batchCurlError
+            json_encode($batchData)
 
     ]);
 
-    exit;
+
+
+    $batchResponse = curl_exec($ch);
+
+    $batchHttpCode = curl_getinfo(
+
+        $ch,
+
+        CURLINFO_HTTP_CODE
+
+    );
+
+    $batchCurlError = curl_error($ch);
+
+    curl_close($ch);
+
+
+
+    if ($batchResponse === false) {
+
+        http_response_code(500);
+
+        echo json_encode([
+
+            'success' => false,
+
+            'error' =>
+
+                'Could not connect to Google Forms.',
+
+            'details' =>
+
+                $batchCurlError
+
+        ]);
+
+        exit;
+
+    }
+
+
+
+    $batchResult = json_decode(
+
+        $batchResponse,
+
+        true
+
+    );
+
+
+
+    if (
+
+        $batchHttpCode < 200 ||
+
+        $batchHttpCode >= 300
+
+    ) {
+
+        http_response_code($batchHttpCode);
+
+        echo json_encode([
+
+            'success' => false,
+
+            'error' =>
+
+                'Google Forms rejected the questions.',
+
+            'details' =>
+
+                $batchResult
+
+        ]);
+
+        exit;
+
+    }
+
 }
 
-
-$batchResult = json_decode(
-    $batchResponse,
-    true
-);
-
-
-if (
-    $batchHttpCode < 200 ||
-    $batchHttpCode >= 300
-) {
-
-    http_response_code($batchHttpCode);
-
-    echo json_encode([
-
-        'success' => false,
-
-        'error' =>
-            'Google Forms rejected the generated form.',
-
-        'details' =>
-            $batchResult
-
-    ]);
-
-    exit;
-}
 
 
 // ------------------------------------------------------------
@@ -1151,11 +1244,15 @@ echo json_encode([
     'formId' => $formId,
 
     'formUrl' =>
+
         'https://docs.google.com/forms/d/' .
+
         $formId .
+
         '/edit',
 
     'message' =>
+
         'Google Form created successfully.'
 
 ]);
