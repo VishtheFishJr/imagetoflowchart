@@ -328,11 +328,17 @@ if ($httpCode < 200 || $httpCode >= 300) {
 
     http_response_code($httpCode);
 
+    $errMsg = $form['error']['message'] ?? 'Google Forms API returned an error.';
+
+    if ($httpCode === 403 && (stripos($errMsg, 'scope') !== false || stripos($errMsg, 'permission') !== false || stripos($errMsg, 'insufficient') !== false)) {
+        $errMsg = 'Google Forms permission is missing. Please reconnect your Google account.';
+    }
+
     echo json_encode([
 
         'success' => false,
 
-        'error' => 'Google Forms API returned an error.',
+        'error' => $errMsg,
 
         'details' => $form
 
@@ -495,11 +501,17 @@ if ($formDescription !== '') {
 
         http_response_code($descriptionHttpCode);
 
+        $descErrMsg = $descriptionResult['error']['message'] ?? 'Google Forms rejected the form description.';
+
+        if ($descriptionHttpCode === 403 && (stripos($descErrMsg, 'scope') !== false || stripos($descErrMsg, 'permission') !== false || stripos($descErrMsg, 'insufficient') !== false)) {
+            $descErrMsg = 'Google Forms permission is missing. Please reconnect your Google account.';
+        }
+
         echo json_encode([
 
             'success' => false,
 
-            'error' => 'Google Forms rejected the form description.',
+            'error' => $descErrMsg,
 
             'details' => $descriptionResult
 
@@ -1395,17 +1407,19 @@ if (count($requests) > 0) {
 
         http_response_code($batchHttpCode);
 
+        $batchErrMsg = $batchResult['error']['message'] ?? 'Google Forms rejected the questions.';
+
+        if ($batchHttpCode === 403 && (stripos($batchErrMsg, 'scope') !== false || stripos($batchErrMsg, 'permission') !== false || stripos($batchErrMsg, 'insufficient') !== false)) {
+            $batchErrMsg = 'Google Forms permission is missing. Please reconnect your Google account.';
+        }
+
         echo json_encode([
 
             'success' => false,
 
-            'error' =>
+            'error' => $batchErrMsg,
 
-                'Google Forms rejected the questions.',
-
-            'details' =>
-
-                $batchResult
+            'details' => $batchResult
 
         ]);
 

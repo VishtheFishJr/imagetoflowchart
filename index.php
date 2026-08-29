@@ -3948,26 +3948,21 @@ $isAdmin =
                 }
 
                 else {
+                    const errorMsg = result.error || "Unknown error";
+                    const isPermissionError = errorMsg.toLowerCase().includes("google") || errorMsg.toLowerCase().includes("reconnect") || errorMsg.toLowerCase().includes("permission");
 
                     output.innerHTML = `
-
                         <div class="study-card">
-
-                            <h2>
-                                Error
-                            </h2>
-
-                            <p>
-                                ${escapeHtml(
-                        result.error ||
-                        "Unknown error"
-                    )}
-                            </p>
-
+                            <h2>Error</h2>
+                            <p>${escapeHtml(errorMsg)}</p>
+                            ${isPermissionError ? `
+                                <br>
+                                <a href="google_login.php" class="presentation-link" target="_self">
+                                    Reconnect Google Account
+                                </a>
+                            ` : ''}
                         </div>
-
                     `;
-
                 }
 
             }
