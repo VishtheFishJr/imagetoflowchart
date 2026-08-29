@@ -33,32 +33,36 @@ if (!isset($_SESSION['google_token'])) {
 
 
 // ------------------------------------------------------------
-// Get questions from the request
+// Get questions from the request (supports JSON body & $_POST)
 // ------------------------------------------------------------
 
-$questionsJson = $_POST['questions'] ?? '';
+$inputData = null;
+$rawInput = file_get_contents('php://input');
 
-if (empty($questionsJson)) {
-
-    http_response_code(400);
-
-    echo json_encode([
-
-        'success' => false,
-
-        'error' => 'No questions were provided.'
-
-    ]);
-
-    exit;
-
+if (!empty($rawInput)) {
+    $inputData = json_decode($rawInput, true);
 }
 
+$questions = null;
 
+if (is_array($inputData)) {
+    if (isset($inputData['questions']) && is_array($inputData['questions'])) {
+        $questions = $inputData['questions'];
+    } elseif (isset($inputData[0]) && is_array($inputData[0])) {
+        $questions = $inputData;
+    }
+}
 
-$questions = json_decode($questionsJson, true);
-
-
+if ($questions === null) {
+    $questionsJson = $_POST['questions'] ?? '';
+    if (!empty($questionsJson)) {
+        if (is_string($questionsJson)) {
+            $questions = json_decode($questionsJson, true);
+        } elseif (is_array($questionsJson)) {
+            $questions = $questionsJson;
+        }
+    }
+}
 
 if (!is_array($questions)) {
 
@@ -68,7 +72,7 @@ if (!is_array($questions)) {
 
         'success' => false,
 
-        'error' => 'Invalid questions JSON.'
+        'error' => 'No questions were provided.'
 
     ]);
 
@@ -100,18 +104,13 @@ if (count($questions) === 0) {
 // OPTIONAL FORM INFORMATION
 // ------------------------------------------------------------
 
-// ADDED:
-// The AI form generator can send a title and description.
-// If they are not provided, the default title is used.
-// ------------------------------------------------------------
+$formTitle = $inputData['title'] ?? ($_POST['title'] ?? 'AI Generated Form');
 
-$formTitle = $_POST['title'] ?? 'AI Generated Form';
+$formDescription = $inputData['description'] ?? ($_POST['description'] ?? '');
 
-$formDescription = $_POST['description'] ?? '';
+$formTitle = trim((string) $formTitle);
 
-$formTitle = trim($formTitle);
-
-$formDescription = trim($formDescription);
+$formDescription = trim((string) $formDescription);
 
 if ($formTitle === '') {
 
@@ -124,19 +123,12 @@ if ($formTitle === '') {
 // ------------------------------------------------------------
 // ADDED: FORM SETTINGS
 // ------------------------------------------------------------
-//
-// These are optional settings that the AI form generator may
-// send in the future. If they are not sent, nothing changes.
-//
-// This keeps create_form.php compatible with the existing
-// quiz/form generator.
-// ------------------------------------------------------------
 
 $formConfirmationMessage =
-    $_POST['confirmationMessage'] ?? '';
+    $inputData['confirmationMessage'] ?? ($_POST['confirmationMessage'] ?? '');
 
 $formConfirmationMessage =
-    trim($formConfirmationMessage);
+    trim((string) $formConfirmationMessage);
 
 
 
@@ -605,7 +597,7 @@ foreach ($questions as $question) {
 
     ) {
 
-        $options = $question['options'] ?? [];
+        $options = $question['options'] ?? $question['choices'] ?? [];
 
 
 
@@ -722,7 +714,7 @@ foreach ($questions as $question) {
 
     ) {
 
-        $options = $question['options'] ?? [];
+        $options = $question['options'] ?? $question['choices'] ?? [];
 
 
 
@@ -841,7 +833,7 @@ foreach ($questions as $question) {
 
     ) {
 
-        $options = $question['options'] ?? [];
+        $options = $question['options'] ?? $question['choices'] ?? [];
 
 
 
