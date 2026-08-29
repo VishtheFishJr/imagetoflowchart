@@ -99,28 +99,44 @@ if (count($questions) === 0) {
 // ------------------------------------------------------------
 // OPTIONAL FORM INFORMATION
 // ------------------------------------------------------------
+
 // ADDED:
-// The new AI form generator can send a title and description.
-// If they are not provided, the old quiz title is used.
+// The AI form generator can send a title and description.
+// If they are not provided, the default title is used.
 // ------------------------------------------------------------
 
 $formTitle = $_POST['title'] ?? 'AI Generated Form';
 
 $formDescription = $_POST['description'] ?? '';
 
-
-
 $formTitle = trim($formTitle);
 
 $formDescription = trim($formDescription);
-
-
 
 if ($formTitle === '') {
 
     $formTitle = 'AI Generated Form';
 
 }
+
+
+
+// ------------------------------------------------------------
+// ADDED: FORM SETTINGS
+// ------------------------------------------------------------
+//
+// These are optional settings that the AI form generator may
+// send in the future. If they are not sent, nothing changes.
+//
+// This keeps create_form.php compatible with the existing
+// quiz/form generator.
+// ------------------------------------------------------------
+
+$formConfirmationMessage =
+    $_POST['confirmationMessage'] ?? '';
+
+$formConfirmationMessage =
+    trim($formConfirmationMessage);
 
 
 
@@ -357,12 +373,10 @@ if (!isset($form['formId'])) {
 
 
 $formId = $form['formId'];
-
-
-
 // ------------------------------------------------------------
 // Add form description
 // ------------------------------------------------------------
+
 // ADDED:
 // Google Forms supports updating the form description separately.
 // ------------------------------------------------------------
@@ -517,6 +531,14 @@ $requests = [];
 
 foreach ($questions as $question) {
 
+    if (!is_array($question)) {
+
+        continue;
+
+    }
+
+
+
     if (!isset($question['question'])) {
 
         continue;
@@ -527,7 +549,7 @@ foreach ($questions as $question) {
 
     $questionText = trim(
 
-        $question['question']
+        (string) $question['question']
 
     );
 
@@ -550,11 +572,10 @@ foreach ($questions as $question) {
 
 
     // --------------------------------------------------------
-    // Required setting
-    // --------------------------------------------------------
-    // ADDED:
-    // AI can now decide whether each question is required.
-    // --------------------------------------------------------
+// Required setting
+// --------------------------------------------------------
+
+    // AI can decide whether each question is required.
 
     $required = true;
 
@@ -569,8 +590,8 @@ foreach ($questions as $question) {
 
 
     // --------------------------------------------------------
-    // Multiple Choice
-    // --------------------------------------------------------
+// Multiple Choice
+// --------------------------------------------------------
 
     if (
 
@@ -578,7 +599,9 @@ foreach ($questions as $question) {
 
         $type === 'multiple choice' ||
 
-        $type === 'mcq'
+        $type === 'mcq' ||
+
+        $type === 'radio'
 
     ) {
 
@@ -687,15 +710,15 @@ foreach ($questions as $question) {
 
 
     // --------------------------------------------------------
-    // Checkboxes
-    // --------------------------------------------------------
+// Checkboxes
+// --------------------------------------------------------
     elseif (
 
         $type === 'checkboxes' ||
 
         $type === 'checkbox' ||
 
-        $type === 'checkboxes'
+        $type === 'checkbox'
 
     ) {
 
@@ -804,15 +827,17 @@ foreach ($questions as $question) {
 
 
     // --------------------------------------------------------
-    // Dropdown
-    // --------------------------------------------------------
+// Dropdown
+// --------------------------------------------------------
     elseif (
 
         $type === 'dropdown' ||
 
         $type === 'drop_down' ||
 
-        $type === 'drop down'
+        $type === 'drop down' ||
+
+        $type === 'select'
 
     ) {
 
@@ -917,19 +942,18 @@ foreach ($questions as $question) {
         ];
 
     }
-
-
-
     // --------------------------------------------------------
-    // True / False
-    // --------------------------------------------------------
-    elseif (
+// True / False
+// --------------------------------------------------------
+    else if (
 
         $type === 'true_false' ||
 
         $type === 'true/false' ||
 
-        $type === 'true false'
+        $type === 'true false' ||
+
+        $type === 'boolean'
 
     ) {
 
@@ -992,15 +1016,25 @@ foreach ($questions as $question) {
 
 
     // --------------------------------------------------------
-    // Short Answer
-    // --------------------------------------------------------
+// Short Answer
+// --------------------------------------------------------
     elseif (
 
         $type === 'short_answer' ||
 
         $type === 'short answer' ||
 
-        $type === 'text'
+        $type === 'text' ||
+
+        $type === 'text_short' ||
+
+        $type === 'name' ||
+
+        $type === 'email' ||
+
+        $type === 'phone' ||
+
+        $type === 'number'
 
     ) {
 
@@ -1045,8 +1079,8 @@ foreach ($questions as $question) {
 
 
     // --------------------------------------------------------
-    // Paragraph / Long Answer
-    // --------------------------------------------------------
+// Paragraph / Long Answer
+// --------------------------------------------------------
     elseif (
 
         $type === 'paragraph' ||
@@ -1055,7 +1089,11 @@ foreach ($questions as $question) {
 
         $type === 'long answer' ||
 
-        $type === 'essay'
+        $type === 'essay' ||
+
+        $type === 'textarea' ||
+
+        $type === 'long_text'
 
     ) {
 
@@ -1076,6 +1114,160 @@ foreach ($questions as $question) {
                             'textQuestion' => [
 
                                 'paragraph' => true
+
+                            ]
+
+                        ]
+
+                    ]
+
+                ],
+
+                'location' => [
+
+                    'index' => count($requests)
+
+                ]
+
+            ]
+
+        ];
+
+    }
+
+
+
+    // --------------------------------------------------------
+// Date
+// --------------------------------------------------------
+    elseif (
+
+        $type === 'date'
+
+    ) {
+
+        $requests[] = [
+
+            'createItem' => [
+
+                'item' => [
+
+                    'title' => $questionText,
+
+                    'questionItem' => [
+
+                        'question' => [
+
+                            'requiredQuestion' => $required,
+
+                            'dateQuestion' => [
+
+                                'includeYear' => true,
+
+                                'includeTime' => false
+
+                            ]
+
+                        ]
+
+                    ]
+
+                ],
+
+                'location' => [
+
+                    'index' => count($requests)
+
+                ]
+
+            ]
+
+        ];
+
+    }
+
+
+
+    // --------------------------------------------------------
+// Time
+// --------------------------------------------------------
+    elseif (
+
+        $type === 'time'
+
+    ) {
+
+        $requests[] = [
+
+            'createItem' => [
+
+                'item' => [
+
+                    'title' => $questionText,
+
+                    'questionItem' => [
+
+                        'question' => [
+
+                            'requiredQuestion' => $required,
+
+                            'timeQuestion' => [
+
+                                'duration' => false
+
+                            ]
+
+                        ]
+
+                    ]
+
+                ],
+
+                'location' => [
+
+                    'index' => count($requests)
+
+                ]
+
+            ]
+
+        ];
+
+    }
+
+
+
+    // --------------------------------------------------------
+// Unsupported type
+// --------------------------------------------------------
+//
+// ADDED:
+// If the AI sends a question type that this file does not
+// understand yet, don't crash the entire form creation.
+// Instead, treat it as a short-answer question.
+//
+// This makes the generator more flexible for general-purpose
+// forms such as registration, interest, signup, surveys, etc.
+// --------------------------------------------------------
+    else {
+
+        $requests[] = [
+
+            'createItem' => [
+
+                'item' => [
+
+                    'title' => $questionText,
+
+                    'questionItem' => [
+
+                        'question' => [
+
+                            'requiredQuestion' => $required,
+
+                            'textQuestion' => [
+
+                                'paragraph' => false
 
                             ]
 
@@ -1230,9 +1422,6 @@ if (count($requests) > 0) {
     }
 
 }
-
-
-
 // ------------------------------------------------------------
 // Success
 // ------------------------------------------------------------
@@ -1250,6 +1439,10 @@ echo json_encode([
         $formId .
 
         '/edit',
+
+    'title' => $formTitle,
+
+    'description' => $formDescription,
 
     'message' =>
 
