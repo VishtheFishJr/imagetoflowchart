@@ -1914,6 +1914,27 @@ $isAdmin =
 
 
 
+                <div id="result">
+
+
+                    <h3>
+                        Output
+                    </h3>
+
+
+                    <p id="ai-status">
+
+                        Select a mode and scan an image.
+
+                    </p>
+
+
+                    <div id="flowchart-render"></div>
+
+
+                </div>
+
+
             </div>
 
 
@@ -3320,13 +3341,13 @@ $isAdmin =
         const status =
             document.getElementById(
                 "ai-status"
-            ) || { innerText: "", parentNode: { appendChild: () => { } } };
+            );
 
 
         const output =
             document.getElementById(
                 "flowchart-render"
-            ) || { innerHTML: "", appendChild: () => { } };
+            );
 
 
         let selectedMode =
