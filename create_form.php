@@ -149,6 +149,7 @@ $client->setRedirectUri(
 $client->setAccessType('offline');
 
 $client->setAccessToken($_SESSION['google_token']);
+error_log('GOOGLE TOKEN INFO: ' . print_r($client->getAccessToken(), true));
 
 
 
