@@ -3931,7 +3931,7 @@ $isAdmin =
                             <a
                                 class="presentation-link"
                                 target="_blank"
-                                href="${escapeHtml(result.url)}"
+                                href="${escapeHtml(result.url || result.formUrl)}"
                             >
 
                                 Open Google Form

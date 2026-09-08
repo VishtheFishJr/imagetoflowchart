@@ -1439,6 +1439,14 @@ echo json_encode([
 
     'formId' => $formId,
 
+    'url' =>
+
+        'https://docs.google.com/forms/d/' .
+
+        $formId .
+
+        '/edit',
+
     'formUrl' =>
 
         'https://docs.google.com/forms/d/' .
