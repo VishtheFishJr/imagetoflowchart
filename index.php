@@ -3711,6 +3711,29 @@ $isAdmin =
 
                 }
 
+                /* =========================================
+                   EMAIL DRAFT
+                ========================================= */
+
+                else if (
+                    selectedMode ===
+                    "email" ||
+                    selectedMode ===
+                    "mail"
+                ) {
+
+                    const emailData =
+                        JSON.parse(
+                            data.ai_response
+                        );
+
+
+                    createEmail(
+                        emailData
+                    );
+
+                }
+
             }
 
             catch (err) {
