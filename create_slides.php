@@ -10,7 +10,7 @@ session_start();
 header("Content-Type: application/json; charset=utf-8");
 
 // ---------------------------------------------------------
-// ALWAYS RETURN JSON FOR UNCAUGHT EXCEPTIONS / FATAL ERRORS
+// ALWAYS RETURN JSON FOR UNCAUGHT EXCEPTIONS / FATAL ERRORS woohoo
 // ---------------------------------------------------------
 
 set_exception_handler(function ($e) {

@@ -133,7 +133,7 @@ $formConfirmationMessage =
 
 
 // ------------------------------------------------------------
-// Set up Google Client
+// Set up Google Client woohoo
 // ------------------------------------------------------------
 
 $client = new Google_Client();
