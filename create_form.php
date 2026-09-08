@@ -682,7 +682,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'choiceQuestion' => [
 
@@ -799,7 +799,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'choiceQuestion' => [
 
@@ -918,7 +918,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'choiceQuestion' => [
 
@@ -974,7 +974,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'choiceQuestion' => [
 
@@ -1055,7 +1055,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'textQuestion' => [
 
@@ -1114,7 +1114,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'textQuestion' => [
 
@@ -1163,7 +1163,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'dateQuestion' => [
 
@@ -1214,7 +1214,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'timeQuestion' => [
 
@@ -1268,7 +1268,7 @@ foreach ($questions as $question) {
 
                         'question' => [
 
-                            'requiredQuestion' => $required,
+                            'required' => $required,
 
                             'textQuestion' => [
 
