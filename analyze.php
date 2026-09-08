@@ -744,7 +744,45 @@ Rules:
 
 ';
 
+} elseif ($mode === "email" || $mode === "mail") {
 
+    $prompt = '
+
+Analyze the image carefully.
+
+Create a complete professional email draft based on the subject, event, announcement, request, inquiry, notes, or information shown in the image.
+
+Return ONLY valid JSON.
+
+No markdown.
+
+No code fences.
+
+No explanations outside JSON.
+
+Use exactly this JSON format:
+
+{
+
+  "subject": "Clear descriptive email subject line",
+
+  "to": "recipient email if mentioned in image or empty string",
+
+  "body": "Complete, well-written, professional email body content based on the image."
+
+}
+
+Rules:
+
+- Make the subject line concise and clear.
+
+- If a recipient email or name is in the image, include it in "to", otherwise use "".
+
+- Write a full, well-structured, professional email body.
+
+- Return valid JSON only.
+
+';
 
 }
 // ----------------------------
@@ -1106,7 +1144,11 @@ if (
 
     $mode === "presentation" ||
 
-    $mode === "form"
+    $mode === "form" ||
+
+    $mode === "email" ||
+
+    $mode === "mail"
 
 ) {
 
@@ -1215,6 +1257,30 @@ if ($mode === "presentation") {
         $decodedForm["title"]
 
         ?? "Untitled Form";
+
+
+
+} elseif ($mode === "email" || $mode === "mail") {
+
+    $decodedEmail =
+
+        json_decode(
+
+            $aiAnswer,
+
+            true
+
+        );
+
+
+
+    $itemName =
+
+        !empty($decodedEmail["subject"])
+
+        ? "Email: " . $decodedEmail["subject"]
+
+        : "Email Draft - " . date("M j, Y g:i A");
 
 
 

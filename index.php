@@ -1910,6 +1910,13 @@ $isAdmin =
                     </button>
 
 
+                    <button class="mode-btn" data-mode="email">
+
+                        ✉️ Draft Email
+
+                    </button>
+
+
                 </div>
 
 
@@ -3950,6 +3957,142 @@ $isAdmin =
                 else {
                     const errorMsg = result.error || "Unknown error";
                     const isPermissionError = errorMsg.toLowerCase().includes("google") || errorMsg.toLowerCase().includes("reconnect") || errorMsg.toLowerCase().includes("permission");
+
+                    output.innerHTML = `
+                        <div class="study-card">
+                            <h2>Error</h2>
+                            <p>${escapeHtml(errorMsg)}</p>
+                            ${isPermissionError ? `
+                                <br>
+                                <a href="google_login.php" class="presentation-link" target="_self">
+                                    Reconnect Google Account
+                                </a>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+
+            }
+
+            catch (err) {
+
+                output.innerHTML = `
+
+                    <div class="study-card">
+
+                        Error:
+                        ${escapeHtml(
+                    err.message
+                )}
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+
+        /* =========================================================
+           GMAIL DRAFT CREATION
+        ========================================================= */
+
+
+        async function createEmail(
+            data
+        ) {
+
+            output.innerHTML = `
+
+                <div class="study-card">
+
+                    <h2>
+                        Creating Email Draft...
+                    </h2>
+
+                    <p>
+                        Please wait while your
+                        email draft is generated in Gmail.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "create_email.php",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    data
+                                )
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (
+                    result.success
+                ) {
+
+                    output.innerHTML = `
+
+                        <div class="study-card">
+
+                            <h2>
+                                Email Draft Created 🎉
+                            </h2>
+
+                            <p>
+                                <strong>Subject:</strong> ${escapeHtml(result.subject || data.subject || "Email Draft")}
+                            </p>
+
+                            <p>
+                                Your email draft is ready in Gmail.
+                            </p>
+
+                            <a
+                                class="presentation-link"
+                                target="_blank"
+                                href="${escapeHtml(result.url || 'https://mail.google.com/mail/u/0/#drafts')}"
+                            >
+
+                                Open Gmail Draft
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+
+                    await loadItems();
+
+                }
+
+                else {
+                    const errorMsg = result.error || "Unknown error";
+                    const isPermissionError = errorMsg.toLowerCase().includes("google") || errorMsg.toLowerCase().includes("reconnect") || errorMsg.toLowerCase().includes("permission") || errorMsg.toLowerCase().includes("gmail");
 
                     output.innerHTML = `
                         <div class="study-card">

@@ -33,6 +33,11 @@ $client->addScope(
 );
 
 
+$client->addScope(
+    'https://www.googleapis.com/auth/gmail.compose'
+);
+
+
 // Important: keep login active
 
 $client->setAccessType('offline');
