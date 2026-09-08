@@ -241,7 +241,11 @@ Rules:
 
 - Every node needs a unique ID
 
-- Every label must be inside quotes
+- Every label must be inside quotes: ID["Label text"]
+
+- NEVER use double quotes INSIDE label text. Use single quotes or plain text.
+
+- Do NOT nest quotes like ID[""Text""] or ID["Text "Quote" Text"].
 
 - Return only Mermaid code
 
@@ -1005,6 +1009,86 @@ $aiAnswer =
 $aiAnswer =
 
     trim($aiAnswer);
+
+
+
+if ($mode === "flowchart") {
+
+    if (preg_match('/(flowchart\s+[A-Za-z]+|graph\s+[A-Za-z]+)/i', $aiAnswer, $matches, PREG_OFFSET_CAPTURE)) {
+
+        $aiAnswer = substr($aiAnswer, $matches[0][1]);
+
+    }
+
+
+
+    $lines = explode("\n", $aiAnswer);
+
+    $fixedLines = [];
+
+
+
+    foreach ($lines as $line) {
+
+        $line = preg_replace_callback('/([A-Za-z0-9_-]+)\s*(\[\s*"+|\(\s*"+|\{\s*"+)((?:(?!\]|\)).)*?)("+\]|"\))/u', function($m) {
+
+            $id = $m[1];
+
+            $openChar = $m[2][0];
+
+            $closeChar = substr($m[4], -1);
+
+            $content = $m[3];
+
+
+
+            $content = trim($content);
+
+            $content = preg_replace('/^"+|"+$/', '', $content);
+
+            $content = str_replace('"', "'", $content);
+
+
+
+            return $id . $openChar . '"' . $content . '"' . $closeChar;
+
+        }, $line);
+
+
+
+        $line = preg_replace_callback('/(subgraph\s+[A-Za-z0-9_-]+\s*\[\s*"+)(.*?)("+\])/i', function($m) {
+
+            $content = trim($m[2]);
+
+            $content = preg_replace('/^"+|"+$/', '', $content);
+
+            $content = str_replace('"', "'", $content);
+
+            return $m[1] . $content . '"]';
+
+        }, $line);
+
+
+
+        $line = preg_replace_callback('/\|"(.*?)"\|/', function($m) {
+
+            $content = str_replace('"', "'", $m[1]);
+
+            return '|"' . $content . '"|';
+
+        }, $line);
+
+
+
+        $fixedLines[] = $line;
+
+    }
+
+
+
+    $aiAnswer = implode("\n", $fixedLines);
+
+}
 
 
 
