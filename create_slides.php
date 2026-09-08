@@ -730,38 +730,88 @@ try {
         );
     }
 
-    $stmt =
-        $GLOBALS["pdo"]->prepare(
-            "
-            INSERT INTO generated_items
-            (
-                name,
-                type,
-                content,
-                presentation_url,
-                user_id
-            )
-            VALUES
-            (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?
-            )
-            "
+    $userId = $_SESSION["user_id"] ?? null;
+    $itemId = $data["item_id"] ?? $data["id"] ?? null;
+
+    if ($itemId) {
+        $stmt = $GLOBALS["pdo"]->prepare(
+            "UPDATE generated_items
+             SET presentation_url = ?
+             WHERE id = ?"
         );
+        $stmt->execute([$presentationUrl, $itemId]);
+        $generatedItemId = $itemId;
+    } else {
+        if ($userId !== null) {
+            $stmt = $GLOBALS["pdo"]->prepare(
+                "UPDATE generated_items
+                 SET presentation_url = ?
+                 WHERE type = 'presentation'
+                   AND user_id = ?
+                   AND presentation_url IS NULL
+                 ORDER BY id DESC
+                 LIMIT 1"
+            );
+            $stmt->execute([$presentationUrl, $userId]);
+        } else {
+            $stmt = $GLOBALS["pdo"]->prepare(
+                "UPDATE generated_items
+                 SET presentation_url = ?
+                 WHERE type = 'presentation'
+                   AND user_id IS NULL
+                   AND presentation_url IS NULL
+                 ORDER BY id DESC
+                 LIMIT 1"
+            );
+            $stmt->execute([$presentationUrl]);
+        }
 
-    $stmt->execute([
-        $presentationName,
-        "presentation",
-        $presentationContent,
-        $presentationUrl,
-        $_SESSION["user_id"] ?? null
-    ]);
-
-    $generatedItemId =
-        $GLOBALS["pdo"]->lastInsertId();
+        if ($stmt->rowCount() > 0) {
+            if ($userId !== null) {
+                $getStmt = $GLOBALS["pdo"]->prepare(
+                    "SELECT id FROM generated_items
+                     WHERE type = 'presentation' AND user_id = ? AND presentation_url = ?
+                     ORDER BY id DESC LIMIT 1"
+                );
+                $getStmt->execute([$userId, $presentationUrl]);
+            } else {
+                $getStmt = $GLOBALS["pdo"]->prepare(
+                    "SELECT id FROM generated_items
+                     WHERE type = 'presentation' AND user_id IS NULL AND presentation_url = ?
+                     ORDER BY id DESC LIMIT 1"
+                );
+                $getStmt->execute([$presentationUrl]);
+            }
+            $generatedItemId = $getStmt->fetchColumn() ?: null;
+        } else {
+            $stmt = $GLOBALS["pdo"]->prepare(
+                "INSERT INTO generated_items
+                (
+                    name,
+                    type,
+                    content,
+                    presentation_url,
+                    user_id
+                )
+                VALUES
+                (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )"
+            );
+            $stmt->execute([
+                $presentationName,
+                "presentation",
+                $presentationContent,
+                $presentationUrl,
+                $userId
+            ]);
+            $generatedItemId = $GLOBALS["pdo"]->lastInsertId();
+        }
+    }
 
 } catch (PDOException $e) {
     // The Google Slides presentation already exists.
