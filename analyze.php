@@ -744,6 +744,48 @@ Rules:
 
 ';
 
+} elseif ($mode === "sheet" || $mode === "sheets" || $mode === "spreadsheet") {
+
+    $prompt = '
+
+Analyze the image carefully.
+
+Convert the information, data, tables, lists, schedules, budgets, financial records, notes, or structured information shown in the image into a clean, well-organized Google Spreadsheet structure.
+
+Interpret how to input the data into proper cells in an organized manner with clear column headers and structured rows.
+
+Return ONLY valid JSON.
+
+No markdown.
+
+No code fences.
+
+No explanations outside JSON.
+
+Use exactly this JSON format:
+
+{
+  "title": "Descriptive Spreadsheet Title",
+  "sheetName": "Sheet1",
+  "data": [
+    ["Header 1", "Header 2", "Header 3"],
+    ["Row 1 Cell 1", "Row 1 Cell 2", "Row 1 Cell 3"],
+    ["Row 2 Cell 1", "Row 2 Cell 2", "Row 2 Cell 3"]
+  ]
+}
+
+Rules:
+- "title": A clear title summarizing the spreadsheet contents based on the image.
+- "sheetName": Name for the spreadsheet tab (e.g. "Sheet1" or a clear descriptive name).
+- "data": A 2D array of strings representing rows and columns.
+- The first row (index 0) MUST contain column headers (e.g., Name, Category, Date, Quantity, Amount, Status, Notes, etc.).
+- Subsequent rows contain the interpreted data values from the image formatted cleanly.
+- Ensure every row has entries matching the layout of the headers.
+- Keep the table layout clear, accurate, and ready for a spreadsheet.
+- Return valid JSON only.
+
+';
+
 }
 
 // ----------------------------
@@ -1105,7 +1147,13 @@ if (
 
     $mode === "presentation" ||
 
-    $mode === "form"
+    $mode === "form" ||
+
+    $mode === "sheet" ||
+
+    $mode === "sheets" ||
+
+    $mode === "spreadsheet"
 ) {
 
 
@@ -1213,6 +1261,28 @@ if ($mode === "presentation") {
         $decodedForm["title"]
 
         ?? "Untitled Form";
+
+
+
+} elseif ($mode === "sheet" || $mode === "sheets" || $mode === "spreadsheet") {
+
+    $decodedSheet =
+
+        json_decode(
+
+            $aiAnswer,
+
+            true
+
+        );
+
+
+
+    $itemName =
+
+        $decodedSheet["title"]
+
+        ?? "Untitled Spreadsheet";
 
 
 

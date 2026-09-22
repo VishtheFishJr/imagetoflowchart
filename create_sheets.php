@@ -709,6 +709,84 @@ $spreadsheetUrl =
 
 
 // ------------------------------------------------------------
+// Save URL to Database & sheets_logs
+// ------------------------------------------------------------
+
+try {
+    require_once 'db.php';
+
+    if (isset($pdo) && $pdo instanceof PDO) {
+        // Ensure sheets_logs table exists matching structure
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS sheets_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                image_path VARCHAR(255),
+                spreadsheet_file VARCHAR(255),
+                spreadsheet_data LONGTEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+
+        $spreadsheetDataJson = json_encode([
+            'title' => $spreadsheetTitle,
+            'sheetName' => $actualSheetName,
+            'range' => $range,
+            'data' => $cleanData
+        ], JSON_UNESCAPED_UNICODE);
+
+        // Insert log record into sheets_logs
+        $logStmt = $pdo->prepare(
+            "INSERT INTO sheets_logs (image_path, spreadsheet_file, spreadsheet_data)
+             VALUES (?, ?, ?)"
+        );
+        $logStmt->execute([
+            $imagePath,
+            $spreadsheetUrl,
+            $spreadsheetDataJson
+        ]);
+
+        // Update generated_items table
+        $itemId = $inputData['item_id'] ?? null;
+        $userId = $_SESSION['user_id'] ?? null;
+
+        if ($itemId) {
+            $stmt = $pdo->prepare(
+                "UPDATE generated_items
+                 SET presentation_url = ?
+                 WHERE id = ?"
+            );
+            $stmt->execute([$spreadsheetUrl, $itemId]);
+        } else {
+            if ($userId !== null) {
+                $stmt = $pdo->prepare(
+                    "UPDATE generated_items
+                     SET presentation_url = ?
+                     WHERE (type = 'sheet' OR type = 'sheets' OR type = 'spreadsheet')
+                       AND user_id = ?
+                       AND presentation_url IS NULL
+                     ORDER BY id DESC
+                     LIMIT 1"
+                );
+                $stmt->execute([$spreadsheetUrl, $userId]);
+            } else {
+                $stmt = $pdo->prepare(
+                    "UPDATE generated_items
+                     SET presentation_url = ?
+                     WHERE (type = 'sheet' OR type = 'sheets' OR type = 'spreadsheet')
+                       AND user_id IS NULL
+                       AND presentation_url IS NULL
+                     ORDER BY id DESC
+                     LIMIT 1"
+                );
+                $stmt->execute([$spreadsheetUrl]);
+            }
+        }
+    }
+} catch (Exception $e) {
+    // Ignore DB update errors
+}
+
+// ------------------------------------------------------------
 // Success
 // ------------------------------------------------------------
 

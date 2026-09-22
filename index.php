@@ -1750,6 +1750,23 @@ $isAdmin =
                 </button>
 
 
+                <button class="sidebar-item" data-folder="sheet" onclick="openFolder('sheet')">
+
+                    <span class="sidebar-icon">
+                        📈
+                    </span>
+
+                    <span>
+                        Google Sheets
+                    </span>
+
+                    <span class="sidebar-count" id="count-sheet">
+                        0
+                    </span>
+
+                </button>
+
+
             </aside>
 
 
@@ -1910,6 +1927,13 @@ $isAdmin =
                     </button>
 
 
+                    <button class="mode-btn" data-mode="sheet">
+
+                        📈 Google Sheet
+
+                    </button>
+
+
                 </div>
 
 
@@ -2024,6 +2048,12 @@ $isAdmin =
                 id: "form",
                 name: "Google Forms",
                 icon: "📋"
+            },
+
+            {
+                id: "sheet",
+                name: "Google Sheets",
+                icon: "📈"
             }
 
         ];
@@ -2174,7 +2204,13 @@ $isAdmin =
 
                 /* ADDED */
 
-                form: "Google Forms"
+                form: "Google Forms",
+
+                sheet: "Google Sheets",
+
+                sheets: "Google Sheets",
+
+                spreadsheet: "Google Sheets"
 
             };
 
@@ -3704,6 +3740,28 @@ $isAdmin =
 
                 }
 
+                else if (
+                    selectedMode ===
+                    "sheet" ||
+                    selectedMode ===
+                    "sheets" ||
+                    selectedMode ===
+                    "spreadsheet"
+                ) {
+
+                    const sheetData =
+                        JSON.parse(
+                            data.ai_response
+                        );
+                    sheetData.item_id = data.item_id;
+                    sheetData.image_path = data.image_path;
+
+                    createSheets(
+                        sheetData
+                    );
+
+                }
+
 
 
             }
@@ -3990,8 +4048,135 @@ $isAdmin =
 
 
 
+        /* =========================================================
+           GOOGLE SHEETS CREATION
+        ========================================================= */
 
 
+        async function createSheets(
+            data
+        ) {
+
+            output.innerHTML = `
+
+                <div class="study-card">
+
+                    <h2>
+                        Creating Google Sheet...
+                    </h2>
+
+                    <p>
+                        Please wait while your
+                        spreadsheet is generated in Google Sheets.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "create_sheets.php",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    data
+                                )
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (
+                    result.success
+                ) {
+
+                    output.innerHTML = `
+
+                        <div class="study-card">
+
+                            <h2>
+                                Google Sheet Created 🎉
+                            </h2>
+
+                            <p>
+                                Your Google Sheet is ready.
+                            </p>
+
+                            <a
+                                class="presentation-link"
+                                target="_blank"
+                                href="${escapeHtml(result.url || result.spreadsheetUrl)}"
+                            >
+
+                                Open Google Sheet
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+
+                    await loadItems();
+
+                }
+
+                else {
+                    const errorMsg = result.error || "Unknown error";
+                    const isPermissionError = errorMsg.toLowerCase().includes("google") || errorMsg.toLowerCase().includes("reconnect") || errorMsg.toLowerCase().includes("permission") || errorMsg.toLowerCase().includes("sheet");
+
+                    output.innerHTML = `
+                        <div class="study-card">
+                            <h2>Error</h2>
+                            <p>${escapeHtml(errorMsg)}</p>
+                            ${isPermissionError ? `
+                                <br>
+                                <a href="google_login.php" class="presentation-link" target="_self">
+                                    Reconnect Google Account
+                                </a>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+
+            }
+
+            catch (err) {
+
+                output.innerHTML = `
+
+                    <div class="study-card">
+
+                        Error:
+                        ${escapeHtml(
+                    err.message
+                )}
+
+                    </div>
+
+                `;
+
+            }
+
+        }
 
 
         /* =========================================================

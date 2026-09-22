@@ -51,7 +51,7 @@ $presentationUrl =
 // DIRECTLY INSTEAD OF SHOWING AN INTERMEDIATE PAGE.
 // ---------------------------------------------------------
 
-if ($type === "presentation" && !empty($presentationUrl)) {
+if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $type === "spreadsheet" || $type === "form") && !empty($presentationUrl)) {
 
     header("Location: " . $presentationUrl);
     exit;
@@ -434,7 +434,19 @@ if ($type === "presentation" && !empty($presentationUrl)) {
                         "🃏 Flashcards",
 
                     "presentation" =>
-                        "📽 Presentation"
+                        "📽 Presentation",
+
+                    "form" =>
+                        "📋 Google Form",
+
+                    "sheet" =>
+                        "📈 Google Sheet",
+
+                    "sheets" =>
+                        "📈 Google Sheet",
+
+                    "spreadsheet" =>
+                        "📈 Google Sheet"
 
                 ];
 

@@ -33,6 +33,12 @@ $client->addScope(
 );
 
 
+$client->addScope(
+    'https://www.googleapis.com/auth/spreadsheets'
+);
+
+
+
 
 // Important: keep login active
 
