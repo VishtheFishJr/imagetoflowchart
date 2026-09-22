@@ -597,13 +597,85 @@ $isAdmin =
         }
 
 
+        .camera-area {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
         video {
             width: 100%;
             border-radius: 0;
             background: #000;
             box-shadow: none;
+            display: block;
         }
 
+        #upload-preview {
+            display: none;
+            width: 100%;
+            max-height: 480px;
+            object-fit: contain;
+            background: #111;
+            border-radius: 0;
+        }
+
+        .camera-area.has-upload video {
+            display: none;
+        }
+
+        .camera-area.has-upload #upload-preview {
+            display: block;
+        }
+
+        .upload-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .upload-btn {
+            padding: 10px 22px;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            color: #64748b;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .upload-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .clear-upload-btn {
+            display: none;
+            padding: 8px 16px;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            color: #ef4444;
+            transition: all 0.2s ease;
+        }
+
+        .clear-upload-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
 
         canvas {
             display: none;
@@ -1566,6 +1638,34 @@ $isAdmin =
             background: #222;
         }
 
+        body.dark-mode .upload-btn {
+            border-color: #555;
+            color: #aaa;
+            background: transparent;
+        }
+
+        body.dark-mode .upload-btn:hover {
+            border-color: #60a5fa;
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.08);
+        }
+
+        body.dark-mode .camera-area {
+            background: #000;
+        }
+
+        body.dark-mode #upload-preview {
+            background: #111;
+        }
+
+        body.dark-mode .mode-select {
+            background: #181818;
+            color: #eee;
+            border-color: #555;
+        }
+
+
+
         @media (max-width: 800px) {
 
             .finder-sidebar {
@@ -1593,6 +1693,7 @@ $isAdmin =
                 transform: translateX(18px);
             }
         }
+
     </style>
 
 </head>
@@ -1889,8 +1990,22 @@ $isAdmin =
                 </h1>
 
 
-                <video id="webcam" autoplay playsinline>
-                </video>
+                <div class="camera-area" id="cameraArea">
+                    <video id="webcam" autoplay playsinline></video>
+                    <img id="upload-preview" alt="Uploaded image preview">
+                </div>
+
+
+                <div class="upload-controls">
+                    <label class="upload-btn" for="imageUpload">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload Image
+                    </label>
+                    <input type="file" id="imageUpload" accept="image/*" style="display:none">
+                    <button class="clear-upload-btn" id="clearUploadBtn" onclick="clearUpload()">
+                        Use Camera
+                    </button>
+                </div>
 
 
                 <canvas id="canvas"></canvas>
@@ -3226,10 +3341,48 @@ $isAdmin =
             );
 
 
-        let selectedMode =
-            "flowchart";
+        let selectedMode = "flowchart";
+
+        let uploadedImageDataUrl = null;
 
 
+        /* =========================================================
+           UPLOAD HANDLING
+        ========================================================= */
+
+        const cameraArea = document.getElementById("cameraArea");
+        const uploadPreview = document.getElementById("upload-preview");
+        const imageUploadInput = document.getElementById("imageUpload");
+        const clearUploadBtn = document.getElementById("clearUploadBtn");
+
+        imageUploadInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                uploadedImageDataUrl = e.target.result;
+                uploadPreview.src = uploadedImageDataUrl;
+                cameraArea.classList.add("has-upload");
+                clearUploadBtn.style.display = "inline-flex";
+                status.innerText = "Image loaded. Select a mode and click Generate.";
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function clearUpload() {
+            uploadedImageDataUrl = null;
+            uploadPreview.src = "";
+            imageUploadInput.value = "";
+            cameraArea.classList.remove("has-upload");
+            clearUploadBtn.style.display = "none";
+            status.innerText = "Select a mode and scan an image.";
+        }
+
+
+        /* =========================================================
+           CAMERA
+        ========================================================= */
 
         async function initCamera() {
 
@@ -3294,33 +3447,37 @@ $isAdmin =
                 "";
 
 
-            canvas.width =
-                video.videoWidth;
+            let image;
 
+            if (uploadedImageDataUrl) {
 
-            canvas.height =
-                video.videoHeight;
+                // Use the uploaded file directly
+                image = uploadedImageDataUrl;
 
+            } else {
 
-            const ctx =
-                canvas.getContext(
-                    "2d"
+                // Capture from the live camera
+                canvas.width =
+                    video.videoWidth;
+
+                canvas.height =
+                    video.videoHeight;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.drawImage(
+                    video,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
                 );
 
+                image =
+                    canvas.toDataURL("image/jpeg");
 
-            ctx.drawImage(
-                video,
-                0,
-                0,
-                canvas.width,
-                canvas.height
-            );
-
-
-            const image =
-                canvas.toDataURL(
-                    "image/jpeg"
-                );
+            }
 
 
             try {
