@@ -614,12 +614,13 @@ $isAdmin =
             margin-top: 20px;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            align-items: center;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
 
-        .mode-btn {
+        .mode-select {
             padding: 10px 18px;
             border: 1px solid #999;
             border-radius: 5px;
@@ -630,8 +631,19 @@ $isAdmin =
         }
 
 
-        .mode-btn:hover {
-            background: #eee;
+        .generate-btn {
+            padding: 10px 24px;
+            border: 1px solid #2563eb;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .generate-btn:hover {
+            background: #1d4ed8;
         }
 
 
@@ -1567,6 +1579,15 @@ $isAdmin =
             </label>
 
 
+            <?php if (empty($_SESSION["google_token"])): ?>
+
+                <a href="https://vishthefishjr.me/google_login.php" class="admin-button" target="_self">
+                    Connect Google Account
+                </a>
+
+            <?php endif; ?>
+
+
             <?php if (!empty($_SESSION["logged_in"])): ?>
 
                 <?php if (
@@ -1575,7 +1596,7 @@ $isAdmin =
                 ): ?>
 
                     <a href="users.php" class="admin-button">
-                        👥 Users
+                        Users
                     </a>
 
                 <?php endif; ?>
@@ -1600,7 +1621,7 @@ $isAdmin =
 
             <button class="storage-toggle" onclick="toggleFinder()">
 
-                📁 My Files
+                My Files
 
             </button>
 
@@ -1613,162 +1634,6 @@ $isAdmin =
         ===================================================== -->
 
         <div id="finder">
-
-
-            <!-- SIDEBAR -->
-
-            <aside class="finder-sidebar">
-
-
-                <div class="sidebar-section-title">
-                    Favorites
-                </div>
-
-
-                <button class="sidebar-item active" data-folder="all" onclick="openFolder('all')">
-
-                    <span class="sidebar-icon">
-                        📁
-                    </span>
-
-                    <span>
-                        All Files
-                    </span>
-
-                    <span class="sidebar-count" id="count-all">
-                        0
-                    </span>
-
-                </button>
-
-
-                <button class="sidebar-item" data-folder="recent" onclick="openFolder('recent')">
-
-                    <span class="sidebar-icon">
-                        🕘
-                    </span>
-
-                    <span>
-                        Recents
-                    </span>
-
-                </button>
-
-
-
-                <div class="sidebar-section-title">
-                    Study Files
-                </div>
-
-
-                <button class="sidebar-item" data-folder="flowchart" onclick="openFolder('flowchart')">
-
-                    <span class="sidebar-icon">
-                        📊
-                    </span>
-
-                    <span>
-                        Flowcharts
-                    </span>
-
-                    <span class="sidebar-count" id="count-flowchart">
-                        0
-                    </span>
-
-                </button>
-
-
-                <button class="sidebar-item" data-folder="quiz" onclick="openFolder('quiz')">
-
-                    <span class="sidebar-icon">
-                        📝
-                    </span>
-
-                    <span>
-                        Quizzes
-                    </span>
-
-                    <span class="sidebar-count" id="count-quiz">
-                        0
-                    </span>
-
-                </button>
-
-
-                <button class="sidebar-item" data-folder="flashcards" onclick="openFolder('flashcards')">
-
-                    <span class="sidebar-icon">
-                        🃏
-                    </span>
-
-                    <span>
-                        Flashcards
-                    </span>
-
-                    <span class="sidebar-count" id="count-flashcards">
-                        0
-                    </span>
-
-                </button>
-
-
-                <button class="sidebar-item" data-folder="presentation" onclick="openFolder('presentation')">
-
-                    <span class="sidebar-icon">
-                        📽
-                    </span>
-
-                    <span>
-                        Presentations
-                    </span>
-
-                    <span class="sidebar-count" id="count-presentation">
-                        0
-                    </span>
-
-                </button>
-
-
-                <!-- =================================================
-                     GOOGLE FORMS — ADDED
-                ================================================= -->
-
-                <button class="sidebar-item" data-folder="form" onclick="openFolder('form')">
-
-                    <span class="sidebar-icon">
-                        📋
-                    </span>
-
-                    <span>
-                        Forms
-                    </span>
-
-                    <span class="sidebar-count" id="count-form">
-                        0
-                    </span>
-
-                </button>
-
-
-                <button class="sidebar-item" data-folder="sheet" onclick="openFolder('sheet')">
-
-                    <span class="sidebar-icon">
-                        📈
-                    </span>
-
-                    <span>
-                        Google Sheets
-                    </span>
-
-                    <span class="sidebar-count" id="count-sheet">
-                        0
-                    </span>
-
-                </button>
-
-
-            </aside>
-
 
 
             <!-- FINDER MAIN -->
@@ -1785,28 +1650,6 @@ $isAdmin =
 
                     </div>
 
-
-                    <input type="text" id="finder-search" class="finder-search" placeholder="Search files..."
-                        oninput="renderFinder()">
-
-
-                    <select id="sort-select" class="sort-select" onchange="renderFinder()">
-
-                        <option value="updated">
-                            Date Modified
-                        </option>
-
-                        <option value="name">
-                            Name
-                        </option>
-
-                        <option value="type">
-                            Type
-                        </option>
-
-                    </select>
-
-
                 </div>
 
 
@@ -1815,7 +1658,7 @@ $isAdmin =
 
                     <button class="breadcrumb-button" onclick="openFolder('all')">
 
-                        📁 All Files
+                        All Files
 
                     </button>
 
@@ -1887,52 +1730,18 @@ $isAdmin =
 
                 <div class="mode-container">
 
+                    <select id="modeSelect" class="mode-select">
+                        <option value="flowchart">Flowchart</option>
+                        <option value="quiz">Quiz</option>
+                        <option value="flashcards">Flashcards</option>
+                        <option value="presentation">Presentation</option>
+                        <option value="form">Google Form</option>
+                        <option value="sheet">Google Sheet</option>
+                    </select>
 
-                    <button class="mode-btn" data-mode="flowchart">
-
-                        📊 Flowchart
-
+                    <button id="generateBtn" class="generate-btn" onclick="triggerGenerate()">
+                        Generate
                     </button>
-
-
-                    <button class="mode-btn" data-mode="quiz">
-
-                        📝 Quiz
-
-                    </button>
-
-
-                    <button class="mode-btn" data-mode="flashcards">
-
-                        🃏 Flashcards
-
-                    </button>
-
-
-                    <button class="mode-btn" data-mode="presentation">
-
-                        📽 Presentation
-
-                    </button>
-
-
-                    <!-- =================================================
-                         GOOGLE FORMS — ADDED
-                    ================================================= -->
-
-                    <button class="mode-btn" data-mode="form">
-
-                        📋 Google Form
-
-                    </button>
-
-
-                    <button class="mode-btn" data-mode="sheet">
-
-                        📈 Google Sheet
-
-                    </button>
-
 
                 </div>
 
@@ -1978,14 +1787,14 @@ $isAdmin =
 
         <button class="context-option" onclick="renameSelected()">
 
-            ✏️ Rename
+            Rename
 
         </button>
 
 
         <button class="context-option" onclick="openSelected()">
 
-            📂 Open
+            Open
 
         </button>
 
@@ -2020,40 +1829,32 @@ $isAdmin =
 
             {
                 id: "flowchart",
-                name: "Flowcharts",
-                icon: "📊"
+                name: "Flowcharts"
             },
 
             {
                 id: "quiz",
-                name: "Quizzes",
-                icon: "📝"
+                name: "Quizzes"
             },
 
             {
                 id: "flashcards",
-                name: "Flashcards",
-                icon: "🃏"
+                name: "Flashcards"
             },
 
             {
                 id: "presentation",
-                name: "Presentations",
-                icon: "📽"
+                name: "Presentations"
             },
-
-            /* ADDED: GOOGLE FORMS */
 
             {
                 id: "form",
-                name: "Google Forms",
-                icon: "📋"
+                name: "Google Forms"
             },
 
             {
                 id: "sheet",
-                name: "Google Sheets",
-                icon: "📈"
+                name: "Google Sheets"
             }
 
         ];
@@ -2273,12 +2074,12 @@ $isAdmin =
             }
 
 
-            const search =
+            const searchInput =
                 document
-                    .getElementById("finder-search")
-                    .value
-                    .trim()
-                    .toLowerCase();
+                    .getElementById("finder-search");
+
+            const search =
+                searchInput ? searchInput.value.trim().toLowerCase() : "";
 
 
             if (search) {
@@ -2295,10 +2096,12 @@ $isAdmin =
             }
 
 
-            const sort =
+            const sortSelect =
                 document
-                    .getElementById("sort-select")
-                    .value;
+                    .getElementById("sort-select");
+
+            const sort =
+                sortSelect ? sortSelect.value : "updated";
 
 
             if (sort === "name") {
@@ -2421,10 +2224,6 @@ $isAdmin =
 
                     button.innerHTML = `
 
-                        <span class="folder-icon">
-                            ${folder.icon}
-                        </span>
-
                         <span class="item-info">
 
                             <span class="item-name">
@@ -2485,9 +2284,7 @@ $isAdmin =
 
                     <div class="column-empty">
 
-                        📁
-
-                        <br><br>
+                        <br>
 
                         ${escapeHtml(
                     getFolderName(currentFolder)
@@ -3258,25 +3055,7 @@ $isAdmin =
             type
         ) {
 
-            const icons = {
-
-                flowchart: "📊",
-
-                quiz: "📝",
-
-                flashcards: "🃏",
-
-                presentation: "📽",
-
-                /* ADDED */
-
-                form: "📋"
-
-            };
-
-
-            return icons[type] ||
-                "📄";
+            return "";
 
         }
 
@@ -3429,20 +3208,13 @@ $isAdmin =
         ========================================================= */
 
 
-        document
-            .querySelectorAll(".mode-btn")
-            .forEach(button => {
-
-                button.onclick = () => {
-
-                    selectedMode =
-                        button.dataset.mode;
-
-                    scanImage();
-
-                };
-
-            });
+        function triggerGenerate() {
+            const select = document.getElementById("modeSelect");
+            if (select) {
+                selectedMode = select.value;
+            }
+            scanImage();
+        }
 
 
 
@@ -3843,7 +3615,7 @@ $isAdmin =
                         <div class="study-card">
 
                             <h2>
-                                Presentation Created 🎉
+                                Presentation Created
                             </h2>
 
                             <p>
@@ -3981,7 +3753,7 @@ $isAdmin =
                         <div class="study-card">
 
                             <h2>
-                                Google Form Created 🎉
+                                Google Form Created
                             </h2>
 
                             <p>
@@ -4113,7 +3885,7 @@ $isAdmin =
                         <div class="study-card">
 
                             <h2>
-                                Google Sheet Created 🎉
+                                Google Sheet Created
                             </h2>
 
                             <p>
@@ -4352,7 +4124,7 @@ $isAdmin =
                             <div class="study-card">
 
                                 <h2>
-                                    Quiz Complete 🎉
+                                    Quiz Complete
                                 </h2>
 
                                 <h1>

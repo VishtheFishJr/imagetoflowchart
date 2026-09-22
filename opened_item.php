@@ -425,32 +425,32 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
                 $icons = [
 
                     "flowchart" =>
-                        "📊 Flowchart",
+                        "Flowchart",
 
                     "quiz" =>
-                        "📝 Quiz",
+                        "Quiz",
 
                     "flashcards" =>
-                        "🃏 Flashcards",
+                        "Flashcards",
 
                     "presentation" =>
-                        "📽 Presentation",
+                        "Presentation",
 
                     "form" =>
-                        "📋 Google Form",
+                        "Google Form",
 
                     "sheet" =>
-                        "📈 Google Sheet",
+                        "Google Sheet",
 
                     "sheets" =>
-                        "📈 Google Sheet",
+                        "Google Sheet",
 
                     "spreadsheet" =>
-                        "📈 Google Sheet"
+                        "Google Sheet"
 
                 ];
 
-                echo $icons[$type] ?? "📄 Study File";
+                echo $icons[$type] ?? "Study File";
 
                 ?>
 
@@ -678,7 +678,7 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
             <div class="study-card">
 
                 <h2>
-                    Quiz Complete 🎉
+                    Quiz Complete
                 </h2>
 
                 <h1>
