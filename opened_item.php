@@ -248,10 +248,24 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
             font-weight: bold;
         }
 
+        body.dark-mode .choice.correct {
+            background: #22c55e !important;
+            color: #ffffff !important;
+            border-color: #16a34a !important;
+            font-weight: bold;
+        }
+
         .choice.wrong {
             background: #b91c1c !important;
             color: #ffffff !important;
             border-color: #991b1b !important;
+            font-weight: bold;
+        }
+
+        body.dark-mode .choice.wrong {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border-color: #dc2626 !important;
             font-weight: bold;
         }
 

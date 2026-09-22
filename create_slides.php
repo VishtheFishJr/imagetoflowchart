@@ -173,208 +173,108 @@ function generateSlideImage(
     $theme,
     $slideTitle = ""
 ) {
-    global $apiKey;
+    $stabilityApiKey = getenv("STABILITY_API_KEY");
+
+    if (!$stabilityApiKey) {
+        error_log("STABILITY_API_KEY environment variable not set.");
+        return null;
+    }
 
     if (!$description) {
         return null;
     }
 
     $prompt =
-        "Create an actual image, not a description.\n\n"
-        . "Create a professional educational presentation graphic.\n\n"
-        . "Subject: "
-        . $slideTitle
-        . "\n\n"
-        . "Visual description:\n"
-        . $description
-        . "\n\n"
-        . "Presentation style:\n"
-        . ($theme["style"] ?? "modern")
-        . "\n\n"
-        . "Color palette:\n"
-        . "Background: "
-        . ($theme["background"] ?? "#FFFFFF")
-        . "\nPrimary: "
-        . ($theme["primaryColor"] ?? "#2563EB")
-        . "\nSecondary: "
-        . ($theme["secondaryColor"] ?? "#60A5FA")
-        . "\n\n"
-        . "Requirements:\n"
-        . "- Generate the actual visual\n"
-        . "- Do NOT return a text description\n"
-        . "- Do NOT explain the image\n"
-        . "- Professional educational graphic\n"
-        . "- Clean composition\n"
-        . "- Suitable for Google Slides\n"
-        . "- 16:9 composition\n"
-        . "- No unnecessary text\n"
-        . "- Make the visual directly relevant to the subject\n"
-        . "- Use the requested color palette\n";
+        "A professional educational presentation graphic. "
+        . "Subject: " . $slideTitle . ". "
+        . "Visual description: " . $description . ". "
+        . "Style: " . ($theme["style"] ?? "modern") . ". "
+        . "Make the visual directly relevant to the subject. "
+        . "Clean composition, professional, suitable for slides. No text in the image.";
 
-    $url =
-        "https://generativelanguage.googleapis.com/v1/models/"
-        . "gemini-3.1-flash-image:generateContent";
+    $url = "https://api.stability.ai/v2beta/stable-image/generate/sd3";
 
     $payload = [
-        "contents" => [
-            [
-                "parts" => [
-                    [
-                        "text" => $prompt
-                    ]
-                ]
-            ]
-        ],
-        "generationConfig" => [
-            "responseModalities" => [
-                "TEXT",
-                "IMAGE"
-            ]
-        ]
+        "prompt" => $prompt,
+        "model" => "sd3.5-medium",
+        "aspect_ratio" => "16:9"
     ];
 
     $ch = curl_init($url);
 
     if ($ch === false) {
-        error_log("Could not initialize Gemini cURL.");
+        error_log("Could not initialize Stability cURL.");
         return null;
     }
 
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_POSTFIELDS => $payload,
         CURLOPT_HTTPHEADER => [
-            "Content-Type: application/json",
-            "X-goog-api-key: " . $apiKey
+            "Authorization: Bearer " . $stabilityApiKey,
+            "Accept: application/json"
         ],
         CURLOPT_TIMEOUT => 120
     ]);
 
     $response = curl_exec($ch);
-
     $curlError = curl_error($ch);
-
-    $httpCode = curl_getinfo(
-        $ch,
-        CURLINFO_HTTP_CODE
-    );
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     curl_close($ch);
 
     if ($response === false) {
-        error_log(
-            "Gemini image cURL error: " . $curlError
-        );
+        error_log("Stability image cURL error: " . $curlError);
         return null;
     }
-
-    file_put_contents(
-        __DIR__ . "/gemini_image_debug.json",
-        $response
-    );
 
     if ($httpCode !== 200) {
-        error_log(
-            "Gemini image generation failed: "
-            . $httpCode
-            . " "
-            . $response
-        );
+        error_log("Stability image generation failed: " . $httpCode . " " . $response);
         return null;
     }
 
-    $responseData = json_decode(
-        $response,
-        true
-    );
+    $responseData = json_decode($response, true);
 
-    if (!is_array($responseData)) {
-        error_log(
-            "Gemini returned invalid JSON: "
-            . json_last_error_msg()
-        );
+    if (!is_array($responseData) || empty($responseData["image"])) {
+        error_log("Stability returned invalid JSON or no image data.");
         return null;
     }
 
-    $imageData = null;
-
-    foreach (
-        $responseData["candidates"][0]["content"]["parts"] ?? []
-        as $part
-    ) {
-        if (isset($part["text"])) {
-            continue;
-        }
-
-        if (
-            isset($part["inlineData"]) &&
-            isset($part["inlineData"]["data"])
-        ) {
-            $imageData = $part["inlineData"]["data"];
-            break;
-        }
-    }
-
-    if (!$imageData) {
-        error_log(
-            "Gemini returned no image data: "
-            . $response
-        );
-        return null;
-    }
-
-    $imageBytes = base64_decode(
-        $imageData,
-        true
-    );
+    $imageBytes = base64_decode($responseData["image"], true);
 
     if ($imageBytes === false) {
-        error_log(
-            "Could not decode Gemini image."
-        );
+        error_log("Could not decode Stability image.");
         return null;
     }
 
-    $uploadDir = __DIR__ . "/uploads/";
+    $uploadDir = "/var/www/html/images/";
 
     if (!is_dir($uploadDir)) {
         if (!mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
-            error_log(
-                "Could not create upload directory: "
-                . $uploadDir
-            );
-            return null;
+            error_log("Could not create upload directory: " . $uploadDir);
+            $uploadDir = __DIR__ . "/uploads/";
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
         }
     }
 
-    $filename =
-        "generated_slide_"
-        . time()
-        . "_"
-        . uniqid()
-        . ".png";
+    $filename = "generated_slide_" . time() . "_" . uniqid() . ".png";
+    $filePath = rtrim($uploadDir, '/') . '/' . $filename;
 
-    $filePath =
-        $uploadDir
-        . $filename;
-
-    $written = file_put_contents(
-        $filePath,
-        $imageBytes
-    );
+    $written = file_put_contents($filePath, $imageBytes);
 
     if ($written === false) {
-        error_log(
-            "Could not save generated image: "
-            . $filePath
-        );
+        error_log("Could not save generated image: " . $filePath);
         return null;
     }
 
-    $publicUrl =
-        "https://vishthefishjr.me/uploads/"
-        . $filename;
+    if (strpos($uploadDir, '/var/www/html/images') !== false) {
+        $publicUrl = "https://vishthefishjr.me/images/" . $filename;
+    } else {
+        $publicUrl = "https://vishthefishjr.me/uploads/" . $filename;
+    }
 
     return $publicUrl;
 }
