@@ -446,48 +446,18 @@ function generateSlideImage(
     // SAVE IMAGE
     // ---------------------------------------------------------
 
-    $uploadDir = "/var/www/html/images/";
-
+    $uploadDir = __DIR__ . "/uploads/";
     if (!is_dir($uploadDir)) {
-
-        if (
-
-            !mkdir($uploadDir, 0755, true) &&
-
-            !is_dir($uploadDir)
-
-        ) {
-
-            error_log(
-
-                "Could not create upload directory: "
-
-                . $uploadDir
-
-            );
-
+        if (!mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+            error_log("Could not create upload directory: " . $uploadDir);
             $uploadDir = __DIR__ . "/uploads/";
-
             if (!is_dir($uploadDir)) {
-
                 if (!mkdir($uploadDir, 0755, true)) {
-
-                    error_log(
-
-                        "Could not create fallback upload directory: "
-
-                        . $uploadDir
-
-                    );
-
+                    error_log("Could not create fallback upload directory: " . $uploadDir);
                     return null;
-
                 }
-
             }
-
         }
-
     }
 
     // ---------------------------------------------------------
