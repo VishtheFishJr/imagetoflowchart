@@ -242,15 +242,17 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
         }
 
         .choice.correct {
-
-            background: #86efac;
-
+            background: #15803d !important;
+            color: #ffffff !important;
+            border-color: #166534 !important;
+            font-weight: bold;
         }
 
         .choice.wrong {
-
-            background: #fca5a5;
-
+            background: #b91c1c !important;
+            color: #ffffff !important;
+            border-color: #991b1b !important;
+            font-weight: bold;
         }
 
         .action-btn {

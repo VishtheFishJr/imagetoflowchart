@@ -611,7 +611,7 @@ $isAdmin =
 
 
         .mode-container {
-            margin-top: 20px;
+            margin-top: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -621,29 +621,43 @@ $isAdmin =
 
 
         .mode-select {
-            padding: 10px 18px;
-            border: 1px solid #999;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            background: #fff;
-            color: #111;
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            outline: none;
+            min-width: 180px;
         }
 
+        .mode-select:hover, .mode-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
 
         .generate-btn {
-            padding: 10px 24px;
+            padding: 12px 28px;
             border: 1px solid #2563eb;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             background: #2563eb;
-            color: #fff;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s ease;
         }
 
         .generate-btn:hover {
             background: #1d4ed8;
+            border-color: #1d4ed8;
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.35);
+            transform: translateY(-1px);
         }
 
 
@@ -690,13 +704,21 @@ $isAdmin =
         }
 
 
-        .choice.correct {
-            background: #d9f2d9;
+        .choice.correct,
+        body.dark-mode .choice.correct {
+            background: #15803d !important;
+            color: #ffffff !important;
+            border-color: #166534 !important;
+            font-weight: bold;
         }
 
 
-        .choice.wrong {
-            background: #f5d6d6;
+        .choice.wrong,
+        body.dark-mode .choice.wrong {
+            background: #b91c1c !important;
+            color: #ffffff !important;
+            border-color: #991b1b !important;
+            font-weight: bold;
         }
 
 
@@ -1289,12 +1311,20 @@ $isAdmin =
             background: #eee;
         }
 
-        .choice.correct {
-            background: #d9f2d9;
+        .choice.correct,
+        body.dark-mode .choice.correct {
+            background: #15803d !important;
+            color: #ffffff !important;
+            border-color: #166534 !important;
+            font-weight: bold;
         }
 
-        .choice.wrong {
-            background: #f5d6d6;
+        .choice.wrong,
+        body.dark-mode .choice.wrong {
+            background: #b91c1c !important;
+            color: #ffffff !important;
+            border-color: #991b1b !important;
+            font-weight: bold;
         }
 
         .flashcard {
@@ -1636,6 +1666,126 @@ $isAdmin =
         <div id="finder">
 
 
+            <!-- SIDEBAR -->
+
+            <aside class="finder-sidebar">
+
+
+                <div class="sidebar-section-title">
+                    Favorites
+                </div>
+
+
+                <button class="sidebar-item active" data-folder="all" onclick="openFolder('all')">
+
+                    <span>
+                        All Files
+                    </span>
+
+                    <span class="sidebar-count" id="count-all">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="recent" onclick="openFolder('recent')">
+
+                    <span>
+                        Recents
+                    </span>
+
+                </button>
+
+
+
+                <div class="sidebar-section-title">
+                    Study Files
+                </div>
+
+
+                <button class="sidebar-item" data-folder="flowchart" onclick="openFolder('flowchart')">
+
+                    <span>
+                        Flowcharts
+                    </span>
+
+                    <span class="sidebar-count" id="count-flowchart">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="quiz" onclick="openFolder('quiz')">
+
+                    <span>
+                        Quizzes
+                    </span>
+
+                    <span class="sidebar-count" id="count-quiz">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="flashcards" onclick="openFolder('flashcards')">
+
+                    <span>
+                        Flashcards
+                    </span>
+
+                    <span class="sidebar-count" id="count-flashcards">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="presentation" onclick="openFolder('presentation')">
+
+                    <span>
+                        Presentations
+                    </span>
+
+                    <span class="sidebar-count" id="count-presentation">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="form" onclick="openFolder('form')">
+
+                    <span>
+                        Forms
+                    </span>
+
+                    <span class="sidebar-count" id="count-form">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="sheet" onclick="openFolder('sheet')">
+
+                    <span>
+                        Google Sheets
+                    </span>
+
+                    <span class="sidebar-count" id="count-sheet">
+                        0
+                    </span>
+
+                </button>
+
+
+            </aside>
+
+
+
             <!-- FINDER MAIN -->
 
             <main class="finder-main">
@@ -1669,16 +1819,11 @@ $isAdmin =
                 <div class="finder-content" id="finder-content">
 
 
-                    <div class="finder-column" id="folder-column">
-
-                    </div>
-
-
                     <div class="finder-column" id="file-column">
 
                         <div class="column-empty">
 
-                            Select a folder
+                            Select a file
 
                         </div>
 
@@ -2161,12 +2306,6 @@ $isAdmin =
 
         function renderFinder() {
 
-            const folderColumn =
-                document.getElementById(
-                    "folder-column"
-                );
-
-
             const fileColumn =
                 document.getElementById(
                     "file-column"
@@ -2179,127 +2318,25 @@ $isAdmin =
                 );
 
 
-            folderColumn.innerHTML = "";
-
-            fileColumn.innerHTML = "";
-
-            detailsColumn.innerHTML = `
-
-                <div class="column-empty">
-
-                    Select a file
-
-                </div>
-
-            `;
-
-
-
-            /* -----------------------------------------
-               FOLDER COLUMN
-            ----------------------------------------- */
-
-
-            if (
-                currentFolder === "all" ||
-                currentFolder === "recent"
-            ) {
-
-                folderDefinitions.forEach(folder => {
-
-                    const count =
-                        allItems.filter(
-                            item =>
-                                item.type === folder.id
-                        ).length;
-
-
-                    const button =
-                        document.createElement("button");
-
-
-                    button.className =
-                        "folder-item";
-
-
-                    button.innerHTML = `
-
-                        <span class="item-info">
-
-                            <span class="item-name">
-                                ${escapeHtml(folder.name)}
-                            </span>
-
-                            <span class="item-meta">
-                                ${count} item${count === 1 ? "" : "s"}
-                            </span>
-
-                        </span>
-
-                        <span class="folder-arrow">
-                            ›
-                        </span>
-
-                    `;
-
-
-                    button.onclick = () => {
-
-                        selectedFolder =
-                            folder.id;
-
-
-                        document
-                            .querySelectorAll(".folder-item")
-                            .forEach(el =>
-                                el.classList.remove(
-                                    "selected"
-                                )
-                            );
-
-
-                        button.classList.add(
-                            "selected"
-                        );
-
-
-                        renderFolderFiles(
-                            folder.id
-                        );
-
-                    };
-
-
-                    folderColumn.appendChild(
-                        button
-                    );
-
-                });
-
+            if (fileColumn) {
+                fileColumn.innerHTML = "";
             }
 
-            else {
-
-                folderColumn.innerHTML = `
+            if (detailsColumn) {
+                detailsColumn.innerHTML = `
 
                     <div class="column-empty">
 
-                        <br>
-
-                        ${escapeHtml(
-                    getFolderName(currentFolder)
-                )}
+                        Select a file
 
                     </div>
 
                 `;
-
-
-                renderFolderFiles(
-                    currentFolder
-                );
-
             }
+
+            renderFolderFiles(
+                currentFolder
+            );
 
         }
 
