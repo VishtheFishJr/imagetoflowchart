@@ -618,431 +618,329 @@ $requests = [];
 
 $generatedImages = [];
 
-foreach (
-
-    $slidesData
-
-    as $index => $slideData
-
-) {
+foreach ($slidesData as $index => $slideData) {
 
     if (!is_array($slideData)) {
-
         continue;
-
     }
 
-    $slideId =
-
-        "slide_" . $index;
+    $slideId = 'slide_' . $index;
 
     $requests[] = [
-
-        "createSlide" => [
-
-            "objectId" => $slideId,
-
-            "slideLayoutReference" => [
-
-                "predefinedLayout" => "BLANK"
-
-            ]
-
-        ]
-
+        'createSlide' => [
+            'objectId'            => $slideId,
+            'slideLayoutReference' => [
+                'predefinedLayout' => 'BLANK',
+            ],
+        ],
     ];
 
-    $layout =
+    $layout         = $slideData['layout']         ?? 'hierarchical_bullet';
+    $titleFontSize  = (int)($slideData['titleFontSize']    ?? 28);
+    $bodyFontSize   = (int)($slideData['bodyFontSize']     ?? 16);
+    $subtitleFontSize = (int)($slideData['subtitleFontSize'] ?? 20);
 
-        $slideData["layout"]
+    // ----------------------------------------------------------
+    // Helper: generate image if a visual/image description given
+    // ----------------------------------------------------------
+    $maybeImage = function ($description) use ($theme, $slideData, &$generatedImages) {
+        if (!$description) return null;
+        $url = generateSlideImage($description, $theme, $slideData['title'] ?? '');
+        if ($url) $generatedImages[] = $url;
+        return $url;
+    };
 
-        ?? "bullet";
+    // ==========================================================
+    // LAYOUT DISPATCH
+    // ==========================================================
 
-    // -----------------------------------------------------
-// TITLE
-// -----------------------------------------------------
+    // ----------------------------------------------------------
+    // TITLE
+    // ----------------------------------------------------------
+    if ($layout === 'title') {
 
-    if ($layout === "title") {
+        $requests = array_merge($requests, titleSlide(
+            $slideId,
+            $slideData['title']    ?? '',
+            $slideData['subtitle'] ?? '',
+            $theme,
+            $titleFontSize,
+            $subtitleFontSize
+        ));
 
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                titleSlide(
-
-                    $slideId,
-
-                    $slideData["title"] ?? "",
-
-                    $slideData["subtitle"] ?? "",
-
-                    $theme
-
-                )
-
-            );
-
-    }
-
-    // -----------------------------------------------------
-// BULLET
-// -----------------------------------------------------
-    elseif ($layout === "bullet") {
-
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                bulletSlide(
-
-                    $slideId,
-
-                    $slideData["title"] ?? "",
-
-                    $slideData["points"] ?? [],
-
-                    $theme,
-
-                    ""
-
-                )
-
-            );
-
-        if (!empty($slideData["visual"])) {
-
-            $imageUrl =
-
-                generateSlideImage(
-
-                    $slideData["visual"],
-
-                    $theme,
-
-                    $slideData["title"] ?? ""
-
-                );
-
-            if ($imageUrl) {
-
-                $generatedImages[] =
-
-                    $imageUrl;
-
-                $requests =
-
-                    array_merge(
-
-                        $requests,
-
-                        addImage(
-
-                            $slideId,
-
-                            $imageUrl,
-
-                            4500000,
-
-                            1100000,
-
-                            2400000,
-
-                            2200000
-
-                        )
-
-                    );
-
+        if (!empty($slideData['visual'])) {
+            $url = $maybeImage($slideData['visual']);
+            // For title slides, place image as a subtle background element if generated
+            if ($url) {
+                $requests = array_merge($requests, addImage(
+                    $slideId, $url, 5500000, 600000, 3400000, 2500000
+                ));
             }
-
         }
 
     }
 
-    // -----------------------------------------------------
-// IMAGE + TEXT
-// -----------------------------------------------------
-    elseif (
+    // ----------------------------------------------------------
+    // SECTION BREAK
+    // ----------------------------------------------------------
+    elseif ($layout === 'section_break') {
 
-        $layout === "image_text"
+        $requests = array_merge($requests, sectionBreakSlide(
+            $slideId,
+            $slideData['title']    ?? '',
+            $slideData['subtitle'] ?? '',
+            $theme,
+            $titleFontSize,
+            $subtitleFontSize
+        ));
 
-    ) {
+    }
+
+    // ----------------------------------------------------------
+    // AGENDA
+    // ----------------------------------------------------------
+    elseif ($layout === 'agenda') {
+
+        $items = $slideData['items'] ?? $slideData['points'] ?? [];
+        // Normalize: if points are objects, extract text
+        $items = array_map(fn($p) => is_array($p) ? ($p['text'] ?? '') : $p, $items);
+
+        $requests = array_merge($requests, agendaSlide(
+            $slideId,
+            $slideData['title'] ?? 'Agenda',
+            $items,
+            $theme,
+            $titleFontSize,
+            $bodyFontSize
+        ));
+
+    }
+
+    // ----------------------------------------------------------
+    // HIERARCHICAL BULLET
+    // ----------------------------------------------------------
+    elseif ($layout === 'hierarchical_bullet') {
 
         $imageUrl = null;
+        if (!empty($slideData['visual'])) {
+            $imageUrl = $maybeImage($slideData['visual']);
+        }
 
-        $visual =
+        $requests = array_merge($requests, hierarchicalBulletSlide(
+            $slideId,
+            $slideData['title']  ?? '',
+            $slideData['points'] ?? [],
+            $theme,
+            $titleFontSize,
+            $bodyFontSize,
+            $imageUrl
+        ));
 
-            $slideData["image"]
+    }
 
-            ?? $slideData["visual"]
+    // ----------------------------------------------------------
+    // IMAGE + TEXT
+    // ----------------------------------------------------------
+    elseif ($layout === 'image_text') {
 
-            ?? "";
+        $visual   = $slideData['image']   ?? $slideData['visual'] ?? '';
+        $imageUrl = $visual ? $maybeImage($visual) : null;
 
-        if ($visual) {
+        $textPoints = $slideData['text']   ?? $slideData['points'] ?? [];
+        if (is_string($textPoints)) $textPoints = [$textPoints];
 
-            $imageUrl =
+        $requests = array_merge($requests, imageTextSlide(
+            $slideId,
+            $slideData['title'] ?? '',
+            $textPoints,
+            $visual,
+            $theme,
+            $imageUrl,
+            $titleFontSize,
+            $bodyFontSize
+        ));
 
-                generateSlideImage(
+    }
 
-                    $visual,
+    // ----------------------------------------------------------
+    // COMPARISON
+    // ----------------------------------------------------------
+    elseif ($layout === 'comparison') {
 
-                    $theme,
+        $requests = array_merge($requests, comparisonSlide(
+            $slideId,
+            $slideData,
+            $theme,
+            $titleFontSize,
+            $bodyFontSize
+        ));
 
-                    $slideData["title"] ?? ""
+    }
 
-                );
+    // ----------------------------------------------------------
+    // STATS
+    // ----------------------------------------------------------
+    elseif ($layout === 'stats') {
 
-            if ($imageUrl) {
-
-                $generatedImages[] =
-
-                    $imageUrl;
-
+        $stats = $slideData['stats'] ?? [];
+        if (empty($stats)) {
+            // Fallback: convert points to stats
+            foreach (($slideData['points'] ?? []) as $p) {
+                $text = is_array($p) ? ($p['text'] ?? '') : $p;
+                $stats[] = ['value' => '—', 'label' => $text];
             }
-
         }
 
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                imageTextSlide(
-
-                    $slideId,
-
-                    $slideData["title"] ?? "",
-
-                    $slideData["text"]
-
-                    ?? $slideData["points"]
-
-                    ?? [],
-
-                    $visual,
-
-                    $theme,
-
-                    $imageUrl
-
-                )
-
-            );
+        $requests = array_merge($requests, statsSlide(
+            $slideId,
+            $slideData['title'] ?? 'Key Facts',
+            $stats,
+            $theme,
+            $titleFontSize,
+            $bodyFontSize
+        ));
 
     }
 
-    // -----------------------------------------------------
-// COMPARISON
-// -----------------------------------------------------
-    elseif (
+    // ----------------------------------------------------------
+    // QUOTE / KEY DEFINITION
+    // ----------------------------------------------------------
+    elseif ($layout === 'quote') {
 
-        $layout === "comparison"
-
-    ) {
-
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                comparisonSlide(
-
-                    $slideId,
-
-                    $slideData,
-
-                    $theme
-
-                )
-
-            );
+        $requests = array_merge($requests, quoteSlide(
+            $slideId,
+            $slideData['title']       ?? '',
+            $slideData['quote']       ?? '',
+            $slideData['attribution'] ?? '',
+            $theme,
+            $titleFontSize,
+            $bodyFontSize
+        ));
 
     }
 
-    // -----------------------------------------------------
-// TIMELINE
-// -----------------------------------------------------
-    elseif (
-
-        $layout === "timeline"
-
-    ) {
-
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                timelineSlide(
-
-                    $slideId,
-
-                    $slideData,
-
-                    $theme
-
-                )
-
-            );
-
-    }
-
-    // -----------------------------------------------------
-// DIAGRAM
-// -----------------------------------------------------
-    elseif (
-
-        $layout === "diagram"
-
-    ) {
-
-        $steps =
-
-            $slideData["steps"]
-
-            ?? [];
-
-        $text =
-
-            ($slideData["title"]
-
-                ?? "Diagram")
-
-            . "\n\n";
-
-        foreach (
-
-            $steps
-
-            as $stepIndex => $step
-
-        ) {
-
-            $text .=
-
-                ($stepIndex + 1)
-
-                . ". "
-
-                . $step
-
-                . "\n\n";
-
-        }
-
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                createTextBox(
-
-                    $slideId,
-
-                    $text,
-
-                    700000,
-
-                    900000,
-
-                    6500000,
-
-                    4000000,
-
-                    $theme,
-
-                    20,
-
-                    false
-
-                )
-
-            );
-
-        if (!empty($slideData["visual"])) {
-
-            $imageUrl =
-
-                generateSlideImage(
-
-                    $slideData["visual"],
-
-                    $theme,
-
-                    $slideData["title"] ?? ""
-
-                );
-
-            if ($imageUrl) {
-
-                $generatedImages[] =
-
-                    $imageUrl;
-
-                $requests =
-
-                    array_merge(
-
-                        $requests,
-
-                        addImage(
-
-                            $slideId,
-
-                            $imageUrl,
-
-                            4300000,
-
-                            1200000,
-
-                            2400000,
-
-                            2600000
-
-                        )
-
-                    );
-
+    // ----------------------------------------------------------
+    // THREE COLUMN
+    // ----------------------------------------------------------
+    elseif ($layout === 'three_column') {
+
+        $columns = $slideData['columns'] ?? [];
+        if (empty($columns)) {
+            // Fallback: split points into 3 groups
+            $pts = $slideData['points'] ?? [];
+            $chunk = (int)ceil(count($pts) / 3);
+            for ($c = 0; $c < 3; $c++) {
+                $columns[] = [
+                    'heading' => 'Part ' . ($c + 1),
+                    'points'  => array_slice($pts, $c * $chunk, $chunk),
+                ];
             }
+        }
 
+        $requests = array_merge($requests, threeColumnSlide(
+            $slideId,
+            $slideData['title'] ?? '',
+            $columns,
+            $theme,
+            $titleFontSize,
+            $bodyFontSize
+        ));
+
+    }
+
+    // ----------------------------------------------------------
+    // DIAGRAM / PROCESS
+    // ----------------------------------------------------------
+    elseif ($layout === 'diagram') {
+
+        $imageUrl = null;
+        if (!empty($slideData['visual'])) {
+            $imageUrl = $maybeImage($slideData['visual']);
+        }
+
+        $requests = array_merge($requests, diagramSlide(
+            $slideId,
+            $slideData['title'] ?? 'Process',
+            $slideData['steps'] ?? [],
+            $theme,
+            $titleFontSize,
+            $bodyFontSize,
+            $imageUrl
+        ));
+
+    }
+
+    // ----------------------------------------------------------
+    // IMAGE FULL
+    // ----------------------------------------------------------
+    elseif ($layout === 'image_full') {
+
+        $visual   = $slideData['image'] ?? $slideData['visual'] ?? '';
+        $imageUrl = $visual ? $maybeImage($visual) : null;
+
+        $requests = array_merge($requests, imageFullSlide(
+            $slideId,
+            $slideData['title'] ?? '',
+            $theme,
+            $imageUrl,
+            $titleFontSize
+        ));
+
+    }
+
+    // ----------------------------------------------------------
+    // TIMELINE (legacy)
+    // ----------------------------------------------------------
+    elseif ($layout === 'timeline') {
+
+        $slideData['titleFontSize'] = $titleFontSize;
+        $slideData['bodyFontSize']  = $bodyFontSize;
+
+        $requests = array_merge($requests, timelineSlide($slideId, $slideData, $theme));
+
+    }
+
+    // ----------------------------------------------------------
+    // BULLET (legacy)
+    // ----------------------------------------------------------
+    elseif ($layout === 'bullet') {
+
+        $imageUrl = null;
+        if (!empty($slideData['visual'])) {
+            $imageUrl = $maybeImage($slideData['visual']);
+        }
+
+        $requests = array_merge($requests, bulletSlide(
+            $slideId,
+            $slideData['title']  ?? '',
+            $slideData['points'] ?? [],
+            $theme,
+            '',
+            $titleFontSize,
+            $bodyFontSize
+        ));
+
+        if ($imageUrl) {
+            $requests = array_merge($requests, addImage(
+                $slideId, $imageUrl, 4500000, 1100000, 4200000, 3500000
+            ));
         }
 
     }
 
-    // -----------------------------------------------------
-// FALLBACK
-// -----------------------------------------------------
+    // ----------------------------------------------------------
+    // FALLBACK
+    // ----------------------------------------------------------
     else {
 
-        $requests =
-
-            array_merge(
-
-                $requests,
-
-                bulletSlide(
-
-                    $slideId,
-
-                    $slideData["title"] ?? "",
-
-                    $slideData["points"] ?? [],
-
-                    $theme,
-
-                    ""
-
-                )
-
-            );
+        $requests = array_merge($requests, hierarchicalBulletSlide(
+            $slideId,
+            $slideData['title']  ?? '',
+            $slideData['points'] ?? ($slideData['text'] ?? []),
+            $theme,
+            $titleFontSize,
+            $bodyFontSize
+        ));
 
     }
 

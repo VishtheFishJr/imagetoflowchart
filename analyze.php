@@ -379,255 +379,189 @@ Rules:
 
     $prompt = '
 
-Analyze the image.
+You are a world-class presentation designer creating a slide deck from a scanned image or document.
 
-Create a professional AI-designed Google Slides presentation.
+STEP 1 — ANALYZE THE IMAGE:
+Look carefully at the image and identify:
+- Subject matter and topic domain (science, history, business, math, literature, etc.)
+- How information is organized: headers, subheadings, bullet lists, diagrams, tables, paragraphs
+- Key concepts, definitions, examples, comparisons, processes, or data present
+- Visual density: is it text-heavy, diagram-heavy, or mixed?
+- The tone: academic, casual, professional, creative?
 
-The output should feel like a presentation made by a human designer using Canva or Beautiful.ai.
+STEP 2 — DESIGN THE THEME:
+Based on the subject, choose:
+- A color palette that fits the topic (biology = green/teal, tech = dark/neon, history = warm/parchment, math = clean/minimal, art = bold/vibrant)
+- A style (Modern, Scientific, Corporate, Creative, Academic, Futuristic, Minimal, Bold)
+- Fonts appropriate for the subject
 
-Return ONLY valid JSON.
+STEP 3 — DESIGN ADAPTIVE SLIDES:
+Create 8-12 slides. DO NOT create the same layout repeatedly. Pick the best layout for each piece of content.
 
-No markdown.
+For content with a clear heading + multiple subtopics → use "hierarchical_bullet"
+For content comparing two things → use "comparison"
+For content that is a process or steps → use "diagram"
+For content with a key statistic or fact → use "stats"
+For an impactful quote or key definition → use "quote"
+For a section transition or chapter break → use "section_break"
+For content best shown with an image alongside text → use "image_text"
+For content that is purely visual → use "image_full"
+For three parallel concepts → use "three_column"
+For the opening slide → use "title"
+For a table of contents or agenda → use "agenda"
 
-No code fences.
+STEP 4 — APPLY FONT HIERARCHY:
+Each slide must specify font sizes using these fields:
+- "titleFontSize": size in points for the main slide title (24-44pt)
+- "bodyFontSize": size in points for body text (14-22pt)
+- "subtitleFontSize": size in points for subtitles or secondary headings (18-28pt)
 
-No explanations outside JSON.
+Adjust font sizes based on content density:
+- Few short points → larger fonts (bodyFontSize 20-22)
+- Many dense points → smaller fonts (bodyFontSize 14-16)
+- Title slides → large (titleFontSize 36-44)
+- Section breaks → very large title (titleFontSize 38-44), minimal body text
 
-Analyze:
+STEP 5 — ADD SUBTOPICS:
+For "hierarchical_bullet" layout, use the "points" field as an array of objects with this structure:
+{
+  "text": "Main point",
+  "subtopics": ["Sub-detail 1", "Sub-detail 2"]
+}
+If a point has no subtopics, it can be a plain string.
 
-- Subject matter
+Return ONLY valid JSON. No markdown. No code fences. No explanations outside JSON.
 
-- Important concepts
-
-- Visual style
-
-- Appropriate colors
-
-- Best educational structure
-
-- Possible diagrams
-
-- Useful images
-
-Design the presentation:
-
-Choose:
-
-- Color palette
-
-- Background style
-
-- Typography style
-
-- Layout variety
-
-- Visual hierarchy
-
-- Decorative elements
-
-- Image placement
-
-Use this exact JSON format:
+Use exactly this JSON structure:
 
 {
-
- "title":"Presentation title",
-
- "theme":{
-
-   "name":"Theme name",
-
-   "background":"HEX color",
-
-   "primaryColor":"HEX color",
-
-   "secondaryColor":"HEX color",
-
-   "textColor":"HEX color",
-
-   "style":"Modern, scientific, futuristic, minimal, creative, etc."
-
- },
-
- "slides":[
-
- {
-
-  "layout":"title",
-
-  "title":"Main title",
-
-  "subtitle":"Subtitle",
-
-  "visual":"Description of hero image, diagram, or graphic"
-
- },
-
- {
-
-  "layout":"bullet",
-
-  "title":"Slide title",
-
-  "points":[
-
-    "Point 1",
-
-    "Point 2",
-
-    "Point 3"
-
-  ],
-
-  "visual":"Image, diagram, chart, icon, or illustration"
-
- },
-
- {
-
-  "layout":"image_text",
-
-  "title":"Slide title",
-
-  "text":[
-
-    "Important explanation",
-
-    "Additional information"
-
-  ],
-
-  "image":"Description of image to display"
-
- },
-
- {
-
-  "layout":"comparison",
-
-  "title":"Comparison title",
-
-  "leftTitle":"Left side",
-
-  "leftPoints":[
-
-    "Point"
-
-  ],
-
-  "rightTitle":"Right side",
-
-  "rightPoints":[
-
-    "Point"
-
+  "title": "Presentation Title",
+  "theme": {
+    "name": "Theme Name",
+    "background": "#HEX",
+    "primaryColor": "#HEX",
+    "secondaryColor": "#HEX",
+    "accentColor": "#HEX",
+    "textColor": "#HEX",
+    "style": "Modern"
+  },
+  "slides": [
+    {
+      "layout": "title",
+      "title": "Main Title",
+      "subtitle": "Subtitle or description",
+      "titleFontSize": 40,
+      "subtitleFontSize": 22,
+      "visual": "Description of a background or hero visual for this slide"
+    },
+    {
+      "layout": "agenda",
+      "title": "Agenda",
+      "titleFontSize": 32,
+      "bodyFontSize": 18,
+      "items": ["Topic 1", "Topic 2", "Topic 3"]
+    },
+    {
+      "layout": "section_break",
+      "title": "Section Title",
+      "subtitle": "Brief description of this section",
+      "titleFontSize": 42,
+      "subtitleFontSize": 20
+    },
+    {
+      "layout": "hierarchical_bullet",
+      "title": "Slide Title",
+      "titleFontSize": 28,
+      "bodyFontSize": 16,
+      "points": [
+        {
+          "text": "Main Point 1",
+          "subtopics": ["Sub-detail A", "Sub-detail B"]
+        },
+        "Simple point with no subtopics",
+        {
+          "text": "Main Point 2",
+          "subtopics": ["Sub-detail C"]
+        }
+      ],
+      "visual": "Description of an image to accompany this slide"
+    },
+    {
+      "layout": "image_text",
+      "title": "Slide Title",
+      "titleFontSize": 28,
+      "bodyFontSize": 16,
+      "text": ["Key point 1", "Key point 2", "Key point 3"],
+      "image": "Description of image to place on the right side",
+      "imagePosition": "right"
+    },
+    {
+      "layout": "comparison",
+      "title": "Comparison Title",
+      "titleFontSize": 28,
+      "bodyFontSize": 15,
+      "leftTitle": "Concept A",
+      "leftPoints": ["Point 1", "Point 2"],
+      "rightTitle": "Concept B",
+      "rightPoints": ["Point 1", "Point 2"]
+    },
+    {
+      "layout": "stats",
+      "title": "Key Facts",
+      "titleFontSize": 30,
+      "bodyFontSize": 18,
+      "stats": [
+        { "value": "42%", "label": "Key statistic label" },
+        { "value": "1865", "label": "Another key fact" },
+        { "value": "3x", "label": "Third key stat" }
+      ]
+    },
+    {
+      "layout": "quote",
+      "title": "Key Definition",
+      "titleFontSize": 26,
+      "bodyFontSize": 20,
+      "quote": "The exact quote, definition, or key statement to highlight",
+      "attribution": "Source, author, or textbook reference"
+    },
+    {
+      "layout": "three_column",
+      "title": "Three Concepts",
+      "titleFontSize": 28,
+      "bodyFontSize": 15,
+      "columns": [
+        { "heading": "Concept 1", "points": ["Detail A", "Detail B"] },
+        { "heading": "Concept 2", "points": ["Detail C", "Detail D"] },
+        { "heading": "Concept 3", "points": ["Detail E", "Detail F"] }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "title": "Process or Steps",
+      "titleFontSize": 28,
+      "bodyFontSize": 16,
+      "steps": ["Step 1", "Step 2", "Step 3", "Step 4"],
+      "visual": "Description of a diagram or process illustration"
+    },
+    {
+      "layout": "image_full",
+      "title": "Visual Concept",
+      "titleFontSize": 26,
+      "image": "Detailed description of the full-slide image to generate"
+    }
   ]
-
- },
-
- {
-
-  "layout":"diagram",
-
-  "title":"Diagram title",
-
-  "steps":[
-
-    "Step 1",
-
-    "Step 2",
-
-    "Step 3"
-
-  ]
-
- }
-
- ],
-
- "images":[
-
- {
-
-  "description":"Image or illustration that improves the slide",
-
-  "slide":2
-
- }
-
- ]
-
 }
 
-Rules:
-
-- Create 7-10 slides.
-
-- First slide MUST use layout "title".
-
-- Use different layouts throughout the presentation.
-
-- Do not make every slide bullet points.
-
-- Avoid large paragraphs.
-
-- Keep text concise.
-
-- Make slides visually balanced.
-
-- Add diagrams, comparisons, and visual explanations when appropriate.
-
-- Use the scanned image as inspiration.
-
-- Suggest images that would improve understanding.
-
-- Pick colors that match the topic.
-
-Subject style examples:
-
-Biology:
-
-- green/blue palette
-
-- scientific diagrams
-
-- microscope imagery
-
-History:
-
-- parchment colors
-
-- timeline layouts
-
-- historical imagery
-
-Technology:
-
-- dark backgrounds
-
-- neon accents
-
-- futuristic graphics
-
-Mathematics:
-
-- geometric layouts
-
-- clean colors
-
-- equations and diagrams
-
-Art:
-
-- bold colors
-
-- creative layouts
-
-- visual emphasis
-
-The final presentation should look professionally designed, not like plain notes.
-
-Return JSON only.
+CRITICAL RULES:
+- First slide MUST be layout "title".
+- Create 8-12 slides total.
+- Use AT LEAST 5 different layout types throughout the deck.
+- Never use the same layout more than 3 times in a row.
+- Each slide must have titleFontSize specified.
+- "hierarchical_bullet" points must use the subtopic object format for any point that has sub-details.
+- Keep text concise: no wall of text, no paragraphs.
+- Font sizes must reflect visual hierarchy (titles bigger than body).
+- Return valid JSON only.
 
 ';
 
