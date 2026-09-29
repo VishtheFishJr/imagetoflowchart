@@ -1,7 +1,5 @@
 <?php
 
-define('GEMINI_API_KEY', 'AQ.Ab8RN6IxW4sfxn7I-fZMwKXxlurU1PBvfq-b8AAGMZJDePmHzA');
-
 // -----------------------------------------------------------------------
 // Resend API Key for sending password reset emails.
 // DigitalOcean blocks SMTP ports, so we use Resend's HTTP API instead.
