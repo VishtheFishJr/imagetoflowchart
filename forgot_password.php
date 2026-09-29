@@ -74,6 +74,7 @@ function sendSmtpEmail($host, $port, $user, $pass, $fromEmail, $fromName, $toEma
 
     // Port 465 = implicit SSL, port 587 = STARTTLS
     $socketAddr = ($port == 465 ? 'ssl://' : '') . $host . ':' . $port;
+    error_log("SMTP attempting connect to: $socketAddr");
     $socket = @stream_socket_client($socketAddr, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context);
 
     if (!$socket) {
