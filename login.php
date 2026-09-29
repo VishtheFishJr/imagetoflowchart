@@ -42,7 +42,11 @@ if (
 
 
 $error = "";
+$success = "";
 
+if (isset($_GET["reset"]) && $_GET["reset"] === "success") {
+    $success = "Your password has been reset successfully! Please log in.";
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -320,6 +324,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+        .success {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            padding: 10px;
+
+            border-radius: 7px;
+
+            margin-bottom: 18px;
+
+        }
+
+        .forgot-wrap {
+
+            text-align: right;
+
+            margin-top: -6px;
+
+            margin-bottom: 18px;
+
+        }
+
+        .forgot-link {
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+        }
+
+        .forgot-link:hover {
+
+            text-decoration: underline;
+
+        }
+
         .bottom {
 
             text-align: center;
@@ -352,6 +396,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="subtitle">
             Log in to access your study materials.
         </div>
+
+        <?php if ($success): ?>
+
+            <div class="success">
+
+                <?php
+
+                echo htmlspecialchars(
+                    $success,
+                    ENT_QUOTES,
+                    "UTF-8"
+                );
+
+                ?>
+
+            </div>
+
+        <?php endif; ?>
 
         <?php if ($error): ?>
 
@@ -401,6 +463,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
             <input type="password" id="password" name="password" required autocomplete="current-password">
+
+
+            <div class="forgot-wrap">
+                <a href="forgot_password.php" class="forgot-link">Forgot Password?</a>
+            </div>
 
 
             <button type="submit">
