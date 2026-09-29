@@ -39,6 +39,7 @@ $url = $client->createAuthUrl();
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -66,6 +67,7 @@ $url = $client->createAuthUrl();
 
         .topbar {
             height: 64px;
+
             position: fixed;
             top: 0;
             left: 0;
@@ -97,73 +99,8 @@ $url = $client->createAuthUrl();
         }
 
         /* ------------------------------------------------------------
-           SIDEBAR
-        ------------------------------------------------------------ */
-
-        .sidebar {
-            position: fixed;
-
-            top: 64px;
-            left: 0;
-            bottom: 0;
-
-            width: 220px;
-
-            background: #f5f5f5;
-            border-right: 1px solid #ddd;
-
-            padding: 20px 14px;
-
-            z-index: 900;
-        }
-
-        .sidebar-title {
-            font-size: 13px;
-            font-weight: 600;
-
-            color: #666;
-
-            margin: 0 10px 12px;
-            text-transform: uppercase;
-        }
-
-        .sidebar-link {
-            display: block;
-
-            padding: 10px 12px;
-            margin-bottom: 4px;
-
-            color: #111;
-            text-decoration: none;
-
-            border-radius: 6px;
-
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .sidebar-link:hover {
-            background: #e5e5e5;
-        }
-
-        /* ------------------------------------------------------------
            DARK MODE SWITCH
         ------------------------------------------------------------ */
-
-        .theme-container {
-            margin-top: 25px;
-
-            padding: 12px;
-
-            border-top: 1px solid #ddd;
-        }
-
-        .theme-label {
-            font-size: 14px;
-            font-weight: 600;
-
-            margin-bottom: 10px;
-        }
 
         .theme-switch {
             position: relative;
@@ -225,11 +162,9 @@ $url = $client->createAuthUrl();
         ------------------------------------------------------------ */
 
         .main {
-            margin-left: 220px;
-
-            padding: 104px 30px 40px;
-
             min-height: 100vh;
+
+            padding: 104px 20px 40px;
 
             display: flex;
             justify-content: center;
@@ -240,15 +175,17 @@ $url = $client->createAuthUrl();
             width: 100%;
             max-width: 600px;
 
-            border: 1px solid #ddd;
-
-            background: #fff;
+            margin-top: 60px;
 
             padding: 40px;
 
-            margin-top: 40px;
-
             text-align: center;
+
+            background: #fff;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
         }
 
         .connect-card h1 {
@@ -306,27 +243,6 @@ $url = $client->createAuthUrl();
             border-color: #333;
         }
 
-        body.dark-mode .sidebar {
-            background: #151515;
-            border-color: #333;
-        }
-
-        body.dark-mode .sidebar-title {
-            color: #999;
-        }
-
-        body.dark-mode .sidebar-link {
-            color: #eee;
-        }
-
-        body.dark-mode .sidebar-link:hover {
-            background: #292929;
-        }
-
-        body.dark-mode .theme-container {
-            border-color: #333;
-        }
-
         body.dark-mode .connect-card {
             background: #181818;
             border-color: #333;
@@ -345,48 +261,14 @@ $url = $client->createAuthUrl();
         body.dark-mode .google-button:hover {
             background: #ccc;
         }
-
-        /* ------------------------------------------------------------
-           MOBILE
-        ------------------------------------------------------------ */
-
-        @media (max-width: 700px) {
-
-            .sidebar {
-                width: 70px;
-                padding: 20px 8px;
-            }
-
-            .sidebar-title,
-            .sidebar-link span,
-            .theme-label {
-                display: none;
-            }
-
-            .sidebar-link {
-                text-align: center;
-                padding: 12px 5px;
-            }
-
-            .theme-container {
-                text-align: center;
-            }
-
-            .main {
-                margin-left: 70px;
-                padding: 94px 20px 30px;
-            }
-
-            .connect-card {
-                padding: 30px 20px;
-            }
-        }
     </style>
+
 </head>
 
 <body>
 
     <!-- TOP BAR -->
+
     <div class="topbar">
 
         <div class="app-title">
@@ -394,36 +276,13 @@ $url = $client->createAuthUrl();
         </div>
 
         <div class="topbar-right">
-            <!-- Keep any existing topbar buttons from index.php here -->
-        </div>
-
-    </div>
-
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-
-        <div class="sidebar-title">
-            Navigation
-        </div>
-
-        <a href="index.php" class="sidebar-link">
-            🏠 <span>Home</span>
-        </a>
-
-        <a href="get_items.php" class="sidebar-link">
-            📁 <span>My Files</span>
-        </a>
-
-        <div class="theme-container">
-
-            <div class="theme-label">
-                Dark Mode
-            </div>
 
             <label class="theme-switch">
+
                 <input type="checkbox" id="darkModeToggle">
+
                 <span class="slider"></span>
+
             </label>
 
         </div>
@@ -431,7 +290,8 @@ $url = $client->createAuthUrl();
     </div>
 
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
+
     <main class="main">
 
         <div class="connect-card">
@@ -454,10 +314,13 @@ $url = $client->createAuthUrl();
 
 
     <script>
+
         const toggle = document.getElementById("darkModeToggle");
 
         // Restore saved theme
-        if (localStorage.getItem("aiStudyScannerDarkMode") === "true") {
+        if (
+            localStorage.getItem("aiStudyScannerDarkMode") === "true"
+        ) {
             document.body.classList.add("dark-mode");
             toggle.checked = true;
         }
@@ -466,14 +329,27 @@ $url = $client->createAuthUrl();
         toggle.addEventListener("change", function () {
 
             if (this.checked) {
+
                 document.body.classList.add("dark-mode");
-                localStorage.setItem("aiStudyScannerDarkMode", "true");
+
+                localStorage.setItem(
+                    "aiStudyScannerDarkMode",
+                    "true"
+                );
+
             } else {
+
                 document.body.classList.remove("dark-mode");
-                localStorage.setItem("aiStudyScannerDarkMode", "false");
+
+                localStorage.setItem(
+                    "aiStudyScannerDarkMode",
+                    "false"
+                );
+
             }
 
         });
+
     </script>
 
 </body>
