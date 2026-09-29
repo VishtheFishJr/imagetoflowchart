@@ -206,7 +206,7 @@ $isAdmin =
             font-size: 14px;
             color: #334155;
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .bottom-bar a {
@@ -4733,9 +4733,14 @@ $isAdmin =
     </script>
 
 
-    <div class="bottom-bar">
-        Any issues or questions? Please email <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>!
-    </div>
+    <<div class="bottom-bar">
+        Any issues or questions? Please email
+        <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>
+        &nbsp;|&nbsp;
+        <a href="privacy.php">Privacy Policy</a>
+        &nbsp;|&nbsp;
+        <a href="terms.php">Terms of Service</a>
+        </div>
 
 </body>
 
