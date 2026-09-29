@@ -1,5 +1,5 @@
 <?php
-// AI Study Scanner - Terms of Service
+// CamCharts - Terms of Service
 ?>
 
 <!DOCTYPE html>
@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Terms of Service - AI Study Scanner</title>
+    <title>Terms of Service - CamCharts</title>
 
     <style>
         * {
@@ -190,7 +190,7 @@
 <body>
 
     <header class="topbar">
-        <div class="logo">AI Study Scanner</div>
+        <div class="logo">CamCharts</div>
 
         <a href="index.php" class="back">
             Back to App
@@ -209,7 +209,7 @@
 
             <p>
                 These Terms of Service ("Terms") govern your use of
-                AI Study Scanner ("AI Study Scanner," "we," "us," or "our").
+                CamCharts ("CamCharts," "we," "us," or "our").
                 By creating an account or using the service, you agree to
                 these Terms.
             </p>
@@ -217,13 +217,13 @@
             <div class="notice">
                 <strong>Please read these Terms carefully.</strong>
                 If you do not agree with these Terms, do not create an
-                account or use AI Study Scanner.
+                account or use CamCharts.
             </div>
 
             <h2>1. Use of the Service</h2>
 
             <p>
-                AI Study Scanner provides educational tools that can analyze
+                CamCharts provides educational tools that can analyze
                 study material and generate content such as flowcharts,
                 quizzes, flashcards, presentations, forms, spreadsheets,
                 and other educational materials.
@@ -251,7 +251,7 @@
 
             <p>
                 You are responsible for content that you upload, scan, or
-                otherwise submit to AI Study Scanner.
+                otherwise submit to CamCharts.
             </p>
 
             <p>
@@ -267,7 +267,7 @@
             <h2>4. AI-Generated Content</h2>
 
             <p>
-                AI Study Scanner uses artificial intelligence services to
+                CamCharts uses artificial intelligence services to
                 generate educational content.
             </p>
 
@@ -278,7 +278,7 @@
             </p>
 
             <p>
-                AI Study Scanner does not guarantee that generated content
+                CamCharts does not guarantee that generated content
                 will always be accurate, complete, or appropriate for a
                 particular assignment or purpose.
             </p>
@@ -286,7 +286,7 @@
             <h2>5. Google Integrations</h2>
 
             <p>
-                AI Study Scanner may allow you to connect your Google account
+                CamCharts may allow you to connect your Google account
                 and create Google Slides, Google Forms, and Google Sheets.
             </p>
 
@@ -297,13 +297,13 @@
 
             <p>
                 You are responsible for reviewing and managing the Google
-                permissions you grant to AI Study Scanner.
+                permissions you grant to CamCharts.
             </p>
 
             <h2>6. Third-Party Services</h2>
 
             <p>
-                AI Study Scanner relies on third-party services for certain
+                CamCharts relies on third-party services for certain
                 functionality, including AI processing, image generation,
                 Google integrations, and email delivery.
             </p>
@@ -332,7 +332,7 @@
             <h2>8. Intellectual Property</h2>
 
             <p>
-                The AI Study Scanner software, interface, branding, design,
+                The CamCharts software, interface, branding, design,
                 and other original materials provided by us are owned by or
                 licensed to us and may not be copied, modified, or redistributed
                 without permission except where applicable law permits.
@@ -347,7 +347,7 @@
             <h2>9. Service Availability</h2>
 
             <p>
-                We aim to keep AI Study Scanner available and functional,
+                We aim to keep CamCharts available and functional,
                 but we do not guarantee that the service will always be
                 available, uninterrupted, or free from errors.
             </p>
@@ -360,7 +360,7 @@
             <h2>10. Account Termination</h2>
 
             <p>
-                You may stop using AI Study Scanner at any time.
+                You may stop using CamCharts at any time.
             </p>
 
             <p>
@@ -371,7 +371,7 @@
             <h2>11. Disclaimer</h2>
 
             <p>
-                AI Study Scanner is provided on an "as is" and "as available"
+                CamCharts is provided on an "as is" and "as available"
                 basis to the extent permitted by applicable law.
             </p>
 
@@ -416,7 +416,7 @@
             </p>
 
             <div class="footer">
-                © 2026 AI Study Scanner. All rights reserved.
+                © 2026 CamCharts. All rights reserved.
             </div>
 
         </div>

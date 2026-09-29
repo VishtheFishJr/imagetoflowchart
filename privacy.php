@@ -1,5 +1,5 @@
 <?php
-// AI Study Scanner - Privacy Policy
+// CamCharts - Privacy Policy
 ?>
 
 <!DOCTYPE html>
@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Privacy Policy - AI Study Scanner</title>
+    <title>Privacy Policy - CamCharts</title>
 
     <style>
         * {
@@ -197,7 +197,7 @@
 <body>
 
     <header class="topbar">
-        <div class="logo">AI Study Scanner</div>
+        <div class="logo">CamCharts</div>
 
         <a href="index.php" class="back">
             Back to App
@@ -215,15 +215,15 @@
             </div>
 
             <p>
-                AI Study Scanner ("AI Study Scanner," "we," "us," or "our")
+                CamCharts ("CamCharts," "we," "us," or "our")
                 respects your privacy. This Privacy Policy explains what
                 information we collect, how we use it, how it may be shared,
-                and the choices available to you when using AI Study Scanner.
+                and the choices available to you when using CamCharts.
             </p>
 
             <div class="notice">
                 <strong>Important:</strong>
-                AI Study Scanner is an educational tool. Do not upload
+                CamCharts is an educational tool. Do not upload
                 information that you do not have permission to upload or
                 that you do not want processed by the services described
                 in this policy.
@@ -243,7 +243,7 @@
             <h3>Uploaded and Scanned Content</h3>
 
             <p>
-                When you use AI Study Scanner to analyze study material,
+                When you use CamCharts to analyze study material,
                 you may upload or capture images and other study-related
                 content. This content may be stored so that the application
                 can provide features such as My Files, quizzes, flashcards,
@@ -253,7 +253,7 @@
             <h3>Generated Content</h3>
 
             <p>
-                AI Study Scanner may store generated quizzes, flashcards,
+                CamCharts may store generated quizzes, flashcards,
                 flowcharts, presentations, forms, spreadsheets, and related
                 information so that you can access your generated materials.
             </p>
@@ -261,16 +261,16 @@
             <h3>Google Account Information</h3>
 
             <p>
-                If you choose to connect a Google account, AI Study Scanner
+                If you choose to connect a Google account, CamCharts
                 requests the Google permissions displayed during Google's
                 authorization process. Depending on the features you use,
-                these permissions may allow AI Study Scanner to create or
+                these permissions may allow CamCharts to create or
                 manage files such as Google Slides presentations, Google
                 Forms, and Google Sheets through your Google account.
             </p>
 
             <p>
-                AI Study Scanner does not request access to your Google
+                CamCharts does not request access to your Google
                 account unless you choose to connect your account.
             </p>
 
@@ -293,7 +293,7 @@
             <h2>3. Third-Party Services</h2>
 
             <p>
-                AI Study Scanner uses third-party services to provide certain
+                CamCharts uses third-party services to provide certain
                 functionality. Information submitted through relevant features
                 may be processed by these providers according to their own
                 privacy policies and terms.
@@ -304,28 +304,28 @@
             <p>
                 Google services are used for features such as Google Slides,
                 Google Forms, and Google Sheets. If you connect Google, the
-                permissions requested by AI Study Scanner are shown during
+                permissions requested by CamCharts are shown during
                 Google's authorization process.
             </p>
 
             <h3>Google Gemini</h3>
 
             <p>
-                AI Study Scanner may send relevant study material and prompts
+                CamCharts may send relevant study material and prompts
                 to Google's Gemini services to generate educational content.
             </p>
 
             <h3>Stability AI</h3>
 
             <p>
-                AI Study Scanner may use Stability AI to generate images used
+                CamCharts may use Stability AI to generate images used
                 in certain generated study materials or presentations.
             </p>
 
             <h3>Resend</h3>
 
             <p>
-                AI Study Scanner may use Resend to deliver account-related
+                CamCharts may use Resend to deliver account-related
                 email messages, such as password-reset emails.
             </p>
 
@@ -337,13 +337,13 @@
 
             <p>
                 When you connect your Google account, Google displays the
-                permissions requested by AI Study Scanner before authorization.
+                permissions requested by CamCharts before authorization.
                 We use the resulting authorization only to provide the Google
                 features you request.
             </p>
 
             <p>
-                You can revoke AI Study Scanner's access to your Google account
+                You can revoke CamCharts's access to your Google account
                 through your Google Account settings.
             </p>
 
@@ -351,7 +351,7 @@
 
             <p>
                 We take reasonable measures to protect information stored by
-                AI Study Scanner. These measures may include access controls,
+                CamCharts. These measures may include access controls,
                 HTTPS encryption during transmission, authentication controls,
                 and protection of application credentials and API keys.
             </p>
@@ -378,7 +378,7 @@
             <h2>7. Account and Data Deletion</h2>
 
             <p>
-                You may request deletion of your AI Study Scanner account and
+                You may request deletion of your CamCharts account and
                 associated personal information by contacting us.
             </p>
 
@@ -393,7 +393,7 @@
             <h2>8. Children's Privacy</h2>
 
             <p>
-                AI Study Scanner is not intended to knowingly collect personal
+                CamCharts is not intended to knowingly collect personal
                 information from children in violation of applicable law.
                 If you believe that a child has provided personal information
                 to the service in a manner that violates applicable law,
@@ -403,7 +403,7 @@
             <h2>9. Changes to This Privacy Policy</h2>
 
             <p>
-                We may update this Privacy Policy as AI Study Scanner changes.
+                We may update this Privacy Policy as CamCharts changes.
                 When we make material changes, we may update the date shown at
                 the top of this page and provide additional notice when
                 appropriate.
@@ -422,7 +422,7 @@
             </p>
 
             <div class="footer">
-                © 2026 AI Study Scanner. All rights reserved.
+                © 2026 CamCharts. All rights reserved.
             </div>
 
         </div>
