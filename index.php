@@ -2041,7 +2041,7 @@ $isAdmin =
 
 
                     <h3>
-                        Output
+                        Your Generation:
                     </h3>
 
 
