@@ -61,7 +61,7 @@ $isAdmin =
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        AI Study Scanner
+        CamCharts
     </title>
 
     <link rel="icon" type="image/png" href="/favicon.png">
@@ -102,6 +102,7 @@ $isAdmin =
 
         body {
             margin: 0;
+            padding-bottom: 55px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
             background: #fff;
             color: #111;
@@ -170,6 +171,52 @@ $isAdmin =
             display: inline-flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .my-files-toggle {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            color: #111;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s, color 0.2s;
+        }
+
+        .my-files-toggle:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #334155;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-bar a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .bottom-bar a:hover {
+            text-decoration: underline;
         }
 
 
@@ -1622,6 +1669,24 @@ $isAdmin =
             color: #ddd;
         }
 
+        body.dark-mode .my-files-toggle {
+            color: #eee;
+        }
+
+        body.dark-mode .my-files-toggle:hover {
+            color: #60a5fa;
+        }
+
+        body.dark-mode .bottom-bar {
+            background: #181818;
+            border-top-color: #333333;
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .bottom-bar a {
+            color: #60a5fa;
+        }
+
         body.dark-mode .theme-slider {
             background: #333;
             border-color: #555;
@@ -1713,7 +1778,7 @@ $isAdmin =
         <div class="topbar">
 
             <div class="app-title">
-                AI Study Scanner
+                CamCharts
             </div>
 
 
@@ -1775,11 +1840,9 @@ $isAdmin =
             <?php endif; ?>
 
 
-            <button class="storage-toggle" onclick="toggleFinder()">
-
-                My Files
-
-            </button>
+            <a href="#" id="myFilesToggle" class="my-files-toggle" onclick="toggleFinder(); return false;">
+                My Files &rarr;
+            </a>
 
         </div>
 
@@ -1987,7 +2050,7 @@ $isAdmin =
 
 
                 <h1>
-                    AI Study Scanner
+                    CamCharts
                 </h1>
 
 
@@ -3146,6 +3209,12 @@ $isAdmin =
                 );
 
 
+            const toggleBtn =
+                document.getElementById(
+                    "myFilesToggle"
+                );
+
+
             if (
                 finder.classList.contains(
                     "visible"
@@ -3160,6 +3229,14 @@ $isAdmin =
                 scanner.style.display =
                     "block";
 
+
+                if (toggleBtn) {
+
+                    toggleBtn.innerHTML =
+                        "My Files &rarr;";
+
+                }
+
             }
 
             else {
@@ -3171,6 +3248,14 @@ $isAdmin =
 
                 scanner.style.display =
                     "none";
+
+
+                if (toggleBtn) {
+
+                    toggleBtn.innerHTML =
+                        "&larr; Back to Scanner";
+
+                }
 
 
                 loadItems();
@@ -3390,6 +3475,14 @@ $isAdmin =
            CAMERA
         ========================================================= */
 
+        const ERROR_RETRY_NOTE = "Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.";
+
+        function formatErrorMessage(msg) {
+            if (!msg) return ERROR_RETRY_NOTE;
+            if (msg.includes("Please retry scan;")) return msg;
+            return msg + "\n\n" + ERROR_RETRY_NOTE;
+        }
+
         async function initCamera() {
 
             try {
@@ -3414,8 +3507,7 @@ $isAdmin =
             catch (err) {
 
                 status.innerText =
-                    "Camera error: " +
-                    err.message;
+                    formatErrorMessage("Camera error: " + err.message);
 
             }
 
@@ -3544,7 +3636,7 @@ $isAdmin =
                         "Something went wrong.";
 
                     status.innerText =
-                        errorMessage;
+                        formatErrorMessage(errorMessage);
 
                     if (
                         errorMessage.toLowerCase().includes(
@@ -3765,8 +3857,7 @@ $isAdmin =
             catch (err) {
 
                 status.innerText =
-                    "Error: " +
-                    err.message;
+                    formatErrorMessage("Error: " + err.message);
 
             }
 
@@ -3882,6 +3973,9 @@ $isAdmin =
                         "Unknown error"
                     )}
                             </p>
+                            <p style="margin-top: 10px; font-size: 14px; opacity: 0.85;">
+                                Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.
+                            </p>
 
                         </div>
 
@@ -3897,10 +3991,15 @@ $isAdmin =
 
                     <div class="study-card">
 
-                        Error:
-                        ${escapeHtml(
+                        <h2>Error</h2>
+                        <p>
+                            ${escapeHtml(
                     err.message
                 )}
+                        </p>
+                        <p style="margin-top: 10px; font-size: 14px; opacity: 0.85;">
+                            Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.
+                        </p>
 
                     </div>
 
@@ -4011,6 +4110,9 @@ $isAdmin =
                         <div class="study-card">
                             <h2>Error</h2>
                             <p>${escapeHtml(errorMsg)}</p>
+                            <p style="margin-top: 10px; font-size: 14px; opacity: 0.85;">
+                                Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.
+                            </p>
                             ${isPermissionError ? `
                                 <br>
                                 <a href="google_login.php" class="presentation-link" target="_self">
@@ -4029,10 +4131,15 @@ $isAdmin =
 
                     <div class="study-card">
 
-                        Error:
-                        ${escapeHtml(
+                        <h2>Error</h2>
+                        <p>
+                            ${escapeHtml(
                     err.message
                 )}
+                        </p>
+                        <p style="margin-top: 10px; font-size: 14px; opacity: 0.85;">
+                            Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.
+                        </p>
 
                     </div>
 
@@ -4143,6 +4250,9 @@ $isAdmin =
                         <div class="study-card">
                             <h2>Error</h2>
                             <p>${escapeHtml(errorMsg)}</p>
+                            <p style="margin-top: 10px; font-size: 14px; opacity: 0.85;">
+                                Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.
+                            </p>
                             ${isPermissionError ? `
                                 <br>
                                 <a href="google_login.php" class="presentation-link" target="_self">
@@ -4161,10 +4271,15 @@ $isAdmin =
 
                     <div class="study-card">
 
-                        Error:
-                        ${escapeHtml(
+                        <h2>Error</h2>
+                        <p>
+                            ${escapeHtml(
                     err.message
                 )}
+                        </p>
+                        <p style="margin-top: 10px; font-size: 14px; opacity: 0.85;">
+                            Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.
+                        </p>
 
                     </div>
 
@@ -4617,6 +4732,10 @@ $isAdmin =
 
     </script>
 
+
+    <div class="bottom-bar">
+        Any issues or questions? Please email <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>!
+    </div>
 
 </body>
 

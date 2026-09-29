@@ -148,7 +148,34 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
             min-height: 100vh;
 
             padding: 40px;
+            padding-bottom: 70px;
 
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #334155;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-bar a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .bottom-bar a:hover {
+            text-decoration: underline;
         }
 
         .container {
@@ -512,7 +539,8 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
 
                             flowchartDiv.textContent =
                                 "Unable to render this flowchart: "
-                                + error.message;
+                                + error.message
+                                + "\n\nPlease retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.";
 
                         }
 
@@ -912,6 +940,10 @@ if (($type === "presentation" || $type === "sheet" || $type === "sheets" || $typ
 
         </div>
 
+    </div>
+
+    <div class="bottom-bar">
+        Any issues or questions? Please email <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>!
     </div>
 
 </body>

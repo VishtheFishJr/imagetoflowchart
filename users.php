@@ -76,12 +76,13 @@ try {
     <title>Users</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f5f5f5; color: #111; }
+        body { margin: 0; padding-bottom: 60px; font-family: Arial, Helvetica, sans-serif; background: #f5f5f5; color: #111; }
         .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
         .top { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
         h1 { margin: 0; }
-        .back { text-decoration: none; color: #2563eb; }
+        .back { text-decoration: none; color: #2563eb; font-weight: 600; }
         .error { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 7px; margin-bottom: 18px; }
+        .error-sub { font-size: 13px; margin-top: 6px; font-style: italic; opacity: 0.9; }
         .table-wrap { background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 14px; text-align: left; border-bottom: 1px solid #ddd; }
@@ -90,6 +91,9 @@ try {
         .delete-button { border: none; border-radius: 6px; padding: 8px 12px; background: #dc2626; color: white; cursor: pointer; }
         .delete-button:hover { background: #b91c1c; }
         .role { font-weight: 600; }
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: #ffffff; border-top: 1px solid #e2e8f0; padding: 12px 20px; text-align: center; font-size: 14px; color: #334155; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .bottom-bar a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        .bottom-bar a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -100,7 +104,10 @@ try {
         </div>
 
         <?php if ($error): ?>
-            <div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?></div>
+            <div class="error">
+                <?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?>
+                <div class="error-sub">Please retry scan; issue usually resolves within 3 attempts if error occurs. If the issue persists, please paste the error message and send an email to camchartssupport@gmail.com.</div>
+            </div>
         <?php endif; ?>
 
         <div class="table-wrap">
@@ -136,6 +143,9 @@ try {
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="bottom-bar">
+        Any issues or questions? Please email <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>!
     </div>
 </body>
 </html>

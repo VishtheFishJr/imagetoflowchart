@@ -151,6 +151,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 sans-serif;
 
             background: #f5f5f5;
+
+            padding-bottom: 60px;
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #334155;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-bar a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .bottom-bar a:hover {
+            text-decoration: underline;
         }
 
         .container {
@@ -369,6 +397,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         </div>
 
+    </div>
+
+    <div class="bottom-bar">
+        Any issues or questions? Please email <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>!
     </div>
 
 </body>
