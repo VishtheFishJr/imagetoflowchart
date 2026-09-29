@@ -1,3 +1,4 @@
+```php
 <?php
 
 require_once 'db.php';
@@ -12,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"] ?? "";
     $confirmPassword = $_POST["confirm_password"] ?? "";
     $role = $_POST["role"] ?? "user";
+    $termsAgreement = isset($_POST["terms_agreement"]);
 
     if (
         $username === "" ||
@@ -43,6 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ) {
 
         $error = "Invalid account role.";
+
+    } elseif (!$termsAgreement) {
+
+        $error = "You must agree to the Terms of Service and acknowledge the Privacy Policy.";
 
     } else {
 
@@ -298,6 +304,67 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             text-decoration: none;
         }
+
+        /* ------------------------------------------------------------
+           TERMS AND PRIVACY CHECKBOX
+        ------------------------------------------------------------ */
+
+        .terms-checkbox {
+
+            margin: 2px 0 18px;
+
+        }
+
+        .terms-checkbox label {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 9px;
+
+            margin: 0;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            font-weight: normal;
+
+            color: #666;
+
+            cursor: pointer;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+
+            width: 16px;
+            height: 16px;
+
+            margin: 2px 0 0;
+
+            padding: 0;
+
+            flex-shrink: 0;
+
+            accent-color: #2563eb;
+
+            cursor: pointer;
+        }
+
+        .terms-checkbox a {
+
+            color: #2563eb;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+        .terms-checkbox a:hover {
+
+            text-decoration: underline;
+        }
     </style>
 
 </head>
@@ -334,34 +401,61 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 Username
             </label>
 
-            <input type="text" id="username" name="username" required autocomplete="username" value="<?php echo htmlspecialchars(
-                $_POST["username"] ?? "",
-                ENT_QUOTES,
-                "UTF-8"
-            ); ?>">
+            <input
+                type="text"
+                id="username"
+                name="username"
+                required
+                autocomplete="username"
+                value="<?php echo htmlspecialchars(
+                    $_POST["username"] ?? "",
+                    ENT_QUOTES,
+                    "UTF-8"
+                ); ?>"
+            >
 
             <label for="email">
                 Email
             </label>
 
-            <input type="email" id="email" name="email" required autocomplete="email" value="<?php echo htmlspecialchars(
-                $_POST["email"] ?? "",
-                ENT_QUOTES,
-                "UTF-8"
-            ); ?>">
+            <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                autocomplete="email"
+                value="<?php echo htmlspecialchars(
+                    $_POST["email"] ?? "",
+                    ENT_QUOTES,
+                    "UTF-8"
+                ); ?>"
+            >
 
             <label for="password">
                 Password
             </label>
 
-            <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                minlength="8"
+                autocomplete="new-password"
+            >
 
             <label for="confirm_password">
                 Confirm Password
             </label>
 
-            <input type="password" id="confirm_password" name="confirm_password" required minlength="8"
-                autocomplete="new-password">
+            <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                required
+                minlength="8"
+                autocomplete="new-password"
+            >
 
             <label for="role">
                 Account Type
@@ -371,10 +465,48 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <option value="user" <?php echo (
                     ($_POST["role"] ?? "user") === "user"
-                ) ? "selected" : ""; ?>> Regular
-                    User </option>
+                ) ? "selected" : ""; ?>>
+                    Regular User
+                </option>
 
             </select>
+
+            <!-- Terms and Privacy Agreement -->
+
+            <div class="terms-checkbox">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="terms_agreement"
+                        value="1"
+                        required
+                        <?php echo isset($_POST["terms_agreement"]) ? "checked" : ""; ?>
+                    >
+
+                    <span>
+                        I agree to the
+                        <a
+                            href="terms.php"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Terms of Service
+                        </a>
+                        and acknowledge the
+                        <a
+                            href="privacy.php"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Privacy Policy
+                        </a>.
+                    </span>
+
+                </label>
+
+            </div>
 
             <button type="submit">
                 Create Account
@@ -395,10 +527,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
 
     <div class="bottom-bar">
-        Any issues or questions? Please email <a
-            href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>!
+
+        Any issues or questions? Please email
+
+        <a href="mailto:camchartssupport@gmail.com">
+            camchartssupport@gmail.com
+        </a>!
+
     </div>
 
 </body>
 
 </html>
+```
