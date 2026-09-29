@@ -4733,14 +4733,14 @@ $isAdmin =
     </script>
 
 
-    <<div class="bottom-bar">
+    <div class="bottom-bar">
         Any issues or questions? Please email
         <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>
         &nbsp;|&nbsp;
         <a href="privacy.php">Privacy Policy</a>
         &nbsp;|&nbsp;
         <a href="terms.php">Terms of Service</a>
-        </div>
+    </div>
 
 </body>
 
