@@ -20,152 +20,46 @@ try {
     // Keep going if table already exists or permission issues
 }
 
-// Helper: send email via authenticated SMTP
+// Helper: send email via Resend HTTP API (SMTP ports are blocked on DigitalOcean)
 function sendCamChartsEmail($toEmail, $subject, $bodyText) {
-    $smtpHost = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.gmail.com';
-    $smtpPort = defined('SMTP_PORT') ? (int)SMTP_PORT : 587;
-    $smtpUser = defined('SMTP_USER') ? SMTP_USER : '';
-    $smtpPass = defined('SMTP_PASS') ? SMTP_PASS : '';
-    $fromName = 'CamCharts Support';
+    $apiKey  = defined('RESEND_API_KEY') ? RESEND_API_KEY : '';
+    $from    = (defined('MAIL_FROM_NAME')    ? MAIL_FROM_NAME    : 'CamCharts Support')
+             . ' <' . (defined('MAIL_FROM_ADDRESS') ? MAIL_FROM_ADDRESS : 'onboarding@resend.dev') . '>';
 
-    error_log("CamCharts email: to=$toEmail host=$smtpHost port=$smtpPort user=$smtpUser pass_set=" . (!empty($smtpPass) ? 'YES' : 'NO'));
+    error_log("CamCharts email: to=$toEmail from=$from api_key_set=" . (!empty($apiKey) ? 'YES' : 'NO'));
 
-    if ($smtpHost && $smtpUser && $smtpPass) {
-        $sent = sendSmtpEmail($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $fromName, $toEmail, $subject, $bodyText);
-        if ($sent) {
-            error_log("CamCharts email: SMTP send SUCCESS");
-            return true;
-        }
-        error_log("CamCharts email: SMTP send FAILED, trying mail()");
-    } else {
-        error_log("CamCharts email: SMTP creds missing, trying mail()");
+    if (empty($apiKey)) {
+        error_log("CamCharts email: RESEND_API_KEY is not set in config.php");
+        return false;
     }
 
-    // Fallback
-    $headers = "From: $fromName <$smtpUser>\r\nReply-To: $smtpUser\r\nContent-Type: text/plain; charset=UTF-8\r\n";
-    $result = @mail($toEmail, $subject, $bodyText, $headers);
-    error_log("CamCharts email: mail() result=" . ($result ? 'true' : 'false'));
-    return $result;
-}
-
-function smtpRead($socket) {
-    $response = '';
-    while (!feof($socket)) {
-        $line = fgets($socket, 515);
-        if ($line === false) break;
-        $response .= $line;
-        // SMTP multi-line response ends when 4th char is a space (not a dash)
-        if (strlen($line) >= 4 && $line[3] === ' ') break;
-    }
-    return trim($response);
-}
-
-function sendSmtpEmail($host, $port, $user, $pass, $fromEmail, $fromName, $toEmail, $subject, $bodyText) {
-    $timeout = 20;
-    $errno = 0; $errstr = '';
-
-    $context = stream_context_create([
-        'ssl' => [
-            'verify_peer'       => false,
-            'verify_peer_name'  => false,
-            'allow_self_signed' => true,
-        ]
+    $payload = json_encode([
+        'from'    => $from,
+        'to'      => [$toEmail],
+        'subject' => $subject,
+        'text'    => $bodyText,
     ]);
 
-    // Port 465 = implicit SSL, port 587 = STARTTLS
-    $socketAddr = ($port == 465 ? 'ssl://' : '') . $host . ':' . $port;
-    error_log("SMTP attempting connect to: $socketAddr");
-    $socket = @stream_socket_client($socketAddr, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context);
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_HTTPHEADER     => [
+            'Authorization: Bearer ' . $apiKey,
+            'Content-Type: application/json',
+        ],
+    ]);
 
-    if (!$socket) {
-        error_log("SMTP connect failed: $socketAddr — $errstr ($errno)");
-        return false;
-    }
-    stream_set_timeout($socket, $timeout);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
 
-    $banner = smtpRead($socket);
-    error_log("SMTP banner: $banner");
-    if (substr($banner, 0, 3) !== '220') { fclose($socket); return false; }
+    error_log("CamCharts email: Resend HTTP $httpCode response=$response curl_err=$curlErr");
 
-    // Send EHLO
-    fwrite($socket, "EHLO " . (gethostname() ?: 'localhost') . "\r\n");
-    $ehlo = smtpRead($socket);
-    error_log("SMTP EHLO: $ehlo");
-
-    // STARTTLS upgrade for port 587
-    if ($port == 587) {
-        fwrite($socket, "STARTTLS\r\n");
-        $tls = smtpRead($socket);
-        error_log("SMTP STARTTLS: $tls");
-        if (substr($tls, 0, 3) !== '220') { fclose($socket); return false; }
-
-        $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
-        if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
-            $crypto |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
-        }
-        if (!stream_socket_enable_crypto($socket, true, $crypto)) {
-            error_log("SMTP TLS handshake failed");
-            fclose($socket);
-            return false;
-        }
-
-        // Re-issue EHLO after TLS
-        fwrite($socket, "EHLO " . (gethostname() ?: 'localhost') . "\r\n");
-        $ehlo2 = smtpRead($socket);
-        error_log("SMTP EHLO2: $ehlo2");
-    }
-
-    // AUTH LOGIN
-    fwrite($socket, "AUTH LOGIN\r\n");
-    $auth = smtpRead($socket);
-    error_log("SMTP AUTH LOGIN: $auth");
-
-    fwrite($socket, base64_encode($user) . "\r\n");
-    $userRes = smtpRead($socket);
-    error_log("SMTP user prompt: $userRes");
-
-    fwrite($socket, base64_encode($pass) . "\r\n");
-    $authRes = smtpRead($socket);
-    error_log("SMTP auth result: $authRes");
-
-    if (substr($authRes, 0, 3) !== '235') {
-        error_log("SMTP auth rejected: $authRes");
-        fwrite($socket, "QUIT\r\n");
-        fclose($socket);
-        return false;
-    }
-
-    // Envelope
-    fwrite($socket, "MAIL FROM: <$fromEmail>\r\n");
-    $mf = smtpRead($socket);
-    error_log("SMTP MAIL FROM: $mf");
-
-    fwrite($socket, "RCPT TO: <$toEmail>\r\n");
-    $rt = smtpRead($socket);
-    error_log("SMTP RCPT TO: $rt");
-
-    fwrite($socket, "DATA\r\n");
-    $data = smtpRead($socket);
-    error_log("SMTP DATA: $data");
-
-    // Build message
-    $msg  = "From: $fromName <$fromEmail>\r\n";
-    $msg .= "To: <$toEmail>\r\n";
-    $msg .= "Subject: $subject\r\n";
-    $msg .= "MIME-Version: 1.0\r\n";
-    $msg .= "Content-Type: text/plain; charset=UTF-8\r\n";
-    $msg .= "Date: " . date('r') . "\r\n";
-    $msg .= "\r\n";
-    $msg .= $bodyText . "\r\n.";
-
-    fwrite($socket, $msg . "\r\n");
-    $sent = smtpRead($socket);
-    error_log("SMTP send result: $sent");
-
-    fwrite($socket, "QUIT\r\n");
-    fclose($socket);
-
-    return substr($sent, 0, 3) === '250';
+    return $httpCode === 200 || $httpCode === 201;
 }
 
 $error = "";

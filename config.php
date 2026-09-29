@@ -3,28 +3,18 @@
 define('GEMINI_API_KEY', 'AQ.Ab8RN6IxW4sfxn7I-fZMwKXxlurU1PBvfq-b8AAGMZJDePmHzA');
 
 // -----------------------------------------------------------------------
-// SMTP Configuration — set SMTP_PASS_VALUE to your Gmail App Password.
-// Apache does NOT inherit /etc/environment, so we read it here directly.
+// Resend API Key for sending password reset emails.
+// DigitalOcean blocks SMTP ports, so we use Resend's HTTP API instead.
+// Sign up free at https://resend.com -> API Keys -> Create API Key
 // -----------------------------------------------------------------------
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'camchartssupport@gmail.com');
+define('RESEND_API_KEY', 're_QLNJRJXR_E1YhzyCg5g5M1tCGHcZ8E1uV');   // <-- paste your Resend API key here
 
-// Try every possible source for the password (env var set various ways,
-// then fall back to the hardcoded value below if all else fails).
-$_smtpPass = getenv('SMTP_PASS')                       // apache2/envvars or shell export
-          ?: ($_ENV['SMTP_PASS']        ?? '')          // PHP-loaded env
-          ?: ($_SERVER['SMTP_PASS']     ?? '')          // server-level var
-          ?: (function_exists('apache_getenv') ? apache_getenv('SMTP_PASS') : ''); // Apache SetEnv
-
-// ---------- HARDCODE FALLBACK (fill in if env var not being picked up) ----------
-// If $_smtpPass is still empty, paste your Gmail App Password between the quotes:
-if (empty($_smtpPass)) {
-    $_smtpPass = '';   // <-- paste App Password here if env var is not working
-}
-// --------------------------------------------------------------------------------
-
-define('SMTP_PASS', $_smtpPass);
-unset($_smtpPass);
+// The FROM address must match a verified domain in your Resend account.
+// While your domain (vishthefishjr.me) is being verified, use:
+//   'onboarding@resend.dev'  (works immediately for testing)
+// Once vishthefishjr.me is verified in Resend, change to:
+//   'noreply@vishthefishjr.me'
+define('MAIL_FROM_ADDRESS', 'noreply@vishthefishjr.me');
+define('MAIL_FROM_NAME', 'CamCharts Support');
 
 ?>
