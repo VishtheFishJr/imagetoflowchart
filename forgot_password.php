@@ -1,6 +1,7 @@
 <?php
 
 require_once 'db.php';
+require_once 'config.php';
 
 // Ensure password_resets table exists
 try {
@@ -17,6 +18,153 @@ try {
     ");
 } catch (PDOException $e) {
     // Keep going if table already exists or permission issues
+}
+
+// Helper: send email via authenticated SMTP
+function sendCamChartsEmail($toEmail, $subject, $bodyText) {
+    $smtpHost = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.gmail.com';
+    $smtpPort = defined('SMTP_PORT') ? (int)SMTP_PORT : 587;
+    $smtpUser = defined('SMTP_USER') ? SMTP_USER : '';
+    $smtpPass = defined('SMTP_PASS') ? SMTP_PASS : '';
+    $fromName = 'CamCharts Support';
+
+    error_log("CamCharts email: to=$toEmail host=$smtpHost port=$smtpPort user=$smtpUser pass_set=" . (!empty($smtpPass) ? 'YES' : 'NO'));
+
+    if ($smtpHost && $smtpUser && $smtpPass) {
+        $sent = sendSmtpEmail($smtpHost, $smtpPort, $smtpUser, $smtpPass, $smtpUser, $fromName, $toEmail, $subject, $bodyText);
+        if ($sent) {
+            error_log("CamCharts email: SMTP send SUCCESS");
+            return true;
+        }
+        error_log("CamCharts email: SMTP send FAILED, trying mail()");
+    } else {
+        error_log("CamCharts email: SMTP creds missing, trying mail()");
+    }
+
+    // Fallback
+    $headers = "From: $fromName <$smtpUser>\r\nReply-To: $smtpUser\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+    $result = @mail($toEmail, $subject, $bodyText, $headers);
+    error_log("CamCharts email: mail() result=" . ($result ? 'true' : 'false'));
+    return $result;
+}
+
+function smtpRead($socket) {
+    $response = '';
+    while (!feof($socket)) {
+        $line = fgets($socket, 515);
+        if ($line === false) break;
+        $response .= $line;
+        // SMTP multi-line response ends when 4th char is a space (not a dash)
+        if (strlen($line) >= 4 && $line[3] === ' ') break;
+    }
+    return trim($response);
+}
+
+function sendSmtpEmail($host, $port, $user, $pass, $fromEmail, $fromName, $toEmail, $subject, $bodyText) {
+    $timeout = 20;
+    $errno = 0; $errstr = '';
+
+    $context = stream_context_create([
+        'ssl' => [
+            'verify_peer'       => false,
+            'verify_peer_name'  => false,
+            'allow_self_signed' => true,
+        ]
+    ]);
+
+    // Port 465 = implicit SSL, port 587 = STARTTLS
+    $socketAddr = ($port == 465 ? 'ssl://' : '') . $host . ':' . $port;
+    $socket = @stream_socket_client($socketAddr, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context);
+
+    if (!$socket) {
+        error_log("SMTP connect failed: $socketAddr — $errstr ($errno)");
+        return false;
+    }
+    stream_set_timeout($socket, $timeout);
+
+    $banner = smtpRead($socket);
+    error_log("SMTP banner: $banner");
+    if (substr($banner, 0, 3) !== '220') { fclose($socket); return false; }
+
+    // Send EHLO
+    fwrite($socket, "EHLO " . (gethostname() ?: 'localhost') . "\r\n");
+    $ehlo = smtpRead($socket);
+    error_log("SMTP EHLO: $ehlo");
+
+    // STARTTLS upgrade for port 587
+    if ($port == 587) {
+        fwrite($socket, "STARTTLS\r\n");
+        $tls = smtpRead($socket);
+        error_log("SMTP STARTTLS: $tls");
+        if (substr($tls, 0, 3) !== '220') { fclose($socket); return false; }
+
+        $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+        if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+            $crypto |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+        }
+        if (!stream_socket_enable_crypto($socket, true, $crypto)) {
+            error_log("SMTP TLS handshake failed");
+            fclose($socket);
+            return false;
+        }
+
+        // Re-issue EHLO after TLS
+        fwrite($socket, "EHLO " . (gethostname() ?: 'localhost') . "\r\n");
+        $ehlo2 = smtpRead($socket);
+        error_log("SMTP EHLO2: $ehlo2");
+    }
+
+    // AUTH LOGIN
+    fwrite($socket, "AUTH LOGIN\r\n");
+    $auth = smtpRead($socket);
+    error_log("SMTP AUTH LOGIN: $auth");
+
+    fwrite($socket, base64_encode($user) . "\r\n");
+    $userRes = smtpRead($socket);
+    error_log("SMTP user prompt: $userRes");
+
+    fwrite($socket, base64_encode($pass) . "\r\n");
+    $authRes = smtpRead($socket);
+    error_log("SMTP auth result: $authRes");
+
+    if (substr($authRes, 0, 3) !== '235') {
+        error_log("SMTP auth rejected: $authRes");
+        fwrite($socket, "QUIT\r\n");
+        fclose($socket);
+        return false;
+    }
+
+    // Envelope
+    fwrite($socket, "MAIL FROM: <$fromEmail>\r\n");
+    $mf = smtpRead($socket);
+    error_log("SMTP MAIL FROM: $mf");
+
+    fwrite($socket, "RCPT TO: <$toEmail>\r\n");
+    $rt = smtpRead($socket);
+    error_log("SMTP RCPT TO: $rt");
+
+    fwrite($socket, "DATA\r\n");
+    $data = smtpRead($socket);
+    error_log("SMTP DATA: $data");
+
+    // Build message
+    $msg  = "From: $fromName <$fromEmail>\r\n";
+    $msg .= "To: <$toEmail>\r\n";
+    $msg .= "Subject: $subject\r\n";
+    $msg .= "MIME-Version: 1.0\r\n";
+    $msg .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $msg .= "Date: " . date('r') . "\r\n";
+    $msg .= "\r\n";
+    $msg .= $bodyText . "\r\n.";
+
+    fwrite($socket, $msg . "\r\n");
+    $sent = smtpRead($socket);
+    error_log("SMTP send result: $sent");
+
+    fwrite($socket, "QUIT\r\n");
+    fclose($socket);
+
+    return substr($sent, 0, 3) === '250';
 }
 
 $error = "";
@@ -58,18 +206,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 $resetUrl = "https://vishthefishjr.me/password_reset.php?token=" . urlencode($token);
 
-                $to = $email;
                 $subject = "Password Reset";
                 $body = "To reset your password for CamCharts, please visit the following link:\n\n" . $resetUrl;
-                $headers = "From: CamCharts Support <camchartssupport@gmail.com>\r\n" .
-                           "Reply-To: camchartssupport@gmail.com\r\n" .
-                           "Content-Type: text/plain; charset=UTF-8\r\n" .
-                           "X-Mailer: PHP/" . phpversion();
 
-                @mail($to, $subject, $body, $headers);
+                $sent = sendCamChartsEmail($email, $subject, $body);
+
+                if (!$sent) {
+                    error_log("Failed to send password reset email to $email.");
+                }
             }
 
-            $info = "If an account with that email exists, we have sent a password reset link to your email.";
+            $info = "If an account with that email exists, a password reset email has been sent. Please check your Inbox and Spam/Junk folder.";
 
         } catch (PDOException $e) {
             $error = "Something went wrong. Please try again.";
