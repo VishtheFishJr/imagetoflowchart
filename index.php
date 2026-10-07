@@ -822,6 +822,66 @@ $isAdmin =
         }
 
 
+        /* ---- Practice Questions ---- */
+
+        .practice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .practice-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: #f5f7fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 15px;
+            line-height: 1.55;
+            color: #1e293b;
+            transition: background 0.15s;
+        }
+
+        .practice-item:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+
+        .practice-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .practice-text {
+            flex: 1;
+        }
+
+        body.dark-mode .practice-item {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .practice-item:hover {
+            background: #1e1b4b;
+            border-color: #4338ca;
+        }
+
+
         .flashcard {
             width: 400px;
             height: 250px;
@@ -1960,6 +2020,7 @@ $isAdmin =
                         <option value="flowchart">Flowchart</option>
                         <option value="quiz">Quiz</option>
                         <option value="flashcards">Flashcards</option>
+                        <option value="practice">Practice Questions</option>
                         <option value="presentation">Presentation</option>
                         <option value="form">Google Form</option>
                         <option value="sheet">Google Sheet</option>
@@ -2071,6 +2132,11 @@ $isAdmin =
             {
                 id: "presentation",
                 name: "Presentations"
+            },
+
+            {
+                id: "practice",
+                name: "Practice Questions"
             },
 
             {
@@ -2226,6 +2292,8 @@ $isAdmin =
                 quiz: "Quizzes",
 
                 flashcards: "Flashcards",
+
+                practice: "Practice Questions",
 
                 presentation: "Presentations",
 
@@ -3175,11 +3243,15 @@ $isAdmin =
 
                 flashcards: "Flashcards",
 
+                practice: "Practice Questions",
+
                 presentation: "Presentation",
 
                 /* ADDED */
 
-                form: "Google Form"
+                form: "Google Form",
+
+                sheet: "Google Sheet"
 
             };
 
@@ -3703,6 +3775,24 @@ $isAdmin =
 
                 else if (
                     selectedMode ===
+                    "practice"
+                ) {
+
+                    const practiceData =
+                        JSON.parse(
+                            data.ai_response
+                        );
+
+                    createPractice(
+                        practiceData
+                    );
+
+                }
+
+
+
+                else if (
+                    selectedMode ===
                     "sheet" ||
                     selectedMode ===
                     "sheets" ||
@@ -4161,6 +4251,57 @@ $isAdmin =
             }
 
         }
+
+
+        /* =========================================================
+           PRACTICE QUESTIONS
+        ========================================================= */
+
+
+        function createPractice(
+            data
+        ) {
+
+            const questions =
+                data.questions || [];
+
+
+            let html = `
+                <div class="study-card">
+                    <h2>Practice Questions</h2>
+                    <p style="opacity:0.7; margin-bottom: 18px; font-size: 14px;">
+                        ${questions.length} question${questions.length !== 1 ? 's' : ''} tailored to your image
+                    </p>
+                    <ol class="practice-list">
+            `;
+
+
+            questions.forEach((q, i) => {
+
+                const text = typeof q === "string"
+                    ? q
+                    : (q.question || q.text || JSON.stringify(q));
+
+                html += `
+                    <li class="practice-item">
+                        <span class="practice-num">${i + 1}</span>
+                        <span class="practice-text">${escapeHtml(text)}</span>
+                    </li>
+                `;
+
+            });
+
+
+            html += `
+                    </ol>
+                </div>
+            `;
+
+
+            output.innerHTML = html;
+
+        }
+
 
 
         /* =========================================================

@@ -667,12 +667,6 @@ Rules:
 - Set "required" to false for optional questions.
 - Avoid asking for unnecessary personal information.
 - Make the form practical and ready to use.
-- Use concise question wording.
-- Make the form appropriate for the audience implied by the image.
-- If the image describes a club, organization, event, or activity, create questions that would actually be useful for registration or interest collection.
-- If the image is clearly a survey or feedback context, create survey-style questions instead.
-- If the image describes an application, create appropriate application questions.
-- If the image describes an event, include relevant registration or RSVP information.
 - If the image does not clearly specify a particular form type, create a sensible general information/interest form based on the image.
 - Return valid JSON only.
 
@@ -720,6 +714,55 @@ Rules:
 
 ';
 
+} elseif ($mode === "practice" || $mode === "practice_questions") {
+
+    $prompt = '
+
+Analyze the image carefully.
+
+Identify how questions or problems are structured and presented in the image (e.g. math equations, word problems, conceptual questions, calculations, fill-in-the-blank style, short answer prompts, etc.).
+
+Generate EXACTLY 5 practice questions tailored to the style, difficulty, and format of the questions shown in the image, but with different content, numbers, variables, or scenarios as necessary.
+
+Do NOT provide answer choices, multiple choice options, answer keys, or explanations. Only provide the 5 practice questions.
+
+Return ONLY valid JSON.
+
+No markdown.
+
+No code fences.
+
+Use exactly this format:
+
+{
+  "title": "Practice Questions",
+  "questions": [
+    {
+      "question": "Question 1 text..."
+    },
+    {
+      "question": "Question 2 text..."
+    },
+    {
+      "question": "Question 3 text..."
+    },
+    {
+      "question": "Question 4 text..."
+    },
+    {
+      "question": "Question 5 text..."
+    }
+  ]
+}
+
+Rules:
+- Generate exactly 5 practice questions.
+- Match the style and phrasing of questions in the image.
+- Do NOT include answer choices or options.
+- Return valid JSON only.
+
+';
+
 }
 
 // ----------------------------
@@ -729,504 +772,177 @@ Rules:
 $url =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 
-
-
 $payload = [
-
     "contents" => [
-
         [
-
             "parts" => [
-
                 [
-
-                    "text" =>
-
-                        $prompt
-
+                    "text" => $prompt
                 ],
-
                 [
-
                     "inlineData" => [
-
-                        "mimeType" =>
-
-                            $mimeType,
-
-                        "data" =>
-
-                            $base64Image
-
+                        "mimeType" => $mimeType,
+                        "data" => $base64Image
                     ]
-
                 ]
-
             ]
-
         ]
-
     ]
-
 ];
 
-
-
-
-
-$ch =
-
-    curl_init($url);
-
-
+$ch = curl_init($url);
 
 curl_setopt_array($ch, [
-
-    CURLOPT_RETURNTRANSFER =>
-
-        true,
-
-    CURLOPT_POST =>
-
-        true,
-
-    CURLOPT_POSTFIELDS =>
-
-        json_encode($payload),
-
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => json_encode($payload),
     CURLOPT_HTTPHEADER => [
-
         "Content-Type: application/json",
-
         "X-goog-api-key: " . $apiKey
-
     ],
-
-    CURLOPT_TIMEOUT =>
-
-        60
-
+    CURLOPT_TIMEOUT => 60
 ]);
 
-
-
-
-
-$response =
-
-    curl_exec($ch);
-
-
-
-
+$response = curl_exec($ch);
 
 if ($response === false) {
-
     echo json_encode([
-
-        "error" =>
-
-            "cURL Error: " .
-
-            curl_error($ch)
-
+        "error" => "cURL Error: " . curl_error($ch)
     ]);
-
     exit;
-
 }
 
-
-
-
-
-$httpCode =
-
-    curl_getinfo(
-
-        $ch,
-
-        CURLINFO_HTTP_CODE
-
-    );
-
-
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 curl_close($ch);
 
-
-
-
-
-$responseData =
-
-    json_decode(
-
-        $response,
-
-        true
-
-    );
-
-
-
-
+$responseData = json_decode($response, true);
 
 if ($httpCode != 200) {
-
     echo json_encode([
-
-        "error" =>
-
-            "Gemini API Error",
-
-        "http_code" =>
-
-            $httpCode,
-
-        "response" =>
-
-            $responseData
-
+        "error" => "Gemini API Error",
+        "http_code" => $httpCode,
+        "response" => $responseData
     ], JSON_PRETTY_PRINT);
-
-
-
     exit;
-
 }
-
-
-
-
 
 // ----------------------------
 // GET AI RESPONSE
 // ----------------------------
 
 $aiAnswer =
-
-    $responseData
-
-    ["candidates"]
-
-    [0]
-
-    ["content"]
-
-    ["parts"]
-
-    [0]
-
-    ["text"]
-
-    ?? "";
-
-
-
-
+    $responseData["candidates"][0]["content"]["parts"][0]["text"] ?? "";
 
 if (!$aiAnswer) {
-
     echo json_encode([
-
-        "error" =>
-
-            "Gemini returned empty response",
-
-        "response" =>
-
-            $responseData
-
+        "error" => "Gemini returned empty response",
+        "response" => $responseData
     ]);
-
     exit;
-
 }
-
-
-
-
 
 // ----------------------------
 // CLEAN RESPONSE
 // ----------------------------
 
-$aiAnswer =
+$aiAnswer = preg_replace('/```(?:json|mermaid)?/i', '', $aiAnswer);
 
-    preg_replace(
+$aiAnswer = str_replace("```", "", $aiAnswer);
 
-        '/```(?:json|mermaid)?/i',
-
-        '',
-
-        $aiAnswer
-
-    );
-
-
-
-$aiAnswer =
-
-    str_replace(
-
-        "```",
-
-        "",
-
-        $aiAnswer
-
-    );
-
-
-
-$aiAnswer =
-
-    trim($aiAnswer);
-
-
+$aiAnswer = trim($aiAnswer);
 
 if ($mode === "flowchart") {
-
     if (preg_match('/(flowchart\s+[A-Za-z]+|graph\s+[A-Za-z]+)/i', $aiAnswer, $matches, PREG_OFFSET_CAPTURE)) {
-
         $aiAnswer = substr($aiAnswer, $matches[0][1]);
-
     }
-
-
 
     $lines = explode("\n", $aiAnswer);
-
     $fixedLines = [];
 
-
-
     foreach ($lines as $line) {
-
         $line = preg_replace_callback('/([A-Za-z0-9_-]+)\s*(\[\s*"+|\(\s*"+|\{\s*"+)((?:(?!\]|\)).)*?)("+\]|"\))/u', function($m) {
-
             $id = $m[1];
-
             $openChar = $m[2][0];
-
             $closeChar = substr($m[4], -1);
-
             $content = $m[3];
 
-
-
             $content = trim($content);
-
             $content = preg_replace('/^"+|"+$/', '', $content);
-
             $content = str_replace('"', "'", $content);
-
-
 
             return $id . $openChar . '"' . $content . '"' . $closeChar;
-
         }, $line);
-
-
 
         $line = preg_replace_callback('/(subgraph\s+[A-Za-z0-9_-]+\s*\[\s*"+)(.*?)("+\])/i', function($m) {
-
             $content = trim($m[2]);
-
             $content = preg_replace('/^"+|"+$/', '', $content);
-
             $content = str_replace('"', "'", $content);
-
             return $m[1] . $content . '"]';
-
         }, $line);
-
-
 
         $line = preg_replace_callback('/\|"(.*?)"\|/', function($m) {
-
             $content = str_replace('"', "'", $m[1]);
-
             return '|"' . $content . '"|';
-
         }, $line);
 
-
-
         $fixedLines[] = $line;
-
     }
 
-
-
     $aiAnswer = implode("\n", $fixedLines);
-
 }
-
-
-
-
 
 // ----------------------------
 // FIX JSON OUTPUT MODES
 // ----------------------------
 
 if (
-
     $mode === "quiz" ||
-
     $mode === "flashcards" ||
-
     $mode === "presentation" ||
-
     $mode === "form" ||
-
     $mode === "sheet" ||
-
     $mode === "sheets" ||
-
-    $mode === "spreadsheet"
+    $mode === "spreadsheet" ||
+    $mode === "practice" ||
+    $mode === "practice_questions"
 ) {
 
+    $decoded = json_decode($aiAnswer, true);
 
-
-    $decoded =
-
-        json_decode(
-
-            $aiAnswer,
-
-            true
-
-        );
-
-
-
-    if (
-
-        json_last_error() !==
-
-        JSON_ERROR_NONE
-
-    ) {
-
+    if (json_last_error() !== JSON_ERROR_NONE) {
         echo json_encode([
-
-            "error" =>
-
-                "AI did not return valid JSON",
-
-            "json_error" =>
-
-                json_last_error_msg(),
-
-            "raw_response" =>
-
-                $aiAnswer
-
+            "error" => "AI did not return valid JSON",
+            "json_error" => json_last_error_msg(),
+            "raw_response" => $aiAnswer
         ]);
-
         exit;
-
     }
 
-
-
-    $aiAnswer =
-
-        json_encode(
-
-            $decoded,
-
-            JSON_UNESCAPED_UNICODE
-
-        );
-
+    $aiAnswer = json_encode($decoded, JSON_UNESCAPED_UNICODE);
 }
-
-
-
-
 
 // ----------------------------
 // GENERATE ITEM NAME
 // ----------------------------
 
 if ($mode === "presentation") {
-
-    $decodedPresentation =
-
-        json_decode(
-
-            $aiAnswer,
-
-            true
-
-        );
-
-
-
-    $itemName =
-
-        $decodedPresentation["title"]
-
-        ?? "Untitled Presentation";
-
-
+    $decodedPresentation = json_decode($aiAnswer, true);
+    $itemName = $decodedPresentation["title"] ?? "Untitled Presentation";
 
 } elseif ($mode === "form") {
-
-    $decodedForm =
-
-        json_decode(
-
-            $aiAnswer,
-
-            true
-
-        );
-
-
-
-    $itemName =
-
-        $decodedForm["title"]
-
-        ?? "Untitled Form";
-
-
+    $decodedForm = json_decode($aiAnswer, true);
+    $itemName = $decodedForm["title"] ?? "Untitled Form";
 
 } elseif ($mode === "sheet" || $mode === "sheets" || $mode === "spreadsheet") {
+    $decodedSheet = json_decode($aiAnswer, true);
+    $itemName = $decodedSheet["title"] ?? "Untitled Spreadsheet";
 
-    $decodedSheet =
-
-        json_decode(
-
-            $aiAnswer,
-
-            true
-
-        );
-
-
-
-    $itemName =
-
-        $decodedSheet["title"]
-
-        ?? "Untitled Spreadsheet";
-
-
+} elseif ($mode === "practice" || $mode === "practice_questions") {
+    $itemName = "Practice Questions - " . date("M j, Y g:i A");
 
 } elseif ($mode === "quiz") {
-
-    $itemName =
-
-        "Quiz - " .
-
-        date("M j, Y g:i A");
+    $itemName = "Quiz - " . date("M j, Y g:i A");
 
 
 
