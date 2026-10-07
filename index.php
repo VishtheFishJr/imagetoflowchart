@@ -209,6 +209,24 @@ $isAdmin =
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
         }
 
+        .bottom-bar .settings-gear-link {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .bottom-bar .settings-gear-link:hover {
+            color: #2563eb;
+            transform: translateY(-50%) rotate(30deg);
+        }
+
         .bottom-bar a {
             color: #2563eb;
             text-decoration: none;
@@ -220,58 +238,7 @@ $isAdmin =
         }
 
 
-        /* DARK/LIGHT MODE SLIDER */
 
-        .theme-switch {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-
-        .theme-switch input {
-            display: none;
-        }
-
-
-        .theme-slider {
-            width: 46px;
-            height: 24px;
-            background: #ccc;
-            border-radius: 24px;
-            position: relative;
-            transition: background .2s;
-            border: 1px solid #aaa;
-        }
-
-
-        .theme-slider::before {
-            content: "";
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            left: 2px;
-            top: 2px;
-            background: #fff;
-            border-radius: 50%;
-            transition: transform .2s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-        }
-
-
-        .theme-switch input:checked+.theme-slider::before {
-            transform: translateX(22px);
-        }
-
-
-        .theme-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111;
-            white-space: nowrap;
-        }
 
 
         /* FINDER — retained */
@@ -993,58 +960,7 @@ $isAdmin =
             background: #333;
         }
 
-        /* CLICKABLE DARK MODE SLIDER */
 
-        .theme-switch {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .theme-switch input {
-            display: none;
-        }
-
-        .theme-slider {
-            width: 52px;
-            height: 28px;
-            background: #ddd;
-            border: 1px solid #bbb;
-            border-radius: 30px;
-            position: relative;
-            transition: .2s;
-            display: block;
-        }
-
-        .theme-slider::after {
-            content: "";
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            left: 2px;
-            top: 2px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-            transition: .2s;
-        }
-
-        .theme-switch input:checked+.theme-slider {
-            background: #333;
-            border-color: #555;
-        }
-
-        .theme-switch input:checked+.theme-slider::after {
-            transform: translateX(24px);
-        }
-
-        .theme-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
 
         /* FINDER */
 
@@ -1665,31 +1581,12 @@ $isAdmin =
             background: #ddd;
         }
 
-        body.dark-mode .theme-label {
-            color: #ddd;
+        body.dark-mode .bottom-bar .settings-gear-link {
+            color: #94a3b8;
         }
 
-        body.dark-mode .my-files-toggle {
-            color: #eee;
-        }
-
-        body.dark-mode .my-files-toggle:hover {
+        body.dark-mode .bottom-bar .settings-gear-link:hover {
             color: #60a5fa;
-        }
-
-        body.dark-mode .bottom-bar {
-            background: #181818;
-            border-top-color: #333333;
-            color: #cbd5e1;
-        }
-
-        body.dark-mode .bottom-bar a {
-            color: #60a5fa;
-        }
-
-        body.dark-mode .theme-slider {
-            background: #333;
-            border-color: #555;
         }
 
         body.dark-mode #contextMenu {
@@ -1747,18 +1644,6 @@ $isAdmin =
             .finder-search {
                 width: 150px;
             }
-
-            .theme-label {
-                display: none;
-            }
-
-            .theme-slider {
-                width: 46px;
-            }
-
-            .theme-switch input:checked+.theme-slider::after {
-                transform: translateX(18px);
-            }
         }
     </style>
 
@@ -1785,19 +1670,7 @@ $isAdmin =
             <div class="topbar-spacer"></div>
 
 
-            <!-- DARK MODE SLIDER -->
 
-            <label class="theme-switch" title="Toggle dark mode">
-
-                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
-
-                <span class="theme-slider"></span>
-
-                <span class="theme-label" id="themeLabel">
-                    Light
-                </span>
-
-            </label>
 
 
             <?php if (empty($_SESSION["google_token"])): ?>
@@ -3797,7 +3670,7 @@ $isAdmin =
                         JSON.parse(
                             data.ai_response
                         );
-
+                    presentation.item_id = data.item_id;
 
                     createPresentation(
                         presentation
@@ -3820,7 +3693,7 @@ $isAdmin =
                         JSON.parse(
                             data.ai_response
                         );
-
+                    form.item_id = data.item_id;
 
                     createForm(
                         form
@@ -4625,91 +4498,15 @@ $isAdmin =
         ========================================================= */
 
 
-        function toggleDarkMode() {
-
-            const checkbox =
-                document.getElementById(
-                    "darkModeToggle"
-                );
-
-
-            const enabled =
-                checkbox.checked;
-
-
-            document.body.classList.toggle(
-                "dark-mode",
-                enabled
-            );
-
-
-            localStorage.setItem(
-                "aiStudyScannerDarkMode",
-                enabled ? "1" : "0"
-            );
-
-
-            const label =
-                document.getElementById(
-                    "themeLabel"
-                );
-
-
-            if (label) {
-
-                label.innerText =
-                    enabled
-                        ? "Dark"
-                        : "Light";
-
-            }
-
-        }
-
-
         function loadDarkMode() {
-
             const enabled =
-                localStorage.getItem(
-                    "aiStudyScannerDarkMode"
-                ) === "1";
-
-
-            const checkbox =
-                document.getElementById(
-                    "darkModeToggle"
-                );
-
-
-            if (checkbox) {
-
-                checkbox.checked =
-                    enabled;
-
-            }
-
+                localStorage.getItem("aiStudyScannerDarkMode") === "1" ||
+                localStorage.getItem("darkMode") === "true";
 
             document.body.classList.toggle(
                 "dark-mode",
                 enabled
             );
-
-
-            const label =
-                document.getElementById(
-                    "themeLabel"
-                );
-
-
-            if (label) {
-
-                label.innerText =
-                    enabled
-                        ? "Dark"
-                        : "Light";
-
-            }
-
         }
 
 
@@ -4734,6 +4531,12 @@ $isAdmin =
 
 
     <div class="bottom-bar">
+        <a href="settings.php" class="settings-gear-link" title="Settings" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        </a>
         Any issues or questions? Please email
         <a href="mailto:camchartssupport@gmail.com">camchartssupport@gmail.com</a>
         &nbsp;|&nbsp;

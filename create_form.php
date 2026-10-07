@@ -888,6 +888,56 @@ if (count($requests) > 0) {
     }
 }
 
+$formUrl = 'https://docs.google.com/forms/d/' . $formId . '/edit';
+
+// ------------------------------------------------------------
+// Save URL to Database
+// ------------------------------------------------------------
+
+try {
+    require_once 'db.php';
+
+    if (isset($pdo) && $pdo instanceof PDO) {
+        $itemId = $inputData['item_id'] ?? null;
+        $userId = $_SESSION['user_id'] ?? null;
+
+        if ($itemId) {
+            $stmt = $pdo->prepare(
+                "UPDATE generated_items
+                 SET presentation_url = ?
+                 WHERE id = ?"
+            );
+            $stmt->execute([$formUrl, $itemId]);
+        } else {
+            if ($userId !== null) {
+                $stmt = $pdo->prepare(
+                    "UPDATE generated_items
+                     SET presentation_url = ?
+                     WHERE type = 'form'
+                       AND user_id = ?
+                       AND presentation_url IS NULL
+                     ORDER BY id DESC
+                     LIMIT 1"
+                );
+                $stmt->execute([$formUrl, $userId]);
+            } else {
+                $stmt = $pdo->prepare(
+                    "UPDATE generated_items
+                     SET presentation_url = ?
+                     WHERE type = 'form'
+                       AND user_id IS NULL
+                       AND presentation_url IS NULL
+                     ORDER BY id DESC
+                     LIMIT 1"
+                );
+                $stmt->execute([$formUrl]);
+            }
+        }
+    }
+} catch (Exception $e) {
+    // Ignore DB update errors
+}
+
 // ------------------------------------------------------------
 // Success
 // ------------------------------------------------------------
@@ -897,15 +947,9 @@ echo json_encode([
 
     'formId' => $formId,
 
-    'url' =>
-        'https://docs.google.com/forms/d/' .
-        $formId .
-        '/edit',
+    'url' => $formUrl,
 
-    'formUrl' =>
-        'https://docs.google.com/forms/d/' .
-        $formId .
-        '/edit',
+    'formUrl' => $formUrl,
 
     'title' => $formTitle,
 
