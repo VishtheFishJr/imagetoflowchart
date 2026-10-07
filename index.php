@@ -94,6 +94,13 @@ $isAdmin =
     </script>
 
 
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="window._katexReady = true;"></script>
+
+
     <style>
         * {
             box-sizing: border-box;
@@ -1637,6 +1644,14 @@ $isAdmin =
             border-color: #eee;
         }
 
+        body.dark-mode .my-files-toggle {
+            color: #fff;
+        }
+
+        body.dark-mode .my-files-toggle:hover {
+            color: #93c5fd;
+        }
+
         body.dark-mode .auth-button:hover {
             background: #ddd;
         }
@@ -1859,6 +1874,19 @@ $isAdmin =
                     </span>
 
                     <span class="sidebar-count" id="count-flashcards">
+                        0
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item" data-folder="practice" onclick="openFolder('practice')">
+
+                    <span>
+                        Practice Questions
+                    </span>
+
+                    <span class="sidebar-count" id="count-practice">
                         0
                     </span>
 
@@ -3349,6 +3377,47 @@ $isAdmin =
 
 
         /* =========================================================
+           MATH RENDERING
+        ========================================================= */
+
+
+        function renderMath(container) {
+
+            if (!container) return;
+
+            const doRender = () => {
+                if (
+                    typeof window.renderMathInElement === "function"
+                ) {
+                    window.renderMathInElement(container, {
+                        delimiters: [
+                            { left: "$$",  right: "$$",  display: true  },
+                            { left: "\\[", right: "\\]", display: true  },
+                            { left: "$",   right: "$",   display: false },
+                            { left: "\\(", right: "\\)", display: false }
+                        ],
+                        throwOnError: false
+                    });
+                }
+            };
+
+            /* KaTeX might still be loading — retry until ready. */
+            if (window._katexReady) {
+                doRender();
+            } else {
+                const id = setInterval(() => {
+                    if (window._katexReady) {
+                        clearInterval(id);
+                        doRender();
+                    }
+                }, 80);
+            }
+
+        }
+
+
+
+        /* =========================================================
            CAMERA
         ========================================================= */
 
@@ -4300,6 +4369,9 @@ $isAdmin =
 
             output.innerHTML = html;
 
+
+            renderMath(output);
+
         }
 
 
@@ -4458,6 +4530,9 @@ $isAdmin =
                     }
                 );
 
+
+                renderMath(output);
+
             }
 
 
@@ -4589,6 +4664,9 @@ $isAdmin =
                     </div>
 
                 `;
+
+
+                renderMath(output);
 
             }
 
